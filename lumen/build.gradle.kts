@@ -122,20 +122,11 @@ publishing {
             val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
             url = if (libraryVersion.endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
 
-            // Read from: gradle.properties, local.properties, or environment variables
-            val localProps = rootProject.file("local.properties").let { file ->
-                if (file.exists()) {
-                    java.util.Properties().apply { load(file.inputStream()) }
-                } else null
-            }
-
             credentials {
-                username = findProperty("ossrhUsername") as String?
-                    ?: localProps?.getProperty("ossrhUsername")
+                username = findProperty("ossrhUsername")?.toString()
                     ?: System.getenv("OSSRH_USERNAME")
                     ?: ""
-                password = findProperty("ossrhPassword") as String?
-                    ?: localProps?.getProperty("ossrhPassword")
+                password = findProperty("ossrhPassword")?.toString()
                     ?: System.getenv("OSSRH_PASSWORD")
                     ?: ""
             }
