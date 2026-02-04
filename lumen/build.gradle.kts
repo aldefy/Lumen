@@ -63,7 +63,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
-val libraryVersion = "1.0.0-beta01"
+val libraryVersion = "1.0.0-beta02"
 val libraryGroup = "io.github.aldefy"
 val libraryArtifact = "lumen"
 
