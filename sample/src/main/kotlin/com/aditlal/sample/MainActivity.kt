@@ -5,8 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,57 +32,55 @@ class MainActivity : ComponentActivity() {
             LumenSampleTheme {
                 var currentExample by remember { mutableStateOf<Example?>(null) }
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
-                    when (currentExample) {
-                        null -> ExampleGallery(
-                            modifier = Modifier.padding(paddingValues),
-                            onExampleSelected = { currentExample = it }
-                        )
-                        Example.BASIC -> BasicExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.SEQUENCE -> SequenceExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.SHAPES -> ShapesExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.CONNECTORS -> ConnectorsExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.ANIMATIONS -> AnimationsExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.TOOLTIP_POSITION -> TooltipPositionExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.TOOLTIP_OPTIONS -> TooltipOptionsExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.THEMING -> ThemingExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.SCRIM_OPACITY -> ScrimOpacityExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.LAZY_COLUMN -> LazyColumnExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                        Example.DIALOG_COORDINATION -> DialogCoordinationExample(
-                            modifier = Modifier.padding(paddingValues),
-                            onBack = { currentExample = null }
-                        )
-                    }
+                when (currentExample) {
+                    null -> ExampleGallery(
+                        modifier = Modifier.fillMaxSize(),
+                        onExampleSelected = { currentExample = it }
+                    )
+                    Example.BASIC -> BasicExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.SEQUENCE -> SequenceExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.SHAPES -> ShapesExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.CONNECTORS -> ConnectorsExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.ANIMATIONS -> AnimationsExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.TOOLTIP_POSITION -> TooltipPositionExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.TOOLTIP_OPTIONS -> TooltipOptionsExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.THEMING -> ThemingExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.SCRIM_OPACITY -> ScrimOpacityExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.LAZY_COLUMN -> LazyColumnExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
+                    Example.DIALOG_COORDINATION -> DialogCoordinationExample(
+                        modifier = Modifier.fillMaxSize(),
+                        onBack = { currentExample = null }
+                    )
                 }
             }
         }
