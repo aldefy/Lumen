@@ -140,6 +140,15 @@ controller.enabled = false        // Disable all coachmarks
 
 The `sample` module includes interactive demos for all features. Clone the repo and run it to explore.
 
+## Size Impact
+
+| Metric | Size |
+|--------|------|
+| AAR size | 123 KB |
+| After R8 minification | ~40-60 KB |
+| Method count | ~200-300 |
+| Dependencies | Compose only (already in your app) |
+
 ## Requirements
 
 - Kotlin 1.9+
