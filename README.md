@@ -71,12 +71,12 @@ CutoutShape.Star(points = 5, innerRadiusRatio = 0.5f, padding = 8.dp)
 
 ## Connector Styles
 
-```
-VERTICAL        HORIZONTAL       ELBOW           DIRECT         AUTO
-   [Icon]       [Icon]----*     [Icon]----+     [Icon]        Picks
-      |                   |               |          \         best
-      *                   |               *           \*       style
- [Tooltip]          [Tooltip]       [Tooltip]    [Tooltip]
+```kotlin
+ConnectorStyle.VERTICAL    // Straight down/up from target to tooltip
+ConnectorStyle.HORIZONTAL  // Straight left/right from target to tooltip
+ConnectorStyle.ELBOW       // L-shaped connector with 90° bend
+ConnectorStyle.DIRECT      // Diagonal line pointing to tooltip
+ConnectorStyle.AUTO        // Automatically picks the best style
 ```
 
 ## Highlight Animations
