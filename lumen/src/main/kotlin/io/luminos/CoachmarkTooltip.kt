@@ -101,6 +101,10 @@ fun CoachmarkTooltip(
                 )
             }
 
+        // Use appropriate text colors based on card mode
+        val titleTextColor = if (showCard) colors.titleColor else colors.strokeColor
+        val descriptionTextColor = if (showCard) colors.descriptionColor else colors.strokeColor.copy(alpha = 0.9f)
+
         // Skip button (top-right)
         if (showSkipButton) {
             Row(
@@ -113,7 +117,7 @@ fun CoachmarkTooltip(
                 ) {
                     Text(
                         text = skipButtonText,
-                        color = colors.strokeColor.copy(alpha = 0.7f),
+                        color = if (showCard) colors.descriptionColor else colors.strokeColor.copy(alpha = 0.7f),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
@@ -125,7 +129,7 @@ fun CoachmarkTooltip(
         // Title
         Text(
             text = title,
-            color = colors.strokeColor,
+            color = titleTextColor,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             lineHeight = 26.sp,
@@ -137,7 +141,7 @@ fun CoachmarkTooltip(
         // Description
         Text(
             text = description,
-            color = colors.strokeColor.copy(alpha = 0.9f),
+            color = descriptionTextColor,
             fontSize = 14.sp,
             lineHeight = 20.sp,
             style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
