@@ -6,7 +6,7 @@ Add the dependency to your module's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("io.github.aldefy:lumen:1.0.0-beta01")
+    implementation("io.github.aldefy:lumen:1.0.0-beta02")
 }
 ```
 
@@ -14,7 +14,7 @@ For Gradle Groovy:
 
 ```groovy
 dependencies {
-    implementation 'io.github.aldefy:lumen:1.0.0-beta01'
+    implementation 'io.github.aldefy:lumen:1.0.0-beta02'
 }
 ```
 

@@ -24,7 +24,7 @@ A Jetpack Compose coachmark library that creates **true transparent cutouts** in
 
 ```kotlin
 dependencies {
-    implementation("io.github.aldefy:lumen:1.0.0-beta01")
+    implementation("io.github.aldefy:lumen:1.0.0-beta02")
 }
 ```
 
