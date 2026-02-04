@@ -114,6 +114,20 @@ publishing {
             }
         }
     }
+
+    repositories {
+        maven {
+            name = "sonatype"
+            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            url = if (libraryVersion.endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
+
+            credentials {
+                username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME") ?: ""
+                password = findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD") ?: ""
+            }
+        }
+    }
 }
 
 // Signing configuration - enable when GPG is configured
