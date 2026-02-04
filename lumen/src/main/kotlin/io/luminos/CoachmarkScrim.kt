@@ -100,7 +100,22 @@ fun CoachmarkHost(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .onGloballyPositioned { coordinates ->
+                // Track viewport bounds for visibility checking
+                controller.setViewportBounds(
+                    Rect(
+                        offset = Offset.Zero,
+                        size = Size(
+                            coordinates.size.width.toFloat(),
+                            coordinates.size.height.toFloat()
+                        )
+                    )
+                )
+            }
+    ) {
         content()
 
         CoachmarkScrim(
@@ -155,6 +170,10 @@ data class CoachmarkConfig(
     val skipButtonText: String = "Skip",
     /** Delay in milliseconds before the coachmark appears */
     val delayBeforeShow: Long = 0L,
+    /** Wait for target to be visible in viewport before showing (for LazyColumn support) */
+    val waitForVisibility: Boolean = true,
+    /** Delay in milliseconds after scroll stops before showing coachmark */
+    val visibilityDelay: Long = 150L,
 )
 
 /**
@@ -209,6 +228,49 @@ fun CoachmarkScrim(
 
     val currentOnDismiss by rememberUpdatedState(onDismiss)
     val currentOnStepCompleted by rememberUpdatedState(onStepCompleted)
+
+    // Track visibility state with delay for smooth appearance after scroll stops
+    var isReadyToShow by remember { mutableStateOf(false) }
+    val isScrolling = controller.isScrolling
+
+    // Get current target ID for visibility check
+    val currentTargetId = when (val s = state) {
+        is CoachmarkState.Showing -> s.target.id
+        is CoachmarkState.Sequence -> s.currentTarget.id
+        CoachmarkState.Hidden -> null
+    }
+
+    // Wait for visibility + scroll idle + delay before showing
+    LaunchedEffect(currentTargetId, isScrolling) {
+        if (currentTargetId == null) {
+            isReadyToShow = false
+            return@LaunchedEffect
+        }
+
+        if (config.waitForVisibility) {
+            // Wait for scroll to stop
+            if (isScrolling) {
+                isReadyToShow = false
+                return@LaunchedEffect
+            }
+
+            // Check if target is visible
+            if (!controller.isTargetVisible(currentTargetId)) {
+                isReadyToShow = false
+                return@LaunchedEffect
+            }
+
+            // Apply delay after scroll stops
+            delay(config.visibilityDelay)
+        }
+
+        isReadyToShow = true
+    }
+
+    // Don't render if waiting for visibility
+    if (config.waitForVisibility && !isReadyToShow && state !is CoachmarkState.Hidden) {
+        return
+    }
 
     when (val currentState = state) {
         CoachmarkState.Hidden -> {
