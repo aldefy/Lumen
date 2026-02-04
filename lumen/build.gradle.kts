@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("maven-publish")
+    id("signing")
 }
 
 android {
@@ -34,6 +35,13 @@ android {
     buildFeatures {
         compose = true
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
@@ -55,16 +63,69 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
+val libraryVersion = "1.0.0-beta01"
+val libraryGroup = "io.github.aldefy"
+val libraryArtifact = "lumen"
+
 publishing {
     publications {
         register<MavenPublication>("release") {
-            groupId = "io.luminos"
-            artifactId = "luminos"
-            version = "1.0.0"
+            groupId = libraryGroup
+            artifactId = libraryArtifact
+            version = libraryVersion
 
             afterEvaluate {
                 from(components["release"])
             }
+
+            pom {
+                name.set("Lumen")
+                description.set("Compose Multiplatform coachmark library with transparent cutouts, 6 animations, and customizable tooltips.")
+                url.set("https://github.com/aldefy/Lumen")
+                inceptionYear.set("2024")
+
+                licenses {
+                    license {
+                        name.set("Apache License 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                        distribution.set("repo")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("aldefy")
+                        name.set("Adit Lal")
+                        email.set("aditlal@gmail.com")
+                        url.set("https://github.com/aldefy")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/aldefy/Lumen.git")
+                    developerConnection.set("scm:git:ssh://github.com/aldefy/Lumen.git")
+                    url.set("https://github.com/aldefy/Lumen")
+                }
+
+                issueManagement {
+                    system.set("GitHub Issues")
+                    url.set("https://github.com/aldefy/Lumen/issues")
+                }
+            }
         }
     }
+}
+
+signing {
+    useGpgCmd()
+    sign(publishing.publications["release"])
+}
+
+// Publish to local directory for Central Portal upload
+// Run: ./gradlew :lumen:publishReleasePublicationToLocalRepository
+// Then zip the output and upload to https://central.sonatype.com
+tasks.register<Copy>("publishToLocalDir") {
+    dependsOn("publishReleasePublicationToMavenLocal")
+    from("${System.getProperty("user.home")}/.m2/repository/io/github/aldefy/lumen")
+    into("${buildDir}/maven-central-upload")
 }
