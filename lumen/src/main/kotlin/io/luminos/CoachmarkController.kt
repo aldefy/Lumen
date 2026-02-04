@@ -30,6 +30,13 @@ class CoachmarkController(
     val state: StateFlow<CoachmarkState> = _state.asStateFlow()
 
     private val registeredTargets = mutableMapOf<String, Rect>()
+    private val targetVisibility = mutableMapOf<String, Boolean>()
+
+    /** Viewport bounds for visibility checking (set by CoachmarkHost) */
+    private var viewportBounds: Rect? = null
+
+    /** Whether the container (e.g., LazyColumn) is currently scrolling */
+    var isScrolling: Boolean by mutableStateOf(false)
 
     /**
      * Global toggle for coachmarks. When false, [show] and [showSequence] silently no-op.
@@ -64,6 +71,7 @@ class CoachmarkController(
         bounds: Rect,
     ) {
         registeredTargets[id] = bounds
+        targetVisibility[id] = isWithinViewport(bounds)
         updateTargetBoundsIfShowing(id, bounds)
     }
 
@@ -78,6 +86,47 @@ class CoachmarkController(
      * Gets the current bounds for a registered target.
      */
     fun getTargetBounds(id: String): Rect? = registeredTargets[id]
+
+    /**
+     * Sets the viewport bounds for visibility checking.
+     * Called by CoachmarkHost when layout changes.
+     */
+    fun setViewportBounds(bounds: Rect) {
+        viewportBounds = bounds
+        // Update visibility for all registered targets
+        registeredTargets.forEach { (id, targetBounds) ->
+            targetVisibility[id] = isWithinViewport(targetBounds)
+        }
+    }
+
+    /**
+     * Checks if a target is currently visible within the viewport.
+     */
+    fun isTargetVisible(id: String): Boolean {
+        val bounds = registeredTargets[id] ?: return false
+        return isWithinViewport(bounds)
+    }
+
+    /**
+     * Checks if the current coachmark target is visible and ready to show.
+     * Returns false if target is outside viewport or scroll is in progress.
+     */
+    fun isCurrentTargetReady(): Boolean {
+        if (isScrolling) return false
+
+        val currentTargetId = when (val s = _state.value) {
+            is CoachmarkState.Showing -> s.target.id
+            is CoachmarkState.Sequence -> s.currentTarget.id
+            CoachmarkState.Hidden -> return true
+        }
+        return isTargetVisible(currentTargetId)
+    }
+
+    private fun isWithinViewport(bounds: Rect): Boolean {
+        val viewport = viewportBounds ?: return true // If no viewport set, assume visible
+        // Check if target overlaps with viewport (at least partially visible)
+        return bounds.overlaps(viewport) && bounds.width > 0 && bounds.height > 0
+    }
 
     /**
      * Shows a single coachmark for the specified target.

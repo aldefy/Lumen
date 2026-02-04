@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -72,6 +75,15 @@ fun LazyColumnExample(
 ) {
     val controller = rememberCoachmarkController()
     var showSequence by remember { mutableStateOf(false) }
+    val lazyListState = rememberLazyListState()
+
+    // Wire up scroll state to controller for visibility tracking
+    LaunchedEffect(lazyListState) {
+        snapshotFlow { lazyListState.isScrollInProgress }
+            .collect { isScrolling ->
+                controller.isScrolling = isScrolling
+            }
+    }
 
     CoachmarkHost(
         controller = controller,
@@ -135,6 +147,7 @@ fun LazyColumnExample(
                 // Scrollable list
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
+                    state = lazyListState,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     itemsIndexed(sampleItems) { index, item ->
