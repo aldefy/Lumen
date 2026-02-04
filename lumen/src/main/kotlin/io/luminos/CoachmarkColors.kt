@@ -45,7 +45,7 @@ val LightCoachmarkColors =
         strokeColor = Color.White,
         connectorColor = Color.White,
         tooltipBackground = Color.White,
-        tooltipCardColor = Color(0xFF2A2A2A).copy(alpha = 0.9f),
+        tooltipCardColor = Color(0xFFF5F5F5).copy(alpha = 0.95f),
         titleColor = Color.Black,
         descriptionColor = Color(0xFF666666),
         ctaButtonColor = Color(0xFF007AFF),

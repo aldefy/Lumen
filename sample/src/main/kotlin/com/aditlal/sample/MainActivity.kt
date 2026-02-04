@@ -2,6 +2,7 @@ package com.aditlal.sample
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +32,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             LumenSampleTheme {
                 var currentExample by remember { mutableStateOf<Example?>(null) }
+
+                // Handle back press when inside a demo
+                BackHandler(enabled = currentExample != null) {
+                    currentExample = null
+                }
 
                 when (currentExample) {
                     null -> ExampleGallery(
