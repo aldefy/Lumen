@@ -1,0 +1,39 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="128" fill="#09090B"/>
+  
+  <!-- Outer ring - represents the scrim -->
+  <circle cx="256" cy="256" r="170" stroke="#27272A" stroke-width="60" fill="none"/>
+  
+  <!-- Gradient ring overlay - the spotlight effect -->
+  <circle cx="256" cy="256" r="170" stroke="url(#ringGradient)" stroke-width="4" fill="none"/>
+  
+  <!-- The "cutout" - bright clear center -->
+  <circle cx="256" cy="256" r="90" fill="url(#centerLight)"/>
+  
+  <!-- Inner bright core -->
+  <circle cx="256" cy="256" r="40" fill="#FFFFFF"/>
+  
+  <!-- Connector line going down - signature feature -->
+  <line x1="256" y1="346" x2="256" y2="420" stroke="url(#connectorGradient)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="256" cy="420" r="8" fill="#10B981"/>
+  
+  <defs>
+    <linearGradient id="ringGradient" x1="86" y1="86" x2="426" y2="426" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10B981"/>
+      <stop offset="0.5" stop-color="#34D399"/>
+      <stop offset="1" stop-color="#6EE7B7"/>
+    </linearGradient>
+    
+    <radialGradient id="centerLight" cx="50%" cy="50%" r="50%">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.6" stop-color="#D1FAE5"/>
+      <stop offset="1" stop-color="#6EE7B7"/>
+    </radialGradient>
+    
+    <linearGradient id="connectorGradient" x1="256" y1="346" x2="256" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6EE7B7"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+</svg>
