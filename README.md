@@ -52,6 +52,20 @@ controller.show(
 )
 ```
 
+## Demo
+
+<p align="center">
+  <img src="demo_basic.png" width="280" alt="Basic Coachmark"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="demo_sequence.png" width="280" alt="Multi-Step Sequence"/>
+</p>
+
+<p align="center">
+  <em>Single coachmark with pulse animation</em>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <em>Multi-step onboarding tour</em>
+</p>
+
 ## API Reference
 
 ### Core Components
