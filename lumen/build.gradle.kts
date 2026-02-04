@@ -116,6 +116,13 @@ publishing {
     }
 }
 
+// Signing configuration - enable when GPG is configured
+// For Central Portal, signing is required for release
+// Configure GPG: https://central.sonatype.org/publish/requirements/gpg/
+tasks.withType<Sign>().configureEach {
+    onlyIf { project.hasProperty("signing.gnupg.keyName") }
+}
+
 signing {
     useGpgCmd()
     sign(publishing.publications["release"])
