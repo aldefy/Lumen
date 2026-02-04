@@ -4,11 +4,14 @@
   <img src="logo.svg" width="128" height="128" alt="Lumen Logo"/>
 </p>
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.aldefy/lumen.svg?label=Maven%20Central&logo=apachemaven)](https://central.sonatype.com/artifact/io.github.aldefy/lumen)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![Compose](https://img.shields.io/badge/Compose_Multiplatform-1.6-4285F4.svg?logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 
-Compose Multiplatform coachmark library with transparent cutouts, 6 animations, and customizable tooltips.
+**Spotlight your UI, not a screenshot of it.**
+
+A Compose Multiplatform coachmark library with transparent cutouts that let your real UI shine through - complete with live animations and touch events.
 
 ## Features
 
@@ -24,7 +27,7 @@ Compose Multiplatform coachmark library with transparent cutouts, 6 animations, 
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.aldefy:lumen:1.0.0")
+    implementation("io.github.aldefy:lumen:1.0.0-beta01")
 }
 ```
 
