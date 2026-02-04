@@ -67,7 +67,9 @@ controller.show(
   <em>Multi-step onboarding tour</em>
 </p>
 
-## API Reference
+## [API Reference](https://aldefy.github.io/Lumen/#/api-reference)
+
+> For the full API documentation, visit the [docs site](https://aldefy.github.io/Lumen/#/api-reference).
 
 ### Core Components
 
