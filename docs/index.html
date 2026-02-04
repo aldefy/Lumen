@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lumen - Compose Coachmark Library</title>
+  <meta name="description" content="A Jetpack Compose coachmark library with true transparent cutouts">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://raw.githubusercontent.com/aldefy/Lumen/main/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
+  <style>
+    :root {
+      --theme-color: #10B981;
+      --base-background-color: #09090B;
+      --sidebar-background: #0f0f11;
+      --cover-background-color: #09090B;
+    }
+    .sidebar-nav a:hover, .sidebar-nav li.active > a {
+      color: #10B981 !important;
+    }
+    .markdown-section code {
+      background: #1e1e1e;
+      color: #e6e6e6;
+    }
+    .app-name-link img {
+      width: 64px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: '<img src="https://raw.githubusercontent.com/aldefy/Lumen/main/logo.svg" alt="Lumen">Lumen',
+      repo: 'aldefy/Lumen',
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        placeholder: 'Search',
+        noData: 'No results',
+        depth: 3
+      },
+      copyCode: {
+        buttonText: 'Copy',
+        successText: 'Copied'
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-kotlin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-groovy.min.js"></script>
+</body>
+</html>
