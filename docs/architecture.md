@@ -731,7 +731,7 @@ kotlin {
 
 **Phase 1: Extract to Android module** (current plan)
 ```
-equal-app/
+lumen/
 └── coachmark/  ← Android library module
 ```
 
@@ -772,7 +772,7 @@ Being first to market with a Compose Multiplatform coachmark library is a signif
 ### Phase 1: Android Library (v1.0)
 
 - [ ] Abstract `CoachmarkRepository` to interface
-- [ ] Remove Equal-specific imports
+- [ ] Remove app-specific imports
 - [ ] Add generic preview annotations
 - [ ] Create sample app module
 - [ ] Write unit tests for Controller and State
