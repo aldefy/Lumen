@@ -2,19 +2,44 @@
 
 ## Installation
 
-Add the dependency to your module's `build.gradle.kts`:
+### Kotlin Multiplatform
+
+Add to your shared module's `build.gradle.kts`:
 
 ```kotlin
-dependencies {
-    implementation("io.github.aldefy:lumen:1.0.0-beta02")
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.github.aldefy:lumen:1.0.0-beta03")
+        }
+    }
 }
 ```
 
-For Gradle Groovy:
+This resolves the correct artifact per target automatically:
+
+| Target | Artifact |
+|--------|----------|
+| Android | `lumen-android` (AAR) |
+| iOS arm64 | `lumen-iosarm64` (klib) |
+| iOS Simulator arm64 | `lumen-iossimulatorarm64` (klib) |
+| iOS Simulator x64 | `lumen-iosx64` (klib) |
+
+### Android Only
+
+If your project is not using KMP:
+
+```kotlin
+dependencies {
+    implementation("io.github.aldefy:lumen-android:1.0.0-beta03")
+}
+```
+
+Gradle Groovy:
 
 ```groovy
 dependencies {
-    implementation 'io.github.aldefy:lumen:1.0.0-beta02'
+    implementation 'io.github.aldefy:lumen-android:1.0.0-beta03'
 }
 ```
 
@@ -104,6 +129,17 @@ fun OnboardingScreen() {
     }
 }
 ```
+
+## Platform Support
+
+| Platform | Min Version |
+|----------|-------------|
+| Android  | API 23      |
+| iOS arm64 | iOS 16     |
+| iOS Simulator arm64 | iOS 16 |
+| iOS Simulator x64   | iOS 16 |
+
+Lumen is a Kotlin Multiplatform library. Add it to `commonMain` dependencies and it works on both Android and iOS. All APIs are identical across platforms.
 
 ## Next Steps
 

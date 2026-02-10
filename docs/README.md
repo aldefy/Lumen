@@ -2,7 +2,9 @@
 
 > Spotlight your UI, not a screenshot of it.
 
-Lumen is a Jetpack Compose coachmark library that creates **true transparent cutouts** in the overlay scrim. Your actual UI remains visible and interactive through the spotlight - animations play, buttons respond, nothing is faked.
+Lumen is a Compose Multiplatform coachmark library that creates **true transparent cutouts** in the overlay scrim. Your actual UI remains visible and interactive through the spotlight - animations play, buttons respond, nothing is faked.
+
+> **Supports Android and iOS** via Kotlin Multiplatform.
 
 ## Features
 
