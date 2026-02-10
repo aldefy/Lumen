@@ -60,6 +60,9 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 
+# Xcode user data
+xcuserdata/
+
 # Misc
 *.DS_Store
 Thumbs.db
