@@ -1,6 +1,5 @@
 package io.luminos
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -19,6 +18,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,10 +30,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import kotlin.math.cos
@@ -49,11 +47,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.luminos.shapes.createPaddedSquirclePath
 import io.luminos.shapes.createPaddedStarPath
 import io.luminos.shapes.createScaledStarPath
 import kotlinx.coroutines.delay
+import kotlin.math.PI
 import kotlin.math.roundToInt
 
 /**
@@ -90,9 +88,9 @@ fun CoachmarkHost(
 ) {
     // Auto-dismiss coachmark when a dialog appears
     val coordinator = LocalOverlayCoordinator.current
-    val dialogCount by coordinator?.activeDialogCount?.collectAsStateWithLifecycle()
+    val dialogCount by coordinator?.activeDialogCount?.collectAsState()
         ?: remember { mutableStateOf(0) }
-    val coachmarkState by controller.state.collectAsStateWithLifecycle()
+    val coachmarkState by controller.state.collectAsState()
 
     LaunchedEffect(dialogCount) {
         if (dialogCount > 0 && coachmarkState !is CoachmarkState.Hidden) {
@@ -224,7 +222,7 @@ fun CoachmarkScrim(
     onDismiss: () -> Unit = {},
     onStepCompleted: (stepIndex: Int, targetId: String) -> Unit = { _, _ -> },
 ) {
-    val state by controller.state.collectAsStateWithLifecycle()
+    val state by controller.state.collectAsState()
 
     val currentOnDismiss by rememberUpdatedState(onDismiss)
     val currentOnStepCompleted by rememberUpdatedState(onStepCompleted)
@@ -428,7 +426,7 @@ private fun CoachmarkScrimContent(
         )
     }
 
-    BackHandler { onBack() }
+    PlatformBackHandler(onBack = onBack)
 
     // Pulse/glow animation
     val highlightAnimation = target.highlightAnimation ?: config.highlightAnimation
@@ -1148,7 +1146,7 @@ private fun DrawScope.drawShimmerEffect(
     density: androidx.compose.ui.unit.Density,
 ) {
     val center = target.bounds.center
-    val angleRad = Math.toRadians(shimmerAngle.toDouble())
+    val angleRad = shimmerAngle.toDouble() * PI / 180.0
 
     // Calculate shimmer highlight position based on angle
     val shimmerRadius = when (val shape = target.shape) {
@@ -1181,7 +1179,7 @@ private fun DrawScope.drawShimmerEffect(
     // Draw multiple shimmer dots at different positions around the stroke
     val shimmerSpread = 30f // degrees of spread for the shimmer trail
     for (i in 0 until 5) {
-        val dotAngle = angleRad - Math.toRadians((i * shimmerSpread / 5).toDouble())
+        val dotAngle = angleRad - (i * shimmerSpread / 5).toDouble() * PI / 180.0
         val alpha = (1f - i * 0.2f).coerceIn(0f, 1f)
         val dotRadius = (strokeWidth * 2f) * (1f - i * 0.15f)
 

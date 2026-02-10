@@ -1,7 +1,5 @@
 package io.luminos
 
-import android.content.Context
-
 /**
  * Interface for coachmark persistence storage.
  * Implement this interface to provide custom storage mechanisms.
@@ -14,34 +12,13 @@ interface CoachmarkStorage {
 }
 
 /**
- * Default implementation using Android SharedPreferences.
- */
-class SharedPrefsCoachmarkStorage(context: Context) : CoachmarkStorage {
-    private val prefs = context.getSharedPreferences("lumen_coachmark", Context.MODE_PRIVATE)
-
-    override fun getBoolean(key: String, default: Boolean): Boolean =
-        prefs.getBoolean(key, default)
-
-    override fun putBoolean(key: String, value: Boolean) {
-        prefs.edit().putBoolean(key, value).apply()
-    }
-
-    override fun remove(key: String) {
-        prefs.edit().remove(key).apply()
-    }
-
-    override fun getAllKeys(): Set<String> =
-        prefs.all.keys.toSet()
-}
-
-/**
  * Repository for persisting coachmark shown state.
  *
  * Coachmarks are typically shown only once per user. This repository
  * tracks which coachmarks have been seen to prevent showing them again.
  *
  * @param storage The storage mechanism to use for persistence.
- *                Use [SharedPrefsCoachmarkStorage] for the default Android implementation.
+ *                On Android, use [SharedPrefsCoachmarkStorage] for the default implementation.
  */
 class CoachmarkRepository(
     private val storage: CoachmarkStorage,
@@ -94,9 +71,3 @@ class CoachmarkRepository(
         return "$PREFIX$id$SUFFIX_SHOWN"
     }
 }
-
-/**
- * Convenience function to create a [CoachmarkRepository] with Android SharedPreferences.
- */
-fun CoachmarkRepository(context: Context): CoachmarkRepository =
-    CoachmarkRepository(SharedPrefsCoachmarkStorage(context))

@@ -5,10 +5,10 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Coordinates between different overlay types (dialogs, bottom sheets, coachmarks)
@@ -50,7 +50,7 @@ class OverlayCoordinator {
     val isDialogShowing: Boolean
         get() = _activeDialogCount.value > 0
 
-    private val counter = AtomicInteger(0)
+    private val counter = atomic(0)
 
     /**
      * Registers a dialog as active. Call when dialog becomes visible.

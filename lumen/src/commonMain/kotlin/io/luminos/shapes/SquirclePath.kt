@@ -2,6 +2,7 @@ package io.luminos.shapes
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -55,7 +56,7 @@ fun createSquirclePath(
 
     // Generate points along the superellipse
     for (i in 0..segments) {
-        val t = (i.toDouble() / segments) * 2 * Math.PI
+        val t = (i.toDouble() / segments) * 2 * PI
         val cosT = kotlin.math.cos(t)
         val sinT = kotlin.math.sin(t)
 
