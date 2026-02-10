@@ -39,6 +39,21 @@ class CoachmarkController(
     var isScrolling: Boolean by mutableStateOf(false)
 
     /**
+     * Optional suspend callback to scroll a target into view.
+     * When set, the scrim will invoke this before showing an off-screen target.
+     * When null and target is off-screen, the step is skipped in sequences.
+     *
+     * Example with LazyColumn:
+     * ```
+     * controller.scrollRequester = { targetId ->
+     *     val index = targetIdToIndex[targetId] ?: return@scrollRequester
+     *     lazyListState.animateScrollToItem(index)
+     * }
+     * ```
+     */
+    var scrollRequester: (suspend (targetId: String) -> Unit)? = null
+
+    /**
      * Global toggle for coachmarks. When false, [show] and [showSequence] silently no-op.
      *
      * Use this to disable coachmarks based on app context:
@@ -238,6 +253,27 @@ class CoachmarkController(
      */
     fun dismiss() {
         _state.value = CoachmarkState.Hidden
+    }
+
+    /**
+     * Skips the current target if it's not visible.
+     * In a sequence: advances to next step (or dismisses if last).
+     * For single target: dismisses.
+     */
+    internal fun skipCurrentIfNotVisible() {
+        _state.update { currentState ->
+            when (currentState) {
+                is CoachmarkState.Sequence -> {
+                    if (currentState.hasNext) {
+                        currentState.copy(currentIndex = currentState.currentIndex + 1)
+                    } else {
+                        CoachmarkState.Hidden
+                    }
+                }
+                is CoachmarkState.Showing -> CoachmarkState.Hidden
+                CoachmarkState.Hidden -> CoachmarkState.Hidden
+            }
+        }
     }
 
     /**
