@@ -11,20 +11,51 @@
 <p align="center">
   <a href="https://central.sonatype.com/artifact/io.github.aldefy/lumen"><img src="https://img.shields.io/maven-central/v/io.github.aldefy/lumen.svg?label=Maven%20Central&logo=apachemaven" alt="Maven Central"/></a>
   <a href="https://kotlinlang.org"><img src="https://img.shields.io/badge/Kotlin-2.0-blue.svg?logo=kotlin" alt="Kotlin"/></a>
-  <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Jetpack_Compose-1.6-4285F4.svg?logo=jetpackcompose" alt="Compose"/></a>
+  <a href="https://www.jetbrains.com/compose-multiplatform/"><img src="https://img.shields.io/badge/Compose_Multiplatform-1.7-4285F4.svg?logo=jetpackcompose" alt="Compose Multiplatform"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"/></a>
   <a href="https://aldefy.github.io/Lumen/"><img src="https://img.shields.io/badge/Docs-Website-blue.svg?logo=readthedocs" alt="Documentation"/></a>
+  <img src="https://img.shields.io/badge/Android-3DDC84.svg?logo=android&logoColor=white" alt="Android"/>
+  <img src="https://img.shields.io/badge/iOS-000000.svg?logo=apple&logoColor=white" alt="iOS"/>
 </p>
 
 ---
 
-A Jetpack Compose coachmark library that creates **true transparent cutouts** in the overlay scrim. Your actual UI remains visible and interactive through the spotlight - animations play, buttons respond, nothing is faked.
+A Compose Multiplatform coachmark library that creates **true transparent cutouts** in the overlay scrim. Your actual UI remains visible and interactive through the spotlight - animations play, buttons respond, nothing is faked.
+
+> **Supports Android and iOS** via Kotlin Multiplatform.
 
 ## Installation
 
+### Kotlin Multiplatform
+
+Add to your shared module's `build.gradle.kts`:
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.github.aldefy:lumen:1.0.0-beta03")
+        }
+    }
+}
+```
+
+This resolves the correct artifact per target automatically:
+
+| Target | Artifact |
+|--------|----------|
+| Android | `lumen-android` (AAR) |
+| iOS arm64 | `lumen-iosarm64` (klib) |
+| iOS Simulator arm64 | `lumen-iossimulatorarm64` (klib) |
+| iOS Simulator x64 | `lumen-iosx64` (klib) |
+
+### Android Only
+
+If your project is not using KMP:
+
 ```kotlin
 dependencies {
-    implementation("io.github.aldefy:lumen:1.0.0-beta02")
+    implementation("io.github.aldefy:lumen-android:1.0.0-beta03")
 }
 ```
 
@@ -138,22 +169,29 @@ controller.enabled = false        // Disable all coachmarks
 
 ## Sample App
 
-The `sample` module includes interactive demos for all features. Clone the repo and run it to explore.
+The `sample` module is a Compose Multiplatform app with interactive demos for all features.
 
-## Size Impact
+- **Android:** Open the project in Android Studio and run the `sample` configuration.
+- **iOS:** Open `iosApp/iosApp.xcodeproj` in Xcode and run on a simulator or device.
 
-| Metric | Size |
-|--------|------|
-| AAR size | 123 KB |
-| After R8 minification | ~40-60 KB |
-| Method count | ~200-300 |
-| Dependencies | Compose only (already in your app) |
+<p align="center">
+  <img src="art/ios-sample-screenshot.png" width="280" alt="iOS Sample App"/>
+</p>
+
+## Platform Support
+
+| Platform | Min Version | Artifact |
+|----------|-------------|----------|
+| Android  | API 23      | `lumen` (via Gradle metadata) or `lumen-android` |
+| iOS arm64 | iOS 16     | `lumen-iosarm64` |
+| iOS Simulator arm64 | iOS 16 | `lumen-iossimulatorarm64` |
+| iOS Simulator x64   | iOS 16 | `lumen-iosx64` |
 
 ## Requirements
 
-- Kotlin 1.9+
-- Compose BOM 2024.01.00+
-- Android API 23+
+- Kotlin 2.0+
+- Compose Multiplatform 1.7+
+- Android API 23+ / iOS 16+
 
 ## License
 

@@ -2,6 +2,7 @@
   - [Introduction](/)
   - [Installation](getting-started.md#installation)
   - [Quick Start](getting-started.md#quick-start)
+  - [Platform Support](getting-started.md#platform-support)
 
 - **Guide**
   - [Basic Usage](guide.md#basic-usage)
