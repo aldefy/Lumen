@@ -172,6 +172,8 @@ data class CoachmarkConfig(
     val waitForVisibility: Boolean = true,
     /** Delay in milliseconds after scroll stops before showing coachmark */
     val visibilityDelay: Long = 150L,
+    /** Timeout in ms after auto-scroll to wait for target visibility. If still not visible, skip. */
+    val scrollTimeout: Long = 2000L,
 )
 
 /**
@@ -236,6 +238,30 @@ fun CoachmarkScrim(
         is CoachmarkState.Showing -> s.target.id
         is CoachmarkState.Sequence -> s.currentTarget.id
         CoachmarkState.Hidden -> null
+    }
+
+    // Auto-scroll or skip when target is off-screen
+    LaunchedEffect(currentTargetId) {
+        if (currentTargetId == null || !config.waitForVisibility) return@LaunchedEffect
+
+        // Small delay to let layout settle after step change
+        delay(50)
+
+        if (!controller.isTargetVisible(currentTargetId)) {
+            val scroller = controller.scrollRequester
+            if (scroller != null) {
+                // Request scroll to bring target into view
+                scroller(currentTargetId)
+                // Wait for scroll + layout to settle, then check if it worked
+                delay(config.scrollTimeout)
+                if (!controller.isTargetVisible(currentTargetId)) {
+                    controller.skipCurrentIfNotVisible()
+                }
+            } else {
+                // No scroller provided — skip this step
+                controller.skipCurrentIfNotVisible()
+            }
+        }
     }
 
     // Wait for visibility + scroll idle + delay before showing
