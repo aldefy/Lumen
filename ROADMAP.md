@@ -222,17 +222,17 @@ CoachmarkTarget(
 True cross-platform coachmarks:
 
 #### Platform Support
-- [ ] **Android** — Full feature parity (current)
-- [ ] **iOS** — Compose Multiplatform for iOS
+- [x] **Android** — Full feature parity (shipping)
+- [x] **iOS** — Compose Multiplatform for iOS (shipping)
 - [ ] **Desktop** — macOS, Windows, Linux
 - [ ] **Web** — Compose for Web (Wasm)
 
 #### Platform Abstractions
-- [ ] **expect/actual for Persistence**
-  - Android: SharedPreferences
-  - iOS: NSUserDefaults
-  - Desktop: java.util.prefs
-  - Web: localStorage
+- [x] **Interface-based Persistence** (CoachmarkStorage interface, not expect/actual)
+  - [x] Android: SharedPreferences
+  - [x] iOS: NSUserDefaults
+  - [ ] Desktop: java.util.prefs
+  - [ ] Web: localStorage
 
 - [ ] **expect/actual for Haptics**
   - Android: VibrationEffect
@@ -273,7 +273,7 @@ compose-spotlight/
 | Analytics callbacks | | | ✅ | ✅ | ✅ |
 | DSL builder | | | | ✅ | ✅ |
 | Custom tooltip content | | | | ✅ | ✅ |
-| iOS support | | | | | ✅ |
+| iOS support | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Desktop support | | | | | ✅ |
 | Web support | | | | | ✅ |
 

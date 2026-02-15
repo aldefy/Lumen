@@ -433,3 +433,59 @@ fun coachmarkColors(
     darkTheme: Boolean = isSystemInDarkTheme()
 ): CoachmarkColors
 ```
+
+---
+
+## Persistence
+
+### CoachmarkStorage
+
+Interface for coachmark persistence storage. Implement this to provide a custom storage mechanism.
+
+```kotlin
+interface CoachmarkStorage {
+    fun getBoolean(key: String, default: Boolean): Boolean
+    fun putBoolean(key: String, value: Boolean)
+    fun remove(key: String)
+    fun getAllKeys(): Set<String>
+}
+```
+
+| Method | Description |
+|--------|-------------|
+| `getBoolean(key, default)` | Read a boolean value, returning `default` if not found |
+| `putBoolean(key, value)` | Write a boolean value |
+| `remove(key)` | Remove a stored key |
+| `getAllKeys()` | Return all stored keys |
+
+#### Platform Implementations
+
+| Platform | Class | Storage Backend |
+|----------|-------|-----------------|
+| Android | `SharedPrefsCoachmarkStorage(context)` | SharedPreferences |
+| iOS | `NSUserDefaultsCoachmarkStorage()` | NSUserDefaults |
+
+### CoachmarkRepository
+
+Repository for persisting coachmark shown state. Tracks which coachmarks have been seen to prevent showing them again.
+
+```kotlin
+class CoachmarkRepository(storage: CoachmarkStorage)
+```
+
+| Method | Description |
+|--------|-------------|
+| `hasSeenCoachmark(id: String): Boolean` | Check if a coachmark has been seen |
+| `markCoachmarkSeen(id: String)` | Mark a coachmark as seen |
+| `resetCoachmark(id: String)` | Reset a coachmark to unseen state |
+| `resetAllCoachmarks()` | Reset all coachmarks to unseen state |
+
+#### Convenience Factories
+
+```kotlin
+// Android
+fun CoachmarkRepository(context: Context): CoachmarkRepository
+
+// iOS
+fun CoachmarkRepository(): CoachmarkRepository
+```
