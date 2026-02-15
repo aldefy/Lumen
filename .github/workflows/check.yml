@@ -97,6 +97,7 @@ jobs:
           report_paths: "**/build/test-results/**/TEST-*.xml"
 
   ios:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: macos-latest
     timeout-minutes: 30
 
