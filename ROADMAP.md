@@ -11,7 +11,7 @@ We analyzed every Compose coachmark library and found the same gaps everywhere:
 | Pain Point | Other Libraries | Compose Spotlight |
 |------------|-----------------|-------------------|
 | "Cutouts are just dimmed, not transparent" | Semi-transparent overlay | **True BlendMode.Clear cutouts** |
-| "Only circles or rectangles" | 1-2 shapes | **4 shapes including Squircle** |
+| "Only circles or rectangles" | 1-2 shapes | **5 shapes including Squircle & Star** |
 | "No visual connection to tooltip" | No connectors | **5 connector styles with AUTO** |
 | "Breaks when dialogs appear" | No coordination | **OverlayCoordinator pattern** |
 | "Back button dismisses everything" | No back handling | **BackPressBehavior.NAVIGATE** |
@@ -24,16 +24,20 @@ We analyzed every Compose coachmark library and found the same gaps everywhere:
 
 ### v1.0.0 — Foundation (Launch)
 
-**Status:** Ready
+**Status:** Shipped
 
 The complete foundation for production coachmarks:
 
 #### Core Features
 - [x] **True Transparent Cutouts** — `BlendMode.Clear` + `CompositingStrategy.Offscreen`
-- [x] **4 Cutout Shapes** — Circle, RoundedRect, Rect, Squircle (iOS-style)
+- [x] **5 Cutout Shapes** — Circle, RoundedRect, Rect, Squircle (iOS-style), Star
 - [x] **5 Connector Styles** — AUTO, DIRECT, HORIZONTAL, VERTICAL, ELBOW
 - [x] **Multi-Step Sequences** — Progress indicator with dot navigation
 - [x] **Smart Tooltip Positioning** — AUTO adapts to available screen space
+- [x] **6 Highlight Animations** — NONE, PULSE, GLOW, RIPPLE, SHIMMER, BOUNCE
+- [x] **Compose Multiplatform** — Android + iOS via KMP
+- [x] **Maven Central Publishing** — 5 KMP artifacts
+- [x] **Unit Tests** — 170 commonTest + 15 iosTest
 
 #### State Management
 - [x] **CoachmarkController** — Reactive StateFlow-based state machine
@@ -56,13 +60,13 @@ The complete foundation for production coachmarks:
 
 ### v1.1.0 — Polish & Animation
 
-**Status:** In Development
+**Status:** Planned
 
 Bringing the library to life with motion and better UX:
 
 #### Highlight Animations
-- [ ] **Pulse Animation** — Gentle breathing effect on cutout (scale 1.0 → 1.05)
-- [ ] **Glow Animation** — Animated stroke glow around cutout
+- [x] **Pulse Animation** — Gentle breathing effect on cutout (scale 1.0 → 1.05)
+- [x] **Glow Animation** — Animated stroke glow around cutout
 - [ ] **Heartbeat Animation** — Quick double-pulse for urgency
 
 ```kotlin
@@ -73,9 +77,9 @@ CoachmarkTarget(
 ```
 
 #### Sequence UX Improvements
-- [ ] **Skip Tour Button** — "Skip" option in tooltip for multi-step sequences
+- [x] **Skip Tour Button** — "Skip" option in tooltip for multi-step sequences
 - [ ] **onSkipTour Callback** — Analytics hook when user skips
-- [ ] **Delay Before Show** — Configurable delay to let UI settle
+- [x] **Delay Before Show** — Configurable delay to let UI settle
 
 ```kotlin
 CoachmarkConfig(
@@ -217,7 +221,7 @@ CoachmarkTarget(
 
 ### v2.0.0 — Compose Multiplatform
 
-**Status:** Future
+**Status:** Planned
 
 True cross-platform coachmarks:
 
@@ -260,7 +264,7 @@ compose-spotlight/
 | Feature | v1.0 | v1.1 | v1.2 | v1.3 | v2.0 |
 |---------|------|------|------|------|------|
 | True transparent cutouts | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 4 cutout shapes | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 5 cutout shapes | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 5 connector styles | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Multi-step sequences | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Dialog coordination | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -323,10 +327,8 @@ This library is built on UX research from:
 
 We welcome contributions! Priority areas:
 
-1. **Pulse/Glow Animation** — High impact, relatively contained scope
-2. **Skip Tour Button** — Quick win for UX
-3. **Accessibility** — Help make coachmarks work for everyone
-4. **Platform Testing** — iOS, Desktop, Web via Compose Multiplatform
+1. **Accessibility** — Help make coachmarks work for everyone
+2. **Platform Testing** — iOS, Desktop, Web via Compose Multiplatform
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
