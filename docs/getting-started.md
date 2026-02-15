@@ -141,6 +141,10 @@ fun OnboardingScreen() {
 
 Lumen is a Kotlin Multiplatform library. Add it to `commonMain` dependencies and it works on both Android and iOS. All APIs are identical across platforms.
 
+## Optional: Persistence
+
+Want coachmarks to show only once? Use `CoachmarkRepository` to track which coachmarks have been seen. See the [Persistence guide](guide.md#persistence) for setup on Android and iOS.
+
 ## Next Steps
 
 - Learn about [Multi-Step Sequences](guide.md#multi-step-sequences)

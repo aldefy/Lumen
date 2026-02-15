@@ -584,28 +584,28 @@ actual class CoachmarkLogger {
 }
 
 // 2. Persistence (seen coachmarks)
-expect class CoachmarkRepository {
+// commonMain: interface + repository class
+interface CoachmarkStorage {
+    fun getBoolean(key: String, default: Boolean): Boolean
+    fun putBoolean(key: String, value: Boolean)
+    fun remove(key: String)
+    fun getAllKeys(): Set<String>
+}
+
+class CoachmarkRepository(private val storage: CoachmarkStorage) {
     fun hasSeenCoachmark(id: String): Boolean
     fun markCoachmarkSeen(id: String)
+    fun resetCoachmark(id: String)
+    fun resetAllCoachmarks()
 }
 
-// Android actual
-actual class CoachmarkRepository(context: Context) {
-    private val prefs = context.getSharedPreferences("coachmarks", Context.MODE_PRIVATE)
-    // ...
-}
+// androidMain: SharedPreferences implementation
+class SharedPrefsCoachmarkStorage(context: Context) : CoachmarkStorage { ... }
+fun CoachmarkRepository(context: Context): CoachmarkRepository
 
-// iOS actual
-actual class CoachmarkRepository {
-    private val defaults = NSUserDefaults.standardUserDefaults
-    // ...
-}
-
-// Desktop actual
-actual class CoachmarkRepository {
-    private val prefs = java.util.prefs.Preferences.userRoot().node("coachmarks")
-    // ...
-}
+// iosMain: NSUserDefaults implementation
+class NSUserDefaultsCoachmarkStorage : CoachmarkStorage { ... }
+fun CoachmarkRepository(): CoachmarkRepository
 ```
 
 ### KMP Module Structure
@@ -631,11 +631,11 @@ compose-coachmark-kmp/
 │       │       └── shapes/
 │       │           └── SquirclePath.kt
 │       ├── androidMain/kotlin/
-│       │   └── com/aditlal/coachmark/
-│       │       └── CoachmarkRepository.android.kt  # SharedPreferences
+│       │   └── io/luminos/
+│       │       └── AndroidCoachmarkRepository.kt   # SharedPreferences
 │       ├── iosMain/kotlin/
-│       │   └── com/aditlal/coachmark/
-│       │       └── CoachmarkRepository.ios.kt      # NSUserDefaults
+│       │   └── io/luminos/
+│       │       └── IosCoachmarkRepository.kt       # NSUserDefaults
 │       ├── desktopMain/kotlin/
 │       │   └── com/aditlal/coachmark/
 │       │       └── CoachmarkRepository.desktop.kt  # java.util.prefs
@@ -787,9 +787,9 @@ Being first to market with a Compose Multiplatform coachmark library is a signif
 
 - [ ] Convert to KMP module structure
 - [ ] Move 95% code to `commonMain`
-- [ ] Implement `expect/actual` for CoachmarkRepository
-  - [ ] Android: SharedPreferences
-  - [ ] iOS: NSUserDefaults
+- [x] Implement platform-specific CoachmarkStorage (interface-based, not expect/actual)
+  - [x] Android: SharedPreferences
+  - [x] iOS: NSUserDefaults
   - [ ] Desktop: java.util.prefs
   - [ ] Web: localStorage
 - [ ] Create platform-specific sample apps

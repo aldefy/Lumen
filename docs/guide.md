@@ -338,3 +338,57 @@ Useful when:
 - Screen is animating in
 - Data is loading
 - Layout may shift
+
+## Persistence
+
+Track which coachmarks have been shown so they only appear once per user.
+
+### Android
+
+```kotlin
+val repository = CoachmarkRepository(context)
+```
+
+Uses `SharedPreferences` under the hood.
+
+### iOS
+
+```kotlin
+val repository = CoachmarkRepository()
+```
+
+Uses `NSUserDefaults` under the hood.
+
+### Using the Repository
+
+```kotlin
+val repository = CoachmarkRepository(context) // Android
+// val repository = CoachmarkRepository()     // iOS
+
+// Check before showing
+if (!repository.hasSeenCoachmark("onboarding")) {
+    controller.show(onboardingTarget)
+}
+
+// Mark as seen after completion
+repository.markCoachmarkSeen("onboarding")
+
+// Reset for testing or "replay tutorial"
+repository.resetCoachmark("onboarding")
+repository.resetAllCoachmarks()
+```
+
+### Custom Storage
+
+Implement `CoachmarkStorage` to use your own persistence backend:
+
+```kotlin
+class MyCustomStorage : CoachmarkStorage {
+    override fun getBoolean(key: String, default: Boolean): Boolean = TODO()
+    override fun putBoolean(key: String, value: Boolean) = TODO()
+    override fun remove(key: String) = TODO()
+    override fun getAllKeys(): Set<String> = TODO()
+}
+
+val repository = CoachmarkRepository(MyCustomStorage())
+```
