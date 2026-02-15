@@ -8,7 +8,7 @@ import kotlin.test.assertTrue
 class FakeCoachmarkStorage : CoachmarkStorage {
     val data = mutableMapOf<String, Boolean>()
 
-    override fun getBoolean(key: String, default: Boolean): Boolean = data.getOrDefault(key, default)
+    override fun getBoolean(key: String, default: Boolean): Boolean = data[key] ?: default
 
     override fun putBoolean(key: String, value: Boolean) {
         data[key] = value
