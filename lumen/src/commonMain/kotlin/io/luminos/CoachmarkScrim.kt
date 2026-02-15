@@ -402,14 +402,18 @@ private fun CoachmarkScrimContent(
         }
 
     val connectorTooltipGapPx = with(density) { config.connectorTooltipGap.toPx() }
+    val strokeWidthPx = with(density) { config.strokeWidth.toPx() }
+    val connectorDotRadiusPx = with(density) { config.connectorDotRadius.toPx() }
     val connectorPoints =
-        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx) {
+        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx) {
             calculateConnectorPoints(
                 target = target,
                 tooltipPosition = tooltipPosition,
                 tooltipSize = tooltipSize,
                 density = density,
                 connectorTooltipGap = connectorTooltipGapPx,
+                strokeWidth = strokeWidthPx,
+                connectorDotRadius = connectorDotRadiusPx,
             )
         }
 
@@ -1002,6 +1006,8 @@ private fun calculateConnectorPoints(
     tooltipSize: IntSize,
     density: androidx.compose.ui.unit.Density,
     connectorTooltipGap: Float,
+    strokeWidth: Float = 0f,
+    connectorDotRadius: Float = 0f,
 ): List<Offset> {
     if (tooltipSize == IntSize.Zero) {
         return emptyList()
@@ -1018,6 +1024,12 @@ private fun calculateConnectorPoints(
     } else {
         defaultLineLength
     }
+
+    // Gap between cutout stroke outer edge and connector start.
+    // Stroke is centered on cutoutRadius, so outer edge = cutoutRadius + strokeWidth/2.
+    // We offset by strokeWidth/2 (to reach outer edge) + dotRadius + strokeWidth (breathing room)
+    // so the connector line and its dot fully clear the cutout stroke.
+    val cutoutStrokeGap = strokeWidth / 2f + connectorDotRadius + strokeWidth
 
     val cutoutRadius = when (shape) {
         is CutoutShape.Circle -> {
@@ -1071,8 +1083,9 @@ private fun calculateConnectorPoints(
 
         ConnectorStyle.HORIZONTAL -> {
             val goingLeft = tooltipCenterX < targetCenter.x
+            val startRadius = cutoutRadius + cutoutStrokeGap
             val cutoutEdgePoint = Offset(
-                x = if (goingLeft) targetCenter.x - cutoutRadius else targetCenter.x + cutoutRadius,
+                x = if (goingLeft) targetCenter.x - startRadius else targetCenter.x + startRadius,
                 y = targetCenter.y,
             )
             val endPointX = if (goingLeft) {
@@ -1086,9 +1099,10 @@ private fun calculateConnectorPoints(
 
         ConnectorStyle.VERTICAL -> {
             val direction = if (isTooltipBelow) 1f else -1f
+            val startRadius = cutoutRadius + cutoutStrokeGap
             val cutoutEdgePoint = Offset(
                 x = targetCenter.x,
-                y = targetCenter.y + direction * cutoutRadius,
+                y = targetCenter.y + direction * startRadius,
             )
             val endPointY = if (isTooltipBelow) {
                 tooltipPosition.y - connectorTooltipGap
@@ -1101,8 +1115,9 @@ private fun calculateConnectorPoints(
 
         ConnectorStyle.ELBOW -> {
             val goingLeft = tooltipCenterX < targetCenter.x
+            val startRadius = cutoutRadius + cutoutStrokeGap
             val cutoutEdgePoint = Offset(
-                x = if (goingLeft) targetCenter.x - cutoutRadius else targetCenter.x + cutoutRadius,
+                x = if (goingLeft) targetCenter.x - startRadius else targetCenter.x + startRadius,
                 y = targetCenter.y,
             )
             val cornerX = if (goingLeft) {
@@ -1151,9 +1166,10 @@ private fun calculateConnectorPoints(
             val normalizedDx = dx / distance
             val normalizedDy = dy / distance
 
+            val startRadius = cutoutRadius + cutoutStrokeGap
             val cutoutEdgePoint = Offset(
-                x = targetCenter.x + normalizedDx * cutoutRadius,
-                y = targetCenter.y + normalizedDy * cutoutRadius,
+                x = targetCenter.x + normalizedDx * startRadius,
+                y = targetCenter.y + normalizedDy * startRadius,
             )
             listOf(cutoutEdgePoint, tooltipConnectionPoint)
         }
