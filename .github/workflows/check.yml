@@ -90,6 +90,17 @@ jobs:
       - name: Build sample app
         run: ./gradlew :sample:assembleDebug
 
+      - name: Verify screenshot tests
+        run: ./gradlew :lumen:verifyRoborazziDebug
+
+      - name: Upload screenshot diff on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roborazzi-diff
+          path: lumen/build/outputs/roborazzi/
+          retention-days: 7
+
       - name: JUnit report
         if: always()
         uses: mikepenz/action-junit-report@v5
