@@ -24,6 +24,8 @@ This resolves the correct artifact per target automatically:
 | iOS arm64 | `lumen-iosarm64` (klib) |
 | iOS Simulator arm64 | `lumen-iossimulatorarm64` (klib) |
 | iOS Simulator x64 | `lumen-iosx64` (klib) |
+| Desktop (JVM) | `lumen-jvm` (JAR) |
+| Web (Wasm) | `lumen-wasmjs` (klib) |
 
 ### Android Only
 
@@ -138,8 +140,10 @@ fun OnboardingScreen() {
 | iOS arm64 | iOS 16     |
 | iOS Simulator arm64 | iOS 16 |
 | iOS Simulator x64   | iOS 16 |
+| Desktop (JVM) | JDK 17 |
+| Web (Wasm) | Modern browser |
 
-Lumen is a Kotlin Multiplatform library. Add it to `commonMain` dependencies and it works on both Android and iOS. All APIs are identical across platforms.
+Lumen is a Kotlin Multiplatform library. Add it to `commonMain` dependencies and it works on Android, iOS, Desktop, and Web. All APIs are identical across platforms.
 
 ## Optional: Persistence
 

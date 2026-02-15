@@ -464,6 +464,8 @@ interface CoachmarkStorage {
 |----------|-------|-----------------|
 | Android | `SharedPrefsCoachmarkStorage(context)` | SharedPreferences |
 | iOS | `NSUserDefaultsCoachmarkStorage()` | NSUserDefaults |
+| Desktop (JVM) | `PreferencesCoachmarkStorage()` | java.util.prefs.Preferences |
+| Web (Wasm) | `LocalStorageCoachmarkStorage()` | Browser localStorage |
 
 ### CoachmarkRepository
 
@@ -487,5 +489,11 @@ class CoachmarkRepository(storage: CoachmarkStorage)
 fun CoachmarkRepository(context: Context): CoachmarkRepository
 
 // iOS
+fun CoachmarkRepository(): CoachmarkRepository
+
+// Desktop (JVM)
+fun CoachmarkRepository(): CoachmarkRepository
+
+// Web (Wasm)
 fun CoachmarkRepository(): CoachmarkRepository
 ```

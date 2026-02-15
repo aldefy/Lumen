@@ -523,7 +523,7 @@ fun drawConnectorPath(points: List<Offset>, progress: Float) {
 - [x] 6 highlight animations (NONE, PULSE, GLOW, RIPPLE, SHIMMER, BOUNCE)
 - [x] Skip button to dismiss entire sequence
 - [x] `delayBeforeShow` for timing control
-- [x] Compose Multiplatform (Android + iOS)
+- [x] Compose Multiplatform (Android + iOS + Desktop + Web)
 - [x] CoachmarkStorage interface with platform implementations
 - [x] Maven Central publishing (KMP artifacts)
 - [x] Unit tests (170 commonTest + 15 iosTest)
@@ -536,8 +536,8 @@ fun drawConnectorPath(points: List<Offset>, progress: Float) {
 - [ ] `showOnce` auto-persistence
 
 ### v2.0 (Future)
-- [ ] Desktop support (macOS, Windows, Linux)
-- [ ] Web support (Compose for Web / Wasm)
+- [x] Desktop support (macOS, Windows, Linux)
+- [x] Web support (Compose for Web / Wasm)
 - [ ] Video/GIF in tooltip
 - [ ] Platform-specific accessibility improvements
 - [ ] Analytics integration interface
@@ -634,6 +634,12 @@ Lumen/
 │       │   └── AndroidCoachmarkRepository.kt
 │       ├── iosMain/kotlin/io/luminos/
 │       │   └── IosCoachmarkRepository.kt
+│       ├── jvmMain/kotlin/io/luminos/
+│       │   ├── DesktopCoachmarkRepository.kt
+│       │   └── PlatformBackHandler.jvm.kt
+│       ├── wasmJsMain/kotlin/io/luminos/
+│       │   ├── WasmCoachmarkRepository.kt
+│       │   └── PlatformBackHandler.wasmJs.kt
 │       ├── commonTest/kotlin/io/luminos/         # Unit tests (170)
 │       │   ├── CoachmarkRepositoryTest.kt
 │       │   ├── CoachmarkStateTest.kt
@@ -736,7 +742,7 @@ No existing KMP coachmark library exists. Current landscape:
 | TapTargetView | Android only | No | No |
 | Spotlight | Android only | No | No |
 | ShowcaseView | Android only | No | No |
-| **Lumen** | **KMP (Android + iOS)** | **Yes** | **Yes** |
+| **Lumen** | **KMP (Android + iOS + Desktop + Web)** | **Yes** | **Yes** |
 
 ---
 
@@ -759,8 +765,8 @@ No existing KMP coachmark library exists. Current landscape:
 - [x] Implement platform-specific CoachmarkStorage (interface-based)
   - [x] Android: SharedPreferences
   - [x] iOS: NSUserDefaults
-  - [ ] Desktop: java.util.prefs
-  - [ ] Web: localStorage
+  - [x] Desktop: java.util.prefs
+  - [x] Web: localStorage
 - [x] Create Compose Multiplatform sample app (Android + iOS)
 - [x] Configure Kotlin Multiplatform Maven publishing
 - [x] Add platform badges to README

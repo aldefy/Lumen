@@ -16,13 +16,15 @@
   <a href="https://aldefy.github.io/Lumen/"><img src="https://img.shields.io/badge/Docs-Website-blue.svg?logo=readthedocs" alt="Documentation"/></a>
   <img src="https://img.shields.io/badge/Android-3DDC84.svg?logo=android&logoColor=white" alt="Android"/>
   <img src="https://img.shields.io/badge/iOS-000000.svg?logo=apple&logoColor=white" alt="iOS"/>
+  <img src="https://img.shields.io/badge/Desktop-JVM-orange.svg?logo=openjdk&logoColor=white" alt="Desktop"/>
+  <img src="https://img.shields.io/badge/Web-Wasm-purple.svg?logo=webassembly&logoColor=white" alt="Web"/>
 </p>
 
 ---
 
 A Compose Multiplatform coachmark library that creates **true transparent cutouts** in the overlay scrim. Your actual UI remains visible and interactive through the spotlight - animations play, buttons respond, nothing is faked.
 
-> **Supports Android and iOS** via Kotlin Multiplatform.
+> **Supports Android, iOS, Desktop, and Web** via Kotlin Multiplatform.
 
 ## Installation
 
@@ -48,6 +50,8 @@ This resolves the correct artifact per target automatically:
 | iOS arm64 | `lumen-iosarm64` (klib) |
 | iOS Simulator arm64 | `lumen-iossimulatorarm64` (klib) |
 | iOS Simulator x64 | `lumen-iosx64` (klib) |
+| Desktop (JVM) | `lumen-jvm` (JAR) |
+| Web (Wasm) | `lumen-wasmjs` (klib) |
 
 ### Android Only
 
@@ -173,6 +177,8 @@ The `sample` module is a Compose Multiplatform app with interactive demos for al
 
 - **Android:** Open the project in Android Studio and run the `sample` configuration.
 - **iOS:** Open `iosApp/iosApp.xcodeproj` in Xcode and run on a simulator or device.
+- **Desktop:** Run `./gradlew :sample:run` from the terminal to launch the desktop window.
+- **Web:** Run `./gradlew :sample:wasmJsBrowserRun` to open the sample in a browser.
 
 <p align="center">
   <img src="art/ios-sample-screenshot.png" width="280" alt="iOS Sample App"/>
@@ -186,12 +192,14 @@ The `sample` module is a Compose Multiplatform app with interactive demos for al
 | iOS arm64 | iOS 16     | `lumen-iosarm64` |
 | iOS Simulator arm64 | iOS 16 | `lumen-iossimulatorarm64` |
 | iOS Simulator x64   | iOS 16 | `lumen-iosx64` |
+| Desktop (JVM) | JDK 17 | `lumen-jvm` |
+| Web (Wasm) | Modern browser | `lumen-wasmjs` |
 
 ## Requirements
 
 - Kotlin 2.0+
 - Compose Multiplatform 1.7+
-- Android API 23+ / iOS 16+
+- Android API 23+ / iOS 16+ / JDK 17+ / Modern browsers (Chrome, Firefox, Safari)
 
 ## License
 

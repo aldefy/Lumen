@@ -141,3 +141,60 @@ jobs:
         uses: mikepenz/action-junit-report@v5
         with:
           report_paths: "**/build/test-results/**/TEST-*.xml"
+
+  desktop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Compile JVM target
+        run: ./gradlew :lumen:jvmJar
+
+      - name: Run JVM tests
+        run: ./gradlew :lumen:jvmTest
+
+      - name: Build Desktop sample
+        run: ./gradlew :sample:desktopJar
+
+      - name: JUnit report
+        if: always()
+        uses: mikepenz/action-junit-report@v5
+        with:
+          report_paths: "**/build/test-results/**/TEST-*.xml"
+
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Compile Wasm target
+        run: ./gradlew :lumen:wasmJsJar
+
+      - name: Build Wasm sample
+        run: ./gradlew :sample:wasmJsBrowserDistribution
