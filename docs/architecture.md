@@ -60,6 +60,12 @@ sealed interface CutoutShape {
         val cornerRadius: Dp = 20.dp,
         val padding: Dp = 8.dp,
     ) : CutoutShape
+
+    data class Star(  // Star shape for gamification
+        val points: Int = 5,
+        val innerRadiusRatio: Float = 0.5f,
+        val padding: Dp = 8.dp,
+    ) : CutoutShape
 }
 ```
 
@@ -170,21 +176,13 @@ Draw attention to the target with subtle animations:
 
 ```kotlin
 enum class HighlightAnimation {
-    NONE,   // Static cutout (default)
-    PULSE,  // Stroke scales 1.0 → 1.08 → 1.0 (breathing effect)
-    GLOW,   // Stroke width 1x → 2x, alpha 1.0 → 0.5 (glowing effect)
+    NONE,     // Static cutout (default)
+    PULSE,    // Stroke scales 1.0 → 1.08 → 1.0 (breathing effect)
+    GLOW,     // Stroke width 1x → 2x, alpha 1.0 → 0.5 (glowing effect)
+    RIPPLE,   // Expanding rings emanating outward
+    SHIMMER,  // Highlight sweeping around the stroke
+    BOUNCE,   // Energetic scale with overshoot
 }
-```
-
-```
-NONE (static)          PULSE (breathing)       GLOW (glowing)
-
-    ┌───────┐              ┌ ─ ─ ─ ┐             ╔═══════╗
-    │       │           ┌──│       │──┐          ║       ║ (thick + bright)
-    │ Icon  │           │  │ Icon  │  │          ║ Icon  ║
-    │       │           └──│       │──┘          ║       ║
-    └───────┘              └ ─ ─ ─ ┘             ╚═══════╝
-                           (expands)              (fades)
 ```
 
 **Usage:**
@@ -214,6 +212,9 @@ CoachmarkTarget(
 | `NONE` | Text-heavy tooltips where animation would distract |
 | `PULSE` | Standard features, gentle attention |
 | `GLOW` | High-priority features, first-time user onboarding |
+| `RIPPLE` | Interactive elements, call-to-action buttons |
+| `SHIMMER` | Premium features, visual polish |
+| `BOUNCE` | Playful UX, gamification elements |
 
 ### 9. Skip Button
 
@@ -506,9 +507,9 @@ fun drawConnectorPath(points: List<Offset>, progress: Float) {
 
 ## Roadmap
 
-### v1.0 (Current)
+### v1.0 (Shipped)
 - [x] True transparent cutouts
-- [x] 4 cutout shapes (Circle, RoundedRect, Rect, Squircle)
+- [x] 5 cutout shapes (Circle, RoundedRect, Rect, Squircle, Star)
 - [x] 5 connector styles (AUTO, DIRECT, HORIZONTAL, VERTICAL, ELBOW)
 - [x] Multi-step sequences with progress indicator
 - [x] Dialog coordination (OverlayCoordinator)
@@ -519,23 +520,22 @@ fun drawConnectorPath(points: List<Offset>, progress: Float) {
 - [x] Configurable back press behavior (DISMISS, NAVIGATE)
 - [x] Optional tooltip card background
 - [x] Explicit radius control for circles
-- [x] Highlight animations (PULSE, GLOW) with configurable duration
+- [x] 6 highlight animations (NONE, PULSE, GLOW, RIPPLE, SHIMMER, BOUNCE)
 - [x] Skip button to dismiss entire sequence
 - [x] `delayBeforeShow` for timing control
+- [x] Compose Multiplatform (Android + iOS)
+- [x] CoachmarkStorage interface with platform implementations
+- [x] Maven Central publishing (KMP artifacts)
+- [x] Unit tests (170 commonTest + 15 iosTest)
 
 ### v1.1 (Planned)
-- [x] Pulse/Glow animation on cutout
-- [x] Skip/Close button
-- [x] `delayBeforeShow` config
 - [ ] DSL builder for sequences
 - [ ] More connector end styles (arrow, none)
 - [ ] Custom drawable for connector end
 - [ ] Haptic feedback option
 - [ ] `showOnce` auto-persistence
 
-### v2.0 (Future) - Compose Multiplatform
-- [ ] KMP module structure with shared core
-- [ ] iOS support via Compose Multiplatform
+### v2.0 (Future)
 - [ ] Desktop support (macOS, Windows, Linux)
 - [ ] Web support (Compose for Web / Wasm)
 - [ ] Video/GIF in tooltip
@@ -611,41 +611,41 @@ fun CoachmarkRepository(): CoachmarkRepository
 ### KMP Module Structure
 
 ```
-compose-coachmark-kmp/
-├── coachmark/
-│   ├── build.gradle.kts              # KMP configuration
+Lumen/
+├── lumen/                                    # KMP library module
+│   ├── build.gradle.kts
 │   └── src/
-│       ├── commonMain/kotlin/        # 95% of code lives here
-│       │   └── com/aditlal/coachmark/
-│       │       ├── CoachmarkHost.kt
-│       │       ├── CoachmarkController.kt
-│       │       ├── CoachmarkTarget.kt
-│       │       ├── CoachmarkState.kt
-│       │       ├── CoachmarkScrim.kt
-│       │       ├── CoachmarkTooltip.kt
-│       │       ├── CoachmarkConfig.kt
-│       │       ├── CoachmarkColors.kt
-│       │       ├── CoachmarkModifier.kt
-│       │       ├── OverlayCoordinator.kt
-│       │       ├── CoachmarkRepository.kt    # expect declarations
-│       │       └── shapes/
-│       │           └── SquirclePath.kt
-│       ├── androidMain/kotlin/
-│       │   └── io/luminos/
-│       │       └── AndroidCoachmarkRepository.kt   # SharedPreferences
-│       ├── iosMain/kotlin/
-│       │   └── io/luminos/
-│       │       └── IosCoachmarkRepository.kt       # NSUserDefaults
-│       ├── desktopMain/kotlin/
-│       │   └── com/aditlal/coachmark/
-│       │       └── CoachmarkRepository.desktop.kt  # java.util.prefs
-│       └── wasmJsMain/kotlin/
-│           └── com/aditlal/coachmark/
-│               └── CoachmarkRepository.web.kt      # localStorage
-├── sample-android/
-├── sample-ios/
-├── sample-desktop/
-└── sample-web/
+│       ├── commonMain/kotlin/io/luminos/     # Shared code (95%)
+│       │   ├── CoachmarkHost.kt
+│       │   ├── CoachmarkController.kt
+│       │   ├── CoachmarkTarget.kt
+│       │   ├── CoachmarkState.kt
+│       │   ├── CoachmarkScrim.kt
+│       │   ├── CoachmarkTooltip.kt
+│       │   ├── CoachmarkConfig.kt
+│       │   ├── CoachmarkColors.kt
+│       │   ├── CoachmarkModifier.kt
+│       │   ├── OverlayCoordinator.kt
+│       │   ├── CoachmarkRepository.kt
+│       │   └── shapes/
+│       │       ├── SquirclePath.kt
+│       │       └── StarPath.kt
+│       ├── androidMain/kotlin/io/luminos/
+│       │   └── AndroidCoachmarkRepository.kt
+│       ├── iosMain/kotlin/io/luminos/
+│       │   └── IosCoachmarkRepository.kt
+│       ├── commonTest/kotlin/io/luminos/         # Unit tests (170)
+│       │   ├── CoachmarkRepositoryTest.kt
+│       │   ├── CoachmarkStateTest.kt
+│       │   ├── CoachmarkControllerTest.kt
+│       │   ├── CoachmarkTargetTest.kt
+│       │   ├── OverlayCoordinatorTest.kt
+│       │   └── shapes/
+│       │       ├── SquirclePathTest.kt
+│       │       └── StarPathTest.kt
+│       └── iosTest/kotlin/io/luminos/            # iOS tests (15)
+│           └── NSUserDefaultsCoachmarkStorageTest.kt
+└── sample/                                       # Compose Multiplatform demo app
 ```
 
 ### build.gradle.kts (KMP)
@@ -727,31 +727,6 @@ kotlin {
 - Consider lazy loading for bundle size
 - localStorage for persistence (limited to ~5MB)
 
-### Migration Path from Android-Only
-
-**Phase 1: Extract to Android module** (current plan)
-```
-lumen/
-└── coachmark/  ← Android library module
-```
-
-**Phase 2: Convert to KMP**
-```
-compose-coachmark/
-├── coachmark/  ← KMP shared module
-└── sample-android/
-```
-
-**Phase 3: Add platforms**
-```
-compose-coachmark/
-├── coachmark/
-├── sample-android/
-├── sample-ios/
-├── sample-desktop/
-└── sample-web/
-```
-
 ### Competitive Advantage
 
 No existing KMP coachmark library exists. Current landscape:
@@ -761,76 +736,34 @@ No existing KMP coachmark library exists. Current landscape:
 | TapTargetView | Android only | No | No |
 | Spotlight | Android only | No | No |
 | ShowcaseView | Android only | No | No |
-| **compose-coachmark** | **KMP (all)** | **Yes** | **Yes** |
-
-Being first to market with a Compose Multiplatform coachmark library is a significant opportunity.
+| **Lumen** | **KMP (Android + iOS)** | **Yes** | **Yes** |
 
 ---
 
 ## Open Source Checklist
 
-### Phase 1: Android Library (v1.0)
-
-- [ ] Abstract `CoachmarkRepository` to interface
-- [ ] Remove app-specific imports
-- [ ] Add generic preview annotations
-- [ ] Create sample app module
-- [ ] Write unit tests for Controller and State
-- [ ] Write UI tests for Scrim rendering
-- [ ] Add KDoc to all public APIs
-- [ ] Create README with GIFs
+### Phase 1: Core Library (v1.0) - Complete
+- [x] Abstract `CoachmarkRepository` to `CoachmarkStorage` interface
+- [x] Create sample app module (Compose Multiplatform)
+- [x] Write unit tests for Controller and State (170 commonTest + 15 iosTest)
+- [ ] Write UI/screenshot tests for Scrim rendering
+- [x] Add KDoc to all public APIs
+- [x] Create README
 - [ ] Set up GitHub Actions for CI
-- [ ] Configure Maven Central publishing
-- [ ] Choose license (Apache 2.0 recommended)
+- [x] Configure Maven Central publishing
+- [x] Apache 2.0 license
 
-### Phase 2: Compose Multiplatform (v2.0)
-
-- [ ] Convert to KMP module structure
-- [ ] Move 95% code to `commonMain`
-- [x] Implement platform-specific CoachmarkStorage (interface-based, not expect/actual)
+### Phase 2: Compose Multiplatform - Complete
+- [x] Convert to KMP module structure
+- [x] Move 95% code to `commonMain`
+- [x] Implement platform-specific CoachmarkStorage (interface-based)
   - [x] Android: SharedPreferences
   - [x] iOS: NSUserDefaults
   - [ ] Desktop: java.util.prefs
   - [ ] Web: localStorage
-- [ ] Create platform-specific sample apps
-- [ ] Set up KMP CI (test on all platforms)
-- [ ] Configure Kotlin Multiplatform Maven publishing
-- [ ] Test on real iOS device (not just simulator)
-- [ ] Verify Web/Wasm bundle size is reasonable
-- [ ] Add platform badges to README
-
-### Module Structure
-
-```
-compose-coachmark/
-├── coachmark/                    # Main library module
-│   ├── src/main/kotlin/
-│   │   └── com/aditlal/coachmark/
-│   │       ├── CoachmarkHost.kt
-│   │       ├── CoachmarkController.kt
-│   │       ├── CoachmarkTarget.kt
-│   │       ├── CoachmarkState.kt
-│   │       ├── CoachmarkScrim.kt
-│   │       ├── CoachmarkTooltip.kt
-│   │       ├── CoachmarkConfig.kt
-│   │       ├── CoachmarkColors.kt
-│   │       ├── CoachmarkModifier.kt
-│   │       ├── OverlayCoordinator.kt
-│   │       ├── CoachmarkRepository.kt
-│   │       └── shapes/
-│   │           └── SquirclePath.kt
-│   └── build.gradle.kts
-├── sample/                       # Demo app
-│   └── src/main/kotlin/
-│       └── com/aditlal/coachmark/sample/
-│           ├── MainActivity.kt
-│           ├── BasicExample.kt
-│           ├── SequenceExample.kt
-│           └── LazyColumnExample.kt
-├── README.md
-├── LICENSE
-└── build.gradle.kts
-```
+- [x] Create Compose Multiplatform sample app (Android + iOS)
+- [x] Configure Kotlin Multiplatform Maven publishing
+- [x] Add platform badges to README
 
 ---
 
@@ -880,9 +813,9 @@ compose-coachmark/
 
 ### Package name suggestion
 ```
-com.aditlal.coachmark
+io.luminos
 ```
-Short, memorable, works across all platforms.
+Published as `io.github.aldefy:lumen` on Maven Central.
 
 ---
 
