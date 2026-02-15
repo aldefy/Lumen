@@ -359,11 +359,27 @@ val repository = CoachmarkRepository()
 
 Uses `NSUserDefaults` under the hood.
 
+### Desktop (JVM)
+
+```kotlin
+val repository = CoachmarkRepository()
+```
+
+Uses `java.util.prefs.Preferences` under the hood.
+
+### Web (Wasm)
+
+```kotlin
+val repository = CoachmarkRepository()
+```
+
+Uses browser `localStorage` under the hood.
+
 ### Using the Repository
 
 ```kotlin
 val repository = CoachmarkRepository(context) // Android
-// val repository = CoachmarkRepository()     // iOS
+// val repository = CoachmarkRepository()     // iOS / Desktop / Web
 
 // Check before showing
 if (!repository.hasSeenCoachmark("onboarding")) {
