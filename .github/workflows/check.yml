@@ -90,6 +90,15 @@ jobs:
       - name: Build sample app
         run: ./gradlew :sample:assembleDebug
 
+      - name: Compile JVM target
+        run: ./gradlew :lumen:jvmJar
+
+      - name: Compile Wasm target
+        run: ./gradlew :lumen:wasmJsJar
+
+      - name: Run JVM tests
+        run: ./gradlew :lumen:jvmTest
+
       - name: Verify screenshot tests
         run: ./gradlew :lumen:verifyRoborazziDebug
 
