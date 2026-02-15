@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
+import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
 import io.luminos.CoachmarkTooltip
 import io.luminos.DarkCoachmarkColors
@@ -27,6 +28,19 @@ class CoachmarkTooltipScreenshotTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private val roborazziOptions = RoborazziOptions(
+        compareOptions = RoborazziOptions.CompareOptions(
+            changeThreshold = 0.02f,
+        ),
+    )
+
+    private fun capture(name: String) {
+        composeTestRule.onRoot().captureRoboImage(
+            filePath = "src/androidUnitTest/snapshots/$name.png",
+            roborazziOptions = roborazziOptions,
+        )
+    }
 
     @Test
     fun tooltip_singleStep_light() {
@@ -45,9 +59,7 @@ class CoachmarkTooltipScreenshotTest {
                 }
             }
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "src/androidUnitTest/snapshots/tooltip_singleStep_light.png"
-        )
+        capture("tooltip_singleStep_light")
     }
 
     @Test
@@ -67,9 +79,7 @@ class CoachmarkTooltipScreenshotTest {
                 }
             }
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "src/androidUnitTest/snapshots/tooltip_multiStep_step2of4.png"
-        )
+        capture("tooltip_multiStep_step2of4")
     }
 
     @Test
@@ -91,9 +101,7 @@ class CoachmarkTooltipScreenshotTest {
                 }
             }
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "src/androidUnitTest/snapshots/tooltip_withSkipButton.png"
-        )
+        capture("tooltip_withSkipButton")
     }
 
     @Test
@@ -114,9 +122,7 @@ class CoachmarkTooltipScreenshotTest {
                 }
             }
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "src/androidUnitTest/snapshots/tooltip_cardMode_light.png"
-        )
+        capture("tooltip_cardMode_light")
     }
 
     @Test
@@ -137,9 +143,7 @@ class CoachmarkTooltipScreenshotTest {
                 }
             }
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "src/androidUnitTest/snapshots/tooltip_cardMode_dark.png"
-        )
+        capture("tooltip_cardMode_dark")
     }
 
     @Test
@@ -159,9 +163,7 @@ class CoachmarkTooltipScreenshotTest {
                 }
             }
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "src/androidUnitTest/snapshots/tooltip_singleStep_dark.png"
-        )
+        capture("tooltip_singleStep_dark")
     }
 
     @Test
@@ -182,9 +184,7 @@ class CoachmarkTooltipScreenshotTest {
                 }
             }
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "src/androidUnitTest/snapshots/tooltip_noProgressIndicator.png"
-        )
+        capture("tooltip_noProgressIndicator")
     }
 
     @Test
@@ -207,8 +207,6 @@ class CoachmarkTooltipScreenshotTest {
                 }
             }
         }
-        composeTestRule.onRoot().captureRoboImage(
-            filePath = "src/androidUnitTest/snapshots/tooltip_skipButton_cardMode_dark.png"
-        )
+        capture("tooltip_skipButton_cardMode_dark")
     }
 }

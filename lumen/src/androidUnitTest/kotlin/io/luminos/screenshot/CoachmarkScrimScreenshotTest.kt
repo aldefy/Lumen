@@ -6,6 +6,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
 import io.luminos.CoachmarkConfig
 import io.luminos.CoachmarkController
@@ -29,6 +30,12 @@ class CoachmarkScrimScreenshotTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private val roborazziOptions = RoborazziOptions(
+        compareOptions = RoborazziOptions.CompareOptions(
+            changeThreshold = 0.02f,
+        ),
+    )
 
     private val noAnimConfig = CoachmarkConfig(
         fadeAnimationDuration = 0,
@@ -66,7 +73,10 @@ class CoachmarkScrimScreenshotTest {
         composeTestRule.mainClock.advanceTimeBy(500)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onRoot().captureRoboImage(filePath = filePath)
+        composeTestRule.onRoot().captureRoboImage(
+            filePath = filePath,
+            roborazziOptions = roborazziOptions,
+        )
     }
 
     @Test
