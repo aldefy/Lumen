@@ -19,6 +19,7 @@ interface CoachmarkStorage {
  *
  * @param storage The storage mechanism to use for persistence.
  *                On Android, use [SharedPrefsCoachmarkStorage] for the default implementation.
+ *                On iOS, use [NSUserDefaultsCoachmarkStorage] for the default implementation.
  */
 class CoachmarkRepository(
     private val storage: CoachmarkStorage,
