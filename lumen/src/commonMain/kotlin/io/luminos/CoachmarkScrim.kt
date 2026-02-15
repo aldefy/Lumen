@@ -403,8 +403,9 @@ private fun CoachmarkScrimContent(
 
     val connectorTooltipGapPx = with(density) { config.connectorTooltipGap.toPx() }
     val strokeWidthPx = with(density) { config.strokeWidth.toPx() }
+    val connectorDotRadiusPx = with(density) { config.connectorDotRadius.toPx() }
     val connectorPoints =
-        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx) {
+        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx) {
             calculateConnectorPoints(
                 target = target,
                 tooltipPosition = tooltipPosition,
@@ -412,6 +413,7 @@ private fun CoachmarkScrimContent(
                 density = density,
                 connectorTooltipGap = connectorTooltipGapPx,
                 strokeWidth = strokeWidthPx,
+                connectorDotRadius = connectorDotRadiusPx,
             )
         }
 
@@ -1005,6 +1007,7 @@ private fun calculateConnectorPoints(
     density: androidx.compose.ui.unit.Density,
     connectorTooltipGap: Float,
     strokeWidth: Float = 0f,
+    connectorDotRadius: Float = 0f,
 ): List<Offset> {
     if (tooltipSize == IntSize.Zero) {
         return emptyList()
@@ -1024,8 +1027,9 @@ private fun calculateConnectorPoints(
 
     // Gap between cutout stroke outer edge and connector start.
     // Stroke is centered on cutoutRadius, so outer edge = cutoutRadius + strokeWidth/2.
-    // Adding strokeWidth clears the stroke with visual breathing room.
-    val cutoutStrokeGap = strokeWidth
+    // We offset by strokeWidth/2 (to reach outer edge) + dotRadius + strokeWidth (breathing room)
+    // so the connector line and its dot fully clear the cutout stroke.
+    val cutoutStrokeGap = strokeWidth / 2f + connectorDotRadius + strokeWidth
 
     val cutoutRadius = when (shape) {
         is CutoutShape.Circle -> {
