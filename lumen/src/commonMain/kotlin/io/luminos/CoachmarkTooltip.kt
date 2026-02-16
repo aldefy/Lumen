@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -50,6 +53,10 @@ import androidx.compose.ui.unit.sp
  * @param showCard Whether to wrap content in a card/box background
  * @param showSkipButton Whether to show a skip button to dismiss the entire sequence
  * @param skipButtonText Text for the skip button
+ * @param showDontShowAgain Whether to show a "Don't show again" checkbox
+ * @param dontShowAgainText Text label for the checkbox
+ * @param dontShowAgainChecked Current checked state of the checkbox
+ * @param onDontShowAgainChanged Callback when the checkbox state changes
  * @param onCtaClick Callback when CTA is clicked
  * @param onSkipClick Callback when Skip is clicked (dismisses entire coachmark)
  */
@@ -66,6 +73,10 @@ fun CoachmarkTooltip(
     showCard: Boolean = false,
     showSkipButton: Boolean = false,
     skipButtonText: String = "Skip",
+    showDontShowAgain: Boolean = false,
+    dontShowAgainText: String = "Don't show again",
+    dontShowAgainChecked: Boolean = false,
+    onDontShowAgainChanged: (Boolean) -> Unit = {},
     onCtaClick: () -> Unit,
     onSkipClick: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -187,6 +198,48 @@ fun CoachmarkTooltip(
                     text = ctaText,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+
+        // "Don't show again" checkbox
+        if (showDontShowAgain) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = dontShowAgainChecked,
+                        onValueChange = onDontShowAgainChanged,
+                        role = Role.Checkbox,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Checkbox(
+                    checked = dontShowAgainChecked,
+                    onCheckedChange = null,
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = colors.ctaButtonColor,
+                        uncheckedColor = if (showCard) colors.descriptionColor else colors.strokeColor.copy(alpha = 0.7f),
+                        checkmarkColor = colors.ctaTextColor,
+                    ),
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = dontShowAgainText,
+                    color = if (showCard) colors.descriptionColor else colors.strokeColor.copy(alpha = 0.8f),
+                    fontSize = 13.sp,
+                    style = if (!showCard) {
+                        TextStyle(
+                            shadow = Shadow(
+                                color = Color.Black.copy(alpha = 0.5f),
+                                offset = Offset(1f, 1f),
+                                blurRadius = 2f,
+                            ),
+                        )
+                    } else {
+                        TextStyle.Default
+                    },
                 )
             }
         }

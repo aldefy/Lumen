@@ -665,4 +665,107 @@ class CoachmarkControllerTest {
         assertTrue(controller.show(target("t2")))
         assertIs<CoachmarkState.Showing>(controller.state.value)
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // "Don't Show Again" / repository integration
+    // ═══════════════════════════════════════════════════════════════════
+
+    private fun targetDSA(
+        id: String,
+        showDontShowAgain: Boolean = true,
+        persistKey: String? = null,
+    ) = CoachmarkTarget(
+        id = id,
+        title = "Title $id",
+        description = "Desc $id",
+        showDontShowAgain = showDontShowAgain,
+        persistKey = persistKey,
+    )
+
+    private fun createRepo(): CoachmarkRepository {
+        return CoachmarkRepository(FakeCoachmarkStorage())
+    }
+
+    @Test
+    fun show_returns_false_when_suppressed_by_repository() = runTest {
+        val repo = createRepo()
+        repo.markCoachmarkSeen("t1")
+        val controller = CoachmarkController(repository = repo)
+        assertFalse(controller.show(targetDSA("t1")))
+        assertIs<CoachmarkState.Hidden>(controller.state.value)
+    }
+
+    @Test
+    fun show_succeeds_when_not_suppressed() = runTest {
+        val repo = createRepo()
+        val controller = CoachmarkController(repository = repo)
+        assertTrue(controller.show(targetDSA("t1")))
+        assertIs<CoachmarkState.Showing>(controller.state.value)
+    }
+
+    @Test
+    fun show_ignores_repository_when_showDontShowAgain_is_false() = runTest {
+        val repo = createRepo()
+        repo.markCoachmarkSeen("t1")
+        val controller = CoachmarkController(repository = repo)
+        // showDontShowAgain is false, so repository is not checked
+        assertTrue(controller.show(targetDSA("t1", showDontShowAgain = false)))
+        assertIs<CoachmarkState.Showing>(controller.state.value)
+    }
+
+    @Test
+    fun showSequence_filters_suppressed_targets() = runTest {
+        val repo = createRepo()
+        repo.markCoachmarkSeen("b")
+        val controller = CoachmarkController(repository = repo)
+        assertTrue(controller.showSequence(listOf(
+            targetDSA("a"),
+            targetDSA("b"),
+            targetDSA("c"),
+        )))
+        val state = controller.state.value
+        assertIs<CoachmarkState.Sequence>(state)
+        assertEquals(2, state.totalSteps)
+        assertEquals("a", state.targets[0].id)
+        assertEquals("c", state.targets[1].id)
+    }
+
+    @Test
+    fun showSequence_returns_false_when_all_suppressed() = runTest {
+        val repo = createRepo()
+        repo.markCoachmarkSeen("a")
+        repo.markCoachmarkSeen("b")
+        val controller = CoachmarkController(repository = repo)
+        assertFalse(controller.showSequence(listOf(
+            targetDSA("a"),
+            targetDSA("b"),
+        )))
+        assertIs<CoachmarkState.Hidden>(controller.state.value)
+    }
+
+    @Test
+    fun markDontShowAgain_persists_via_repository() = runTest {
+        val repo = createRepo()
+        val controller = CoachmarkController(repository = repo)
+        val t = targetDSA("t1")
+        controller.markDontShowAgain(t)
+        assertTrue(repo.hasSeenCoachmark("t1"))
+    }
+
+    @Test
+    fun markDontShowAgain_noop_without_repository() = runTest {
+        val controller = CoachmarkController()
+        val t = targetDSA("t1")
+        controller.markDontShowAgain(t) // should not crash
+    }
+
+    @Test
+    fun markDontShowAgain_uses_persistKey_over_id() = runTest {
+        val repo = createRepo()
+        val controller = CoachmarkController(repository = repo)
+        val t = targetDSA("t1", persistKey = "custom_key")
+        controller.markDontShowAgain(t)
+        assertTrue(repo.hasSeenCoachmark("custom_key"))
+        assertFalse(repo.hasSeenCoachmark("t1"))
+    }
 }
