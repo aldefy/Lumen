@@ -115,6 +115,12 @@ version = libraryVersion
 
 publishing {
     publications.withType<MavenPublication>().configureEach {
+        val publicationName = name
+        val javadocJar = tasks.register("${publicationName}JavadocJar", Jar::class) {
+            archiveClassifier.set("javadoc")
+            archiveAppendix.set(publicationName)
+        }
+        artifact(javadocJar)
         pom {
             name.set("Lumen")
             description.set("Compose Multiplatform coachmark library with transparent cutouts, 6 animations, and customizable tooltips.")
