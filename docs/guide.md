@@ -389,6 +389,47 @@ CoachmarkHost(
 
 > **Note:** The scrim overlay intercepts all taps. True pass-through to the underlying UI is not possible. Use `onTargetTap` to programmatically trigger the target's action.
 
+## Analytics
+
+Track coachmark lifecycle events for product analytics:
+
+```kotlin
+val analytics = CoachmarkAnalytics(
+    onShow = { targetId, stepIndex, totalSteps ->
+        tracker.log("coachmark_shown", targetId)
+    },
+    onDismiss = { targetId, stepIndex, totalSteps, reason ->
+        tracker.log("coachmark_dismissed", mapOf("target" to targetId, "reason" to reason.name))
+    },
+    onAdvance = { fromTargetId, toTargetId, stepIndex, totalSteps ->
+        tracker.log("coachmark_advanced", fromTargetId)
+    },
+    onComplete = { totalSteps ->
+        tracker.log("coachmark_tour_completed", totalSteps)
+    },
+)
+
+CoachmarkHost(
+    controller = controller,
+    analytics = analytics,
+) {
+    // content
+}
+```
+
+### DismissReason
+
+The `onDismiss` callback provides the reason for dismissal:
+
+| Reason | Description |
+|--------|-------------|
+| `SCRIM_TAP` | User tapped the scrim overlay |
+| `SKIP_BUTTON` | User tapped the skip button |
+| `BACK_PRESS` | User pressed the back button |
+| `PROGRAMMATIC` | Dismissed via `controller.dismiss()` |
+| `SUPPRESSED` | Target was suppressed (e.g., "Don't show again") |
+| `DIALOG_INTERRUPTED` | A dialog appeared and auto-dismissed the coachmark |
+
 ## Disabling Coachmarks
 
 Temporarily disable all coachmarks:
