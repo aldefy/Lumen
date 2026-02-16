@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.0-beta05] - Unreleased
+## [1.0.0-beta05] - 2026-02-16
 
 ### Features
 - **Connector endpoint styles** — `DOT` (default), `ARROW`, `NONE`, and `CUSTOM` endpoint decorations where the connector meets the tooltip (#23)

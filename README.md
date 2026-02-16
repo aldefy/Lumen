@@ -36,7 +36,7 @@ Add to your shared module's `build.gradle.kts`:
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.aldefy:lumen:1.0.0-beta04")
+            implementation("io.github.aldefy:lumen:1.0.0-beta05")
         }
     }
 }
@@ -59,7 +59,7 @@ If your project is not using KMP:
 
 ```kotlin
 dependencies {
-    implementation("io.github.aldefy:lumen-android:1.0.0-beta04")
+    implementation("io.github.aldefy:lumen-android:1.0.0-beta05")
 }
 ```
 
@@ -125,8 +125,10 @@ controller.show(
 | `shape` | `CutoutShape` | Shape of the transparent cutout |
 | `tooltipPosition` | `TooltipPosition` | Where tooltip appears relative to target |
 | `connectorStyle` | `ConnectorStyle` | Style of line connecting cutout to tooltip |
+| `connectorEndStyle` | `ConnectorEndStyle` | Endpoint decoration (DOT, ARROW, NONE, CUSTOM) |
 | `highlightAnimation` | `HighlightAnimation` | Animation effect on the cutout |
 | `targetTapBehavior` | `TargetTapBehavior` | What happens when user taps the cutout area |
+| `showDontShowAgain` | `Boolean` | Show "Don't show again" checkbox |
 | `ctaText` | `String` | Call-to-action button text |
 
 ### CutoutShape
@@ -149,6 +151,26 @@ controller.show(
 | `RIPPLE` | Expanding rings emanating outward |
 | `SHIMMER` | Highlight sweeping around the stroke |
 | `BOUNCE` | Energetic scale with overshoot |
+
+### ConnectorStyle
+
+| Style | Description |
+|-------|-------------|
+| `AUTO` | Auto-select based on tooltip position |
+| `VERTICAL` | Straight vertical line |
+| `HORIZONTAL` | Straight horizontal line |
+| `ELBOW` | L-shaped with 90° bend |
+| `DIRECT` | Diagonal line pointing to tooltip |
+| `CURVED` | Smooth quadratic Bezier curve |
+
+### ConnectorEndStyle
+
+| Style | Description |
+|-------|-------------|
+| `DOT` | Small filled circle (default) |
+| `ARROW` | Directional arrowhead toward tooltip |
+| `NONE` | No endpoint decoration |
+| `CUSTOM` | Custom rendering via `DrawScope` lambda |
 
 ### CoachmarkConfig
 
