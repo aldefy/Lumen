@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.luminos.CoachmarkConfig
 import io.luminos.CoachmarkHost
-import io.luminos.CoachmarkRepository
+import com.aditlal.sample.rememberCoachmarkRepository
 import io.luminos.CoachmarkTarget
 import io.luminos.CutoutShape
 import io.luminos.coachmarkColors
@@ -43,7 +43,7 @@ fun DontShowAgainExample(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
 ) {
-    val repository = remember { CoachmarkRepository() }
+    val repository = rememberCoachmarkRepository()
     val controller = rememberCoachmarkController(repository = repository)
     var triggerSequence by remember { mutableStateOf(false) }
     var statusText by remember { mutableStateOf("Tap 'Show Tour' to start") }
