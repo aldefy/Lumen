@@ -76,6 +76,9 @@ import kotlin.math.roundToInt
  * @param colors Theme colors for the scrim
  * @param onDismiss Callback when the scrim is dismissed
  * @param onStepCompleted Callback when a step is completed
+ * @param onTargetTap Callback when the target cutout area is tapped.
+ *        Only invoked when [CoachmarkTarget.targetTapBehavior] is
+ *        [TargetTapBehavior.PASS_THROUGH] or [TargetTapBehavior.BOTH].
  * @param content The content to render underneath the coachmark scrim
  */
 @Composable
@@ -86,6 +89,7 @@ fun CoachmarkHost(
     colors: CoachmarkColors = coachmarkColors(),
     onDismiss: () -> Unit = {},
     onStepCompleted: (stepIndex: Int, targetId: String) -> Unit = { _, _ -> },
+    onTargetTap: (targetId: String) -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     // Auto-dismiss coachmark when a dialog appears
@@ -124,6 +128,7 @@ fun CoachmarkHost(
             colors = colors,
             onDismiss = onDismiss,
             onStepCompleted = onStepCompleted,
+            onTargetTap = onTargetTap,
         )
     }
 }
@@ -231,11 +236,13 @@ fun CoachmarkScrim(
     colors: CoachmarkColors = coachmarkColors(),
     onDismiss: () -> Unit = {},
     onStepCompleted: (stepIndex: Int, targetId: String) -> Unit = { _, _ -> },
+    onTargetTap: (targetId: String) -> Unit = {},
 ) {
     val state by controller.state.collectAsState()
 
     val currentOnDismiss by rememberUpdatedState(onDismiss)
     val currentOnStepCompleted by rememberUpdatedState(onStepCompleted)
+    val currentOnTargetTap by rememberUpdatedState(onTargetTap)
 
     // Track visibility state with delay for smooth appearance after scroll stops
     var isReadyToShow by remember { mutableStateOf(false) }
@@ -329,6 +336,7 @@ fun CoachmarkScrim(
                     controller.dismiss()
                     currentOnDismiss()
                 },
+                onTargetTap = { currentOnTargetTap(currentState.target.id) },
                 modifier = modifier,
             )
         }
@@ -361,6 +369,7 @@ fun CoachmarkScrim(
                     controller.dismiss()
                     currentOnDismiss()
                 },
+                onTargetTap = { currentOnTargetTap(currentState.currentTarget.id) },
                 modifier = modifier,
             )
         }
@@ -378,6 +387,7 @@ private fun CoachmarkScrimContent(
     onNext: () -> Unit,
     onBack: () -> Unit,
     onDismiss: () -> Unit,
+    onTargetTap: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
@@ -580,13 +590,22 @@ private fun CoachmarkScrimContent(
                 alpha = overlayAlpha.value
                 compositingStrategy = CompositingStrategy.Offscreen
             }
-            .pointerInput(config.scrimTapBehavior) {
+            .pointerInput(config.scrimTapBehavior, target.targetTapBehavior) {
                 detectTapGestures { offset ->
                     if (!target.bounds.contains(offset)) {
                         when (config.scrimTapBehavior) {
                             ScrimTapBehavior.DISMISS -> onDismiss()
                             ScrimTapBehavior.ADVANCE -> onNext()
                             ScrimTapBehavior.NONE -> { /* Do nothing */ }
+                        }
+                    } else {
+                        when (target.targetTapBehavior) {
+                            TargetTapBehavior.ADVANCE -> onNext()
+                            TargetTapBehavior.BOTH -> {
+                                onTargetTap()
+                                onNext()
+                            }
+                            TargetTapBehavior.PASS_THROUGH -> onTargetTap()
                         }
                     }
                 }

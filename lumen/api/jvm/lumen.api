@@ -156,8 +156,8 @@ public final class io/luminos/CoachmarkRepository$Companion {
 }
 
 public final class io/luminos/CoachmarkScrimKt {
-	public static final fun CoachmarkHost (Lio/luminos/CoachmarkController;Landroidx/compose/ui/Modifier;Lio/luminos/CoachmarkConfig;Lio/luminos/CoachmarkColors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;II)V
-	public static final fun CoachmarkScrim (Lio/luminos/CoachmarkController;Landroidx/compose/ui/Modifier;Lio/luminos/CoachmarkConfig;Lio/luminos/CoachmarkColors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;II)V
+	public static final fun CoachmarkHost (Lio/luminos/CoachmarkController;Landroidx/compose/ui/Modifier;Lio/luminos/CoachmarkConfig;Lio/luminos/CoachmarkColors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;II)V
+	public static final fun CoachmarkScrim (Lio/luminos/CoachmarkController;Landroidx/compose/ui/Modifier;Lio/luminos/CoachmarkConfig;Lio/luminos/CoachmarkColors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)V
 }
 
 public abstract interface class io/luminos/CoachmarkState {
@@ -216,12 +216,13 @@ public abstract interface class io/luminos/CoachmarkStorage {
 
 public final class io/luminos/CoachmarkTarget {
 	public static final field $stable I
-	public synthetic fun <init> (Ljava/lang/String;Landroidx/compose/ui/geometry/Rect;Lio/luminos/CutoutShape;Ljava/lang/String;Ljava/lang/String;Lio/luminos/TooltipPosition;Lio/luminos/ConnectorStyle;FLio/luminos/ConnectorEndStyle;Ljava/lang/String;Ljava/lang/Boolean;Lio/luminos/HighlightAnimation;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (Ljava/lang/String;Landroidx/compose/ui/geometry/Rect;Lio/luminos/CutoutShape;Ljava/lang/String;Ljava/lang/String;Lio/luminos/TooltipPosition;Lio/luminos/ConnectorStyle;FLio/luminos/ConnectorEndStyle;Ljava/lang/String;Ljava/lang/Boolean;Lio/luminos/HighlightAnimation;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Landroidx/compose/ui/geometry/Rect;Lio/luminos/CutoutShape;Ljava/lang/String;Ljava/lang/String;Lio/luminos/TooltipPosition;Lio/luminos/ConnectorStyle;FLio/luminos/ConnectorEndStyle;Ljava/lang/String;Ljava/lang/Boolean;Lio/luminos/HighlightAnimation;Lio/luminos/TargetTapBehavior;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Landroidx/compose/ui/geometry/Rect;Lio/luminos/CutoutShape;Ljava/lang/String;Ljava/lang/String;Lio/luminos/TooltipPosition;Lio/luminos/ConnectorStyle;FLio/luminos/ConnectorEndStyle;Ljava/lang/String;Ljava/lang/Boolean;Lio/luminos/HighlightAnimation;Lio/luminos/TargetTapBehavior;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()Ljava/lang/String;
 	public final fun component11 ()Ljava/lang/Boolean;
 	public final fun component12 ()Lio/luminos/HighlightAnimation;
+	public final fun component13 ()Lio/luminos/TargetTapBehavior;
 	public final fun component2 ()Landroidx/compose/ui/geometry/Rect;
 	public final fun component3 ()Lio/luminos/CutoutShape;
 	public final fun component4 ()Ljava/lang/String;
@@ -230,8 +231,8 @@ public final class io/luminos/CoachmarkTarget {
 	public final fun component7 ()Lio/luminos/ConnectorStyle;
 	public final fun component8-D9Ej5fM ()F
 	public final fun component9 ()Lio/luminos/ConnectorEndStyle;
-	public final fun copy-gMrHQkA (Ljava/lang/String;Landroidx/compose/ui/geometry/Rect;Lio/luminos/CutoutShape;Ljava/lang/String;Ljava/lang/String;Lio/luminos/TooltipPosition;Lio/luminos/ConnectorStyle;FLio/luminos/ConnectorEndStyle;Ljava/lang/String;Ljava/lang/Boolean;Lio/luminos/HighlightAnimation;)Lio/luminos/CoachmarkTarget;
-	public static synthetic fun copy-gMrHQkA$default (Lio/luminos/CoachmarkTarget;Ljava/lang/String;Landroidx/compose/ui/geometry/Rect;Lio/luminos/CutoutShape;Ljava/lang/String;Ljava/lang/String;Lio/luminos/TooltipPosition;Lio/luminos/ConnectorStyle;FLio/luminos/ConnectorEndStyle;Ljava/lang/String;Ljava/lang/Boolean;Lio/luminos/HighlightAnimation;ILjava/lang/Object;)Lio/luminos/CoachmarkTarget;
+	public final fun copy-f8-ukHw (Ljava/lang/String;Landroidx/compose/ui/geometry/Rect;Lio/luminos/CutoutShape;Ljava/lang/String;Ljava/lang/String;Lio/luminos/TooltipPosition;Lio/luminos/ConnectorStyle;FLio/luminos/ConnectorEndStyle;Ljava/lang/String;Ljava/lang/Boolean;Lio/luminos/HighlightAnimation;Lio/luminos/TargetTapBehavior;)Lio/luminos/CoachmarkTarget;
+	public static synthetic fun copy-f8-ukHw$default (Lio/luminos/CoachmarkTarget;Ljava/lang/String;Landroidx/compose/ui/geometry/Rect;Lio/luminos/CutoutShape;Ljava/lang/String;Ljava/lang/String;Lio/luminos/TooltipPosition;Lio/luminos/ConnectorStyle;FLio/luminos/ConnectorEndStyle;Ljava/lang/String;Ljava/lang/Boolean;Lio/luminos/HighlightAnimation;Lio/luminos/TargetTapBehavior;ILjava/lang/Object;)Lio/luminos/CoachmarkTarget;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBounds ()Landroidx/compose/ui/geometry/Rect;
 	public final fun getConnectorEndStyle ()Lio/luminos/ConnectorEndStyle;
@@ -243,6 +244,7 @@ public final class io/luminos/CoachmarkTarget {
 	public final fun getId ()Ljava/lang/String;
 	public final fun getShape ()Lio/luminos/CutoutShape;
 	public final fun getShowProgressIndicator ()Ljava/lang/Boolean;
+	public final fun getTargetTapBehavior ()Lio/luminos/TargetTapBehavior;
 	public final fun getTitle ()Ljava/lang/String;
 	public final fun getTooltipPosition ()Lio/luminos/TooltipPosition;
 	public fun hashCode ()I
@@ -413,6 +415,15 @@ public final class io/luminos/ScrimTapBehavior : java/lang/Enum {
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/luminos/ScrimTapBehavior;
 	public static fun values ()[Lio/luminos/ScrimTapBehavior;
+}
+
+public final class io/luminos/TargetTapBehavior : java/lang/Enum {
+	public static final field ADVANCE Lio/luminos/TargetTapBehavior;
+	public static final field BOTH Lio/luminos/TargetTapBehavior;
+	public static final field PASS_THROUGH Lio/luminos/TargetTapBehavior;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/luminos/TargetTapBehavior;
+	public static fun values ()[Lio/luminos/TargetTapBehavior;
 }
 
 public final class io/luminos/TooltipPosition : java/lang/Enum {

@@ -12,4 +12,5 @@ enum class Example(val title: String, val description: String) {
     SCRIM_OPACITY("Scrim Opacity", "Light, Medium, Dark, Extra Dark"),
     LAZY_COLUMN("LazyColumn", "Coachmarks in scrollable lists"),
     DIALOG_COORDINATION("Dialog Coordination", "Auto-dismiss when dialogs appear"),
+    TAP_THROUGH("Tap-Through Behavior", "Pass-through, Advance, Both tap modes"),
 }

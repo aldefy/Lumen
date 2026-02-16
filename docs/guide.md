@@ -349,6 +349,46 @@ if (showDialog) {
 }
 ```
 
+## Target Tap Behavior
+
+Control what happens when the user taps on the highlighted cutout area:
+
+| Behavior | Description |
+|----------|-------------|
+| `PASS_THROUGH` | Default — tap on cutout does nothing; only the CTA button advances |
+| `ADVANCE` | Tap on cutout advances to the next step or dismisses |
+| `BOTH` | Tap fires `onTargetTap` callback AND advances |
+
+```kotlin
+CoachmarkTarget(
+    id = "my-target",
+    title = "Tap Me",
+    description = "Tapping the cutout will advance.",
+    targetTapBehavior = TargetTapBehavior.ADVANCE,
+)
+```
+
+### Handling Target Taps
+
+Use the `onTargetTap` callback on `CoachmarkHost` to react when a user taps the cutout:
+
+```kotlin
+CoachmarkHost(
+    controller = controller,
+    onTargetTap = { targetId ->
+        // Programmatically trigger the target's action
+        when (targetId) {
+            "settings" -> openSettings()
+            "profile" -> navigateToProfile()
+        }
+    },
+) {
+    // content
+}
+```
+
+> **Note:** The scrim overlay intercepts all taps. True pass-through to the underlying UI is not possible. Use `onTargetTap` to programmatically trigger the target's action.
+
 ## Disabling Coachmarks
 
 Temporarily disable all coachmarks:

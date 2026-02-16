@@ -177,6 +177,23 @@ class CoachmarkTargetTest {
         assertTrue(values.contains(ConnectorEndStyle.CUSTOM))
     }
 
+    // ── TargetTapBehavior ──────────────────────────────────────────────────
+
+    @Test
+    fun default_targetTapBehavior_is_PASS_THROUGH() {
+        val target = CoachmarkTarget(id = "t1", title = "T", description = "D")
+        assertEquals(TargetTapBehavior.PASS_THROUGH, target.targetTapBehavior)
+    }
+
+    @Test
+    fun targetTapBehavior_enum_has_3_entries() {
+        val values = TargetTapBehavior.entries
+        assertEquals(3, values.size)
+        assertTrue(values.contains(TargetTapBehavior.PASS_THROUGH))
+        assertTrue(values.contains(TargetTapBehavior.ADVANCE))
+        assertTrue(values.contains(TargetTapBehavior.BOTH))
+    }
+
     // ── CutoutShape sealed hierarchy ─────────────────────────────────────
 
     @Test

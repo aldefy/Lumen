@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -85,6 +86,7 @@ fun ExampleGallery(
                         Example.SCRIM_OPACITY -> Icons.Default.DarkMode
                         Example.LAZY_COLUMN -> Icons.AutoMirrored.Filled.List
                         Example.DIALOG_COORDINATION -> Icons.Default.CheckCircle
+                        Example.TAP_THROUGH -> Icons.Default.TouchApp
                     },
                     onClick = { onExampleSelected(example) }
                 )

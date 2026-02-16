@@ -13,6 +13,7 @@ fun CoachmarkHost(
     colors: CoachmarkColors = coachmarkColors(),
     onDismiss: () -> Unit = {},
     onStepCompleted: (stepIndex: Int, targetId: String) -> Unit = { _, _ -> },
+    onTargetTap: (targetId: String) -> Unit = {},
     content: @Composable () -> Unit,
 )
 ```
@@ -25,6 +26,7 @@ fun CoachmarkHost(
 | `colors` | `CoachmarkColors` | Theme colors |
 | `onDismiss` | `() -> Unit` | Called when coachmark is dismissed |
 | `onStepCompleted` | `(Int, String) -> Unit` | Called when a step is completed (index, targetId) |
+| `onTargetTap` | `(String) -> Unit` | Called when user taps the cutout area (for PASS_THROUGH and BOTH behaviors) |
 | `content` | `@Composable () -> Unit` | Your screen content |
 
 ---
@@ -84,6 +86,7 @@ data class CoachmarkTarget(
     val ctaText: String = "Got it!",
     val showProgressIndicator: Boolean? = null,
     val highlightAnimation: HighlightAnimation? = null,
+    val targetTapBehavior: TargetTapBehavior = TargetTapBehavior.PASS_THROUGH,
 )
 ```
 
@@ -101,6 +104,7 @@ data class CoachmarkTarget(
 | `ctaText` | `String` | `"Got it!"` | Call-to-action button text |
 | `showProgressIndicator` | `Boolean?` | `null` | Override global progress setting |
 | `highlightAnimation` | `HighlightAnimation?` | `null` | Override global animation |
+| `targetTapBehavior` | `TargetTapBehavior` | `PASS_THROUGH` | What happens when user taps the cutout area |
 
 ---
 
@@ -351,6 +355,16 @@ enum class ScrimTapBehavior {
 enum class BackPressBehavior {
     DISMISS,   // Back dismisses entirely
     NAVIGATE,  // Back goes to previous step
+}
+```
+
+### TargetTapBehavior
+
+```kotlin
+enum class TargetTapBehavior {
+    PASS_THROUGH,  // Tap on cutout does nothing (default)
+    ADVANCE,       // Tap on cutout advances/dismisses
+    BOTH,          // Fires onTargetTap callback AND advances
 }
 ```
 
