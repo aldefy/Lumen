@@ -36,7 +36,7 @@ Add to your shared module's `build.gradle.kts`:
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.aldefy:lumen:1.0.0-beta03")
+            implementation("io.github.aldefy:lumen:1.0.0-beta04")
         }
     }
 }
@@ -59,7 +59,7 @@ If your project is not using KMP:
 
 ```kotlin
 dependencies {
-    implementation("io.github.aldefy:lumen-android:1.0.0-beta03")
+    implementation("io.github.aldefy:lumen-android:1.0.0-beta04")
 }
 ```
 
