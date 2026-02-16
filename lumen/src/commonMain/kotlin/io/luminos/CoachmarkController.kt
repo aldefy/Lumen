@@ -21,10 +21,14 @@ import kotlinx.coroutines.flow.update
  * @param overlayCoordinator Optional coordinator to prevent coachmarks from showing
  *        when dialogs are active. When provided, [show] and [showSequence] will
  *        silently no-op if any dialog is currently showing.
+ * @param repository Optional repository for "Don't show again" persistence.
+ *        When provided, targets with [CoachmarkTarget.showDontShowAgain] = true
+ *        will be checked/persisted via this repository.
  */
 @Stable
 class CoachmarkController(
     private val overlayCoordinator: OverlayCoordinator? = null,
+    private val repository: CoachmarkRepository? = null,
 ) {
     private val _state = MutableStateFlow<CoachmarkState>(CoachmarkState.Hidden)
     val state: StateFlow<CoachmarkState> = _state.asStateFlow()
@@ -52,6 +56,12 @@ class CoachmarkController(
      * ```
      */
     var scrollRequester: (suspend (targetId: String) -> Unit)? = null
+
+    /**
+     * Called when a target is suppressed by "Don't show again" repository check.
+     * Useful for firing analytics with [DismissReason.SUPPRESSED].
+     */
+    var onSuppressed: ((targetId: String) -> Unit)? = null
 
     /**
      * Global toggle for coachmarks. When false, [show] and [showSequence] silently no-op.
@@ -162,6 +172,15 @@ class CoachmarkController(
             return false
         }
 
+        // Check "Don't show again" suppression
+        if (target.showDontShowAgain) {
+            val key = target.persistKey ?: target.id
+            if (repository?.hasSeenCoachmark(key) == true) {
+                onSuppressed?.invoke(target.id)
+                return false
+            }
+        }
+
         val bounds = registeredTargets[target.id] ?: target.bounds
         _state.value =
             CoachmarkState.Showing(
@@ -195,8 +214,24 @@ class CoachmarkController(
             return false
         }
 
+        // Filter out suppressed targets
+        val filteredTargets = targets.filter { target ->
+            if (target.showDontShowAgain) {
+                val key = target.persistKey ?: target.id
+                val suppressed = repository?.hasSeenCoachmark(key) == true
+                if (suppressed) {
+                    onSuppressed?.invoke(target.id)
+                }
+                !suppressed
+            } else {
+                true
+            }
+        }
+
+        if (filteredTargets.isEmpty()) return false
+
         val updatedTargets =
-            targets.map { target ->
+            filteredTargets.map { target ->
                 val bounds = registeredTargets[target.id] ?: target.bounds
                 target.copy(bounds = bounds)
             }
@@ -246,6 +281,16 @@ class CoachmarkController(
                 else -> currentState
             }
         }
+    }
+
+    /**
+     * Persists the "Don't show again" preference for a target.
+     * Uses [CoachmarkTarget.persistKey] if set, otherwise [CoachmarkTarget.id].
+     * No-op if no [repository] was provided.
+     */
+    fun markDontShowAgain(target: CoachmarkTarget) {
+        val key = target.persistKey ?: target.id
+        repository?.markCoachmarkSeen(key)
     }
 
     /**
@@ -312,13 +357,15 @@ class CoachmarkController(
  * @param overlayCoordinator Optional coordinator to prevent coachmarks when dialogs are showing.
  *        If provided, coachmarks will automatically be blocked when any dialog is active.
  *        Pass [LocalOverlayCoordinator.current] for automatic dialog coordination.
+ * @param repository Optional repository for "Don't show again" persistence.
  */
 @Composable
 fun rememberCoachmarkController(
     overlayCoordinator: OverlayCoordinator? = LocalOverlayCoordinator.current,
+    repository: CoachmarkRepository? = null,
 ): CoachmarkController =
-    remember(overlayCoordinator) {
-        CoachmarkController(overlayCoordinator)
+    remember(overlayCoordinator, repository) {
+        CoachmarkController(overlayCoordinator, repository)
     }
 
 /**
