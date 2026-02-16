@@ -229,6 +229,10 @@ enum class ConnectorEndStyle {
  *           [TargetTapBehavior.PASS_THROUGH] (default) — tap does nothing.
  *           [TargetTapBehavior.ADVANCE] — tap advances/dismisses.
  *           [TargetTapBehavior.BOTH] — fires onTargetTap callback and advances.
+ * @property showDontShowAgain Whether to show a "Don't show again" checkbox in the tooltip.
+ *           Requires a [CoachmarkRepository] on the controller for persistence.
+ * @property persistKey Custom persistence key for "Don't show again" state.
+ *           Defaults to [id] when null.
  */
 @Immutable
 data class CoachmarkTarget(
@@ -245,4 +249,6 @@ data class CoachmarkTarget(
     val showProgressIndicator: Boolean? = null,
     val highlightAnimation: HighlightAnimation? = null,
     val targetTapBehavior: TargetTapBehavior = TargetTapBehavior.PASS_THROUGH,
+    val showDontShowAgain: Boolean = false,
+    val persistKey: String? = null,
 )

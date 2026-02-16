@@ -101,6 +101,13 @@ fun CoachmarkHost(
     val coachmarkState by controller.state.collectAsState()
     val currentAnalytics by rememberUpdatedState(analytics)
 
+    // Wire suppression callback to analytics
+    LaunchedEffect(analytics) {
+        controller.onSuppressed = { targetId ->
+            currentAnalytics?.onDismiss?.invoke(targetId, 0, 0, DismissReason.SUPPRESSED)
+        }
+    }
+
     LaunchedEffect(dialogCount) {
         if (dialogCount > 0 && coachmarkState !is CoachmarkState.Hidden) {
             // Fire analytics for dialog-interrupted dismiss
@@ -198,6 +205,8 @@ data class CoachmarkConfig(
     val waitForVisibility: Boolean = true,
     /** Delay in milliseconds after scroll stops before showing coachmark */
     val visibilityDelay: Long = 150L,
+    /** Text for the "Don't show again" checkbox */
+    val dontShowAgainText: String = "Don't show again",
     /** Timeout in ms after auto-scroll to wait for target visibility. If still not visible, skip. */
     val scrollTimeout: Long = 2000L,
 )
@@ -372,6 +381,7 @@ fun CoachmarkScrim(
                     currentOnDismiss()
                 },
                 onTargetTap = { currentOnTargetTap(currentState.target.id) },
+                onDontShowAgain = { controller.markDontShowAgain(currentState.target) },
                 modifier = modifier,
             )
         }
@@ -426,6 +436,7 @@ fun CoachmarkScrim(
                     currentOnDismiss()
                 },
                 onTargetTap = { currentOnTargetTap(currentState.currentTarget.id) },
+                onDontShowAgain = { controller.markDontShowAgain(currentState.currentTarget) },
                 modifier = modifier,
             )
         }
@@ -444,9 +455,13 @@ private fun CoachmarkScrimContent(
     onBack: () -> Unit,
     onDismiss: (DismissReason) -> Unit,
     onTargetTap: () -> Unit = {},
+    onDontShowAgain: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
+
+    // "Don't show again" checkbox state — resets when target changes
+    var dontShowAgainChecked by remember(target.id) { mutableStateOf(false) }
 
     // Animation states
     val overlayAlpha = remember { Animatable(if (isFirstStep) 0f else 1f) }
@@ -792,8 +807,18 @@ private fun CoachmarkScrimContent(
             colors = colors,
             config = config,
             onSizeChanged = { tooltipSize = it },
-            onNext = onNext,
-            onSkip = { onDismiss(DismissReason.SKIP_BUTTON) },
+            onNext = {
+                if (dontShowAgainChecked) onDontShowAgain()
+                onNext()
+            },
+            onSkip = {
+                if (dontShowAgainChecked) onDontShowAgain()
+                onDismiss(DismissReason.SKIP_BUTTON)
+            },
+            showDontShowAgain = target.showDontShowAgain,
+            dontShowAgainText = config.dontShowAgainText,
+            dontShowAgainChecked = dontShowAgainChecked,
+            onDontShowAgainChanged = { dontShowAgainChecked = it },
         )
     }
 }
@@ -810,6 +835,10 @@ private fun BoxScope.TooltipContainer(
     onSizeChanged: (IntSize) -> Unit,
     onNext: () -> Unit,
     onSkip: () -> Unit,
+    showDontShowAgain: Boolean = false,
+    dontShowAgainText: String = "Don't show again",
+    dontShowAgainChecked: Boolean = false,
+    onDontShowAgainChanged: (Boolean) -> Unit = {},
 ) {
     val showProgressIndicator = target.showProgressIndicator ?: config.showProgressIndicator
 
@@ -834,6 +863,10 @@ private fun BoxScope.TooltipContainer(
             showCard = config.showTooltipCard,
             showSkipButton = config.showSkipButton,
             skipButtonText = config.skipButtonText,
+            showDontShowAgain = showDontShowAgain,
+            dontShowAgainText = dontShowAgainText,
+            dontShowAgainChecked = dontShowAgainChecked,
+            onDontShowAgainChanged = onDontShowAgainChanged,
             onCtaClick = onNext,
             onSkipClick = onSkip,
         )

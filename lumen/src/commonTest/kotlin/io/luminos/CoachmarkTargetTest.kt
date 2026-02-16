@@ -194,6 +194,20 @@ class CoachmarkTargetTest {
         assertTrue(values.contains(TargetTapBehavior.BOTH))
     }
 
+    // ── Don't Show Again defaults ──────────────────────────────────────
+
+    @Test
+    fun default_showDontShowAgain_is_false() {
+        val target = CoachmarkTarget(id = "t1", title = "T", description = "D")
+        assertEquals(false, target.showDontShowAgain)
+    }
+
+    @Test
+    fun default_persistKey_is_null() {
+        val target = CoachmarkTarget(id = "t1", title = "T", description = "D")
+        assertNull(target.persistKey)
+    }
+
     // ── CutoutShape sealed hierarchy ─────────────────────────────────────
 
     @Test
