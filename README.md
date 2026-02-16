@@ -126,6 +126,7 @@ controller.show(
 | `tooltipPosition` | `TooltipPosition` | Where tooltip appears relative to target |
 | `connectorStyle` | `ConnectorStyle` | Style of line connecting cutout to tooltip |
 | `highlightAnimation` | `HighlightAnimation` | Animation effect on the cutout |
+| `targetTapBehavior` | `TargetTapBehavior` | What happens when user taps the cutout area |
 | `ctaText` | `String` | Call-to-action button text |
 
 ### CutoutShape

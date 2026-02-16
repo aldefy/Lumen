@@ -18,6 +18,7 @@ import com.aditlal.sample.examples.SequenceExample
 import com.aditlal.sample.examples.ShapesExample
 import com.aditlal.sample.examples.ThemingExample
 import com.aditlal.sample.examples.TooltipOptionsExample
+import com.aditlal.sample.examples.TapThroughExample
 import com.aditlal.sample.examples.TooltipPositionExample
 import com.aditlal.sample.ui.theme.LumenSampleTheme
 
@@ -76,6 +77,10 @@ fun App() {
                 onBack = { currentExample = null }
             )
             Example.DIALOG_COORDINATION -> DialogCoordinationExample(
+                modifier = Modifier.fillMaxSize(),
+                onBack = { currentExample = null }
+            )
+            Example.TAP_THROUGH -> TapThroughExample(
                 modifier = Modifier.fillMaxSize(),
                 onBack = { currentExample = null }
             )
