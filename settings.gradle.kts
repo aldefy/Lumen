@@ -23,3 +23,4 @@ dependencyResolutionManagement {
 rootProject.name = "Lumen"
 include(":lumen")
 include(":sample")
+include(":sample-web")

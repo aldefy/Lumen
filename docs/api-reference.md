@@ -224,6 +224,7 @@ data class CoachmarkConfig(
     val skipButtonText: String = "Skip",
     val delayBeforeShow: Long = 0L,
     val dontShowAgainText: String = "Don't show again",
+    val connectorCutoutGap: Dp = 12.dp,
 )
 ```
 
@@ -250,6 +251,7 @@ data class CoachmarkConfig(
 | `pulseDurationMs` | `Int` | `1000` | Animation cycle duration (ms) |
 | `showSkipButton` | `Boolean` | `false` | Show skip button in tooltip |
 | `skipButtonText` | `String` | `"Skip"` | Text for skip button |
+| `connectorCutoutGap` | `Dp` | `12.dp` | Minimum gap between cutout animation edge and connector dot |
 | `delayBeforeShow` | `Long` | `0L` | Delay before appearing (ms) |
 | `dontShowAgainText` | `String` | `"Don't show again"` | Text for the "Don't show again" checkbox |
 

@@ -39,11 +39,15 @@ jobs:
       - name: Build Wasm sample
         run: ./gradlew :sample:wasmJsBrowserDistribution
 
+      - name: Build Wasm dashboard
+        run: ./gradlew :sample-web:wasmJsBrowserDistribution
+
       - name: Assemble site
         run: |
           mkdir -p _site
           cp -r docs/* _site/
           cp -r sample/build/dist/wasmJs/productionExecutable/ _site/demo/
+          cp -r sample-web/build/dist/wasmJs/productionExecutable/ _site/dashboard/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
