@@ -503,6 +503,20 @@ Lumen includes built-in accessibility support for TalkBack (Android) and VoiceOv
 
 When `targetTapBehavior` is set to `ADVANCE` or `BOTH`, the screen reader announces "Tap the highlighted area to advance." When `scrimTapBehavior` is `DISMISS` or `ADVANCE`, the corresponding hint is also announced.
 
+### Platform Support
+
+Lumen uses Compose semantics APIs which are cross-platform, but actual screen reader support varies by platform:
+
+| Platform | Screen Reader | Support |
+|----------|--------------|---------|
+| Android | TalkBack | Full |
+| iOS | VoiceOver | Full |
+| Desktop (macOS) | VoiceOver | Partial — Compose for Desktop accessibility is still maturing |
+| Desktop (Windows) | Narrator | Partial — limited Java Access Bridge mapping |
+| Web (Wasm) | Any | Limited — Canvas rendering is opaque to screen readers |
+
+Android and iOS are the only platforms with reliable screen reader integration today. The semantics annotations are in place for all platforms and will work better as Compose Multiplatform's accessibility mapping improves.
+
 ### No Extra Setup Required
 
 All accessibility features are enabled automatically. No configuration needed.
