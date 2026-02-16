@@ -14,6 +14,7 @@
   <a href="https://www.jetbrains.com/compose-multiplatform/"><img src="https://img.shields.io/badge/Compose_Multiplatform-1.7-4285F4.svg?logo=jetpackcompose" alt="Compose Multiplatform"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"/></a>
   <a href="https://aldefy.github.io/Lumen/"><img src="https://img.shields.io/badge/Docs-Website-blue.svg?logo=readthedocs" alt="Documentation"/></a>
+  <a href="https://aldefy.github.io/Lumen/demo/"><img src="https://img.shields.io/badge/Live_Demo-Try_It-10B981.svg?logo=googlechrome&logoColor=white" alt="Live Demo"/></a>
   <img src="https://img.shields.io/badge/Android-3DDC84.svg?logo=android&logoColor=white" alt="Android"/>
   <img src="https://img.shields.io/badge/iOS-000000.svg?logo=apple&logoColor=white" alt="iOS"/>
   <img src="https://img.shields.io/badge/Desktop-JVM-orange.svg?logo=openjdk&logoColor=white" alt="Desktop"/>
@@ -25,6 +26,8 @@
 A Compose Multiplatform coachmark library that creates **true transparent cutouts** in the overlay scrim. Your actual UI remains visible and interactive through the spotlight - animations play, buttons respond, nothing is faked.
 
 > **Supports Android, iOS, Desktop, and Web** via Kotlin Multiplatform.
+
+**[Live Demo](https://aldefy.github.io/Lumen/demo/)** — Try it in your browser, no install required.
 
 ## Installation
 
