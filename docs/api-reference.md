@@ -14,6 +14,7 @@ fun CoachmarkHost(
     onDismiss: () -> Unit = {},
     onStepCompleted: (stepIndex: Int, targetId: String) -> Unit = { _, _ -> },
     onTargetTap: (targetId: String) -> Unit = {},
+    analytics: CoachmarkAnalytics? = null,
     content: @Composable () -> Unit,
 )
 ```
@@ -27,6 +28,7 @@ fun CoachmarkHost(
 | `onDismiss` | `() -> Unit` | Called when coachmark is dismissed |
 | `onStepCompleted` | `(Int, String) -> Unit` | Called when a step is completed (index, targetId) |
 | `onTargetTap` | `(String) -> Unit` | Called when user taps the cutout area (for PASS_THROUGH and BOTH behaviors) |
+| `analytics` | `CoachmarkAnalytics?` | Analytics callbacks for tracking coachmark lifecycle events |
 | `content` | `@Composable () -> Unit` | Your screen content |
 
 ---
@@ -288,6 +290,28 @@ coachmarkColors(darkTheme: Boolean = isSystemInDarkTheme())
 
 ---
 
+## CoachmarkAnalytics
+
+Data class for tracking coachmark lifecycle events.
+
+```kotlin
+data class CoachmarkAnalytics(
+    val onShow: (targetId: String, stepIndex: Int, totalSteps: Int) -> Unit = { _, _, _ -> },
+    val onDismiss: (targetId: String, stepIndex: Int, totalSteps: Int, reason: DismissReason) -> Unit = { _, _, _, _ -> },
+    val onAdvance: (fromTargetId: String, toTargetId: String?, stepIndex: Int, totalSteps: Int) -> Unit = { _, _, _, _ -> },
+    val onComplete: (totalSteps: Int) -> Unit = { _ -> },
+)
+```
+
+| Callback | Description |
+|----------|-------------|
+| `onShow` | Called when a coachmark becomes visible |
+| `onDismiss` | Called when a coachmark is dismissed, with the reason |
+| `onAdvance` | Called when advancing from one step to the next |
+| `onComplete` | Called when the entire sequence is completed |
+
+---
+
 ## Enums
 
 ### TooltipPosition
@@ -355,6 +379,19 @@ enum class ScrimTapBehavior {
 enum class BackPressBehavior {
     DISMISS,   // Back dismisses entirely
     NAVIGATE,  // Back goes to previous step
+}
+```
+
+### DismissReason
+
+```kotlin
+enum class DismissReason {
+    SCRIM_TAP,           // User tapped the scrim overlay
+    SKIP_BUTTON,         // User tapped the skip button
+    BACK_PRESS,          // User pressed back
+    PROGRAMMATIC,        // Dismissed via controller.dismiss()
+    SUPPRESSED,          // Target was suppressed by repository
+    DIALOG_INTERRUPTED,  // A dialog auto-dismissed the coachmark
 }
 ```
 

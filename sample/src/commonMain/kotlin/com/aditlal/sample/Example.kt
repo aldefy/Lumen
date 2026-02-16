@@ -13,4 +13,5 @@ enum class Example(val title: String, val description: String) {
     LAZY_COLUMN("LazyColumn", "Coachmarks in scrollable lists"),
     DIALOG_COORDINATION("Dialog Coordination", "Auto-dismiss when dialogs appear"),
     TAP_THROUGH("Tap-Through Behavior", "Pass-through, Advance, Both tap modes"),
+    ANALYTICS("Analytics Callbacks", "Track onShow, onDismiss, onAdvance, onComplete"),
 }
