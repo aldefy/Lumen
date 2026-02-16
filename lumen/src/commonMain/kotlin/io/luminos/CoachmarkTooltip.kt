@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -124,7 +125,10 @@ fun CoachmarkTooltip(
             ) {
                 TextButton(
                     onClick = onSkipClick,
-                    modifier = Modifier.semantics { role = Role.Button },
+                    modifier = Modifier.semantics {
+                        role = Role.Button
+                        contentDescription = "$skipButtonText. Dismisses all coachmarks."
+                    },
                 ) {
                     Text(
                         text = skipButtonText,
@@ -145,6 +149,7 @@ fun CoachmarkTooltip(
             fontWeight = FontWeight.Bold,
             lineHeight = 26.sp,
             style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
+            modifier = Modifier.semantics { heading() },
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -183,9 +188,10 @@ fun CoachmarkTooltip(
                 onClick = onCtaClick,
                 modifier =
                     Modifier
-                        .heightIn(min = 44.dp)
+                        .heightIn(min = 48.dp)
                         .semantics {
                             role = Role.Button
+                            contentDescription = "$ctaText. Advances to next step."
                         },
                 colors =
                     ButtonDefaults.buttonColors(

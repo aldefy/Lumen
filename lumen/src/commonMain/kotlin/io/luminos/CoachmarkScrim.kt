@@ -42,8 +42,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -463,6 +470,9 @@ private fun CoachmarkScrimContent(
     // "Don't show again" checkbox state — resets when target changes
     var dontShowAgainChecked by remember(target.id) { mutableStateOf(false) }
 
+    // Focus management for accessibility
+    val tooltipFocusRequester = remember { FocusRequester() }
+
     // Animation states
     val overlayAlpha = remember { Animatable(if (isFirstStep) 0f else 1f) }
     val connectorProgress = remember { Animatable(0f) }
@@ -682,8 +692,17 @@ private fun CoachmarkScrimContent(
                 }
             }
             .semantics {
-                contentDescription = "Coachmark overlay: ${target.title}. ${target.description}. " +
-                    "Tap Got it to continue or tap outside to dismiss."
+                contentDescription = buildScrimContentDescription(
+                    target = target,
+                    currentStep = currentStep,
+                    totalSteps = totalSteps,
+                    scrimTapBehavior = config.scrimTapBehavior,
+                )
+                liveRegion = LiveRegionMode.Polite
+                dismiss {
+                    onDismiss(DismissReason.SCRIM_TAP)
+                    true
+                }
             },
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -806,6 +825,7 @@ private fun CoachmarkScrimContent(
             alpha = tooltipEffectiveAlpha,
             colors = colors,
             config = config,
+            focusRequester = tooltipFocusRequester,
             onSizeChanged = { tooltipSize = it },
             onNext = {
                 if (dontShowAgainChecked) onDontShowAgain()
@@ -820,6 +840,17 @@ private fun CoachmarkScrimContent(
             dontShowAgainChecked = dontShowAgainChecked,
             onDontShowAgainChanged = { dontShowAgainChecked = it },
         )
+
+        // Request focus on tooltip after animation completes for a11y
+        LaunchedEffect(target.id, tooltipAlpha.value) {
+            if (tooltipAlpha.value >= 1f) {
+                try {
+                    tooltipFocusRequester.requestFocus()
+                } catch (_: IllegalStateException) {
+                    // FocusRequester not yet attached — ignore
+                }
+            }
+        }
     }
 }
 
@@ -832,6 +863,7 @@ private fun BoxScope.TooltipContainer(
     alpha: Float,
     colors: CoachmarkColors,
     config: CoachmarkConfig,
+    focusRequester: FocusRequester = remember { FocusRequester() },
     onSizeChanged: (IntSize) -> Unit,
     onNext: () -> Unit,
     onSkip: () -> Unit,
@@ -849,6 +881,8 @@ private fun BoxScope.TooltipContainer(
             .onGloballyPositioned { coordinates ->
                 onSizeChanged(coordinates.size)
             }
+            .focusRequester(focusRequester)
+            .semantics { isTraversalGroup = true }
             .padding(config.tooltipMargin),
     ) {
         CoachmarkTooltip(
@@ -1532,4 +1566,34 @@ private fun DrawScope.drawShimmerEffect(
         radius = strokeWidth * 2.5f,
         center = Offset(leadX, leadY),
     )
+}
+
+/**
+ * Builds a dynamic content description for the scrim overlay.
+ * This is a pure function for easy testing.
+ */
+internal fun buildScrimContentDescription(
+    target: CoachmarkTarget,
+    currentStep: Int,
+    totalSteps: Int,
+    scrimTapBehavior: ScrimTapBehavior,
+): String {
+    val sb = StringBuilder()
+    sb.append("Coachmark: ${target.title}. ${target.description}.")
+    sb.append(" Step $currentStep of $totalSteps.")
+
+    when (target.targetTapBehavior) {
+        TargetTapBehavior.ADVANCE, TargetTapBehavior.BOTH -> {
+            sb.append(" Tap the highlighted area to advance.")
+        }
+        TargetTapBehavior.PASS_THROUGH -> { /* no hint needed */ }
+    }
+
+    when (scrimTapBehavior) {
+        ScrimTapBehavior.DISMISS -> sb.append(" Tap outside to dismiss.")
+        ScrimTapBehavior.ADVANCE -> sb.append(" Tap outside to advance.")
+        ScrimTapBehavior.NONE -> { /* no dismiss hint */ }
+    }
+
+    return sb.toString()
 }
