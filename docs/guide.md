@@ -486,6 +486,27 @@ repository.resetCoachmark("onboarding")  // Reset one
 repository.resetAllCoachmarks()           // Reset all
 ```
 
+## Accessibility
+
+Lumen includes built-in accessibility support for TalkBack (Android) and VoiceOver (iOS).
+
+### What's Built In
+
+- **Dynamic content descriptions** — the scrim announces the coachmark title, description, step progress, and available actions
+- **Live region** — screen readers are notified when a new coachmark appears
+- **Focus management** — focus automatically moves to the tooltip when it appears
+- **Semantic heading** — the tooltip title is marked as a heading for navigation
+- **Dismiss action** — screen reader users can dismiss via the accessibility dismiss action
+- **Touch targets** — CTA button meets the 48dp minimum touch target size
+
+### Tap Behavior Hints
+
+When `targetTapBehavior` is set to `ADVANCE` or `BOTH`, the screen reader announces "Tap the highlighted area to advance." When `scrimTapBehavior` is `DISMISS` or `ADVANCE`, the corresponding hint is also announced.
+
+### No Extra Setup Required
+
+All accessibility features are enabled automatically. No configuration needed.
+
 ## Disabling Coachmarks
 
 Temporarily disable all coachmarks:
