@@ -4,13 +4,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
@@ -66,34 +68,43 @@ fun ExampleGallery(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(paddingValues),
+            contentAlignment = Alignment.TopCenter,
         ) {
-            items(Example.entries) { example ->
-                ExampleCard(
-                    example = example,
-                    icon = when (example) {
-                        Example.BASIC -> Icons.Default.Star
-                        Example.SEQUENCE -> Icons.AutoMirrored.Filled.List
-                        Example.SHAPES -> Icons.Default.CheckCircle
-                        Example.CONNECTORS -> Icons.Default.Refresh
-                        Example.ANIMATIONS -> Icons.Default.PlayArrow
-                        Example.TOOLTIP_POSITION -> Icons.Default.LocationOn
-                        Example.TOOLTIP_OPTIONS -> Icons.Default.Info
-                        Example.THEMING -> Icons.Default.Palette
-                        Example.SCRIM_OPACITY -> Icons.Default.DarkMode
-                        Example.LAZY_COLUMN -> Icons.AutoMirrored.Filled.List
-                        Example.DIALOG_COORDINATION -> Icons.Default.CheckCircle
-                        Example.TAP_THROUGH -> Icons.Default.TouchApp
-                        Example.ANALYTICS -> Icons.Default.Timeline
-                        Example.DONT_SHOW_AGAIN -> Icons.Default.Block
-                    },
-                    onClick = { onExampleSelected(example) }
-                )
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 280.dp),
+                modifier = Modifier
+                    .widthIn(max = 960.dp)
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(Example.entries) { example ->
+                    ExampleCard(
+                        example = example,
+                        icon = when (example) {
+                            Example.BASIC -> Icons.Default.Star
+                            Example.SEQUENCE -> Icons.AutoMirrored.Filled.List
+                            Example.SHAPES -> Icons.Default.CheckCircle
+                            Example.CONNECTORS -> Icons.Default.Refresh
+                            Example.ANIMATIONS -> Icons.Default.PlayArrow
+                            Example.TOOLTIP_POSITION -> Icons.Default.LocationOn
+                            Example.TOOLTIP_OPTIONS -> Icons.Default.Info
+                            Example.THEMING -> Icons.Default.Palette
+                            Example.SCRIM_OPACITY -> Icons.Default.DarkMode
+                            Example.LAZY_COLUMN -> Icons.AutoMirrored.Filled.List
+                            Example.DIALOG_COORDINATION -> Icons.Default.CheckCircle
+                            Example.TAP_THROUGH -> Icons.Default.TouchApp
+                            Example.ANALYTICS -> Icons.Default.Timeline
+                            Example.DONT_SHOW_AGAIN -> Icons.Default.Block
+                        },
+                        onClick = { onExampleSelected(example) }
+                    )
+                }
             }
         }
     }
