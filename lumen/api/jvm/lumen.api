@@ -6,6 +6,26 @@ public final class io/luminos/BackPressBehavior : java/lang/Enum {
 	public static fun values ()[Lio/luminos/BackPressBehavior;
 }
 
+public final class io/luminos/CoachmarkAnalytics {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lkotlin/jvm/functions/Function3;
+	public final fun component2 ()Lkotlin/jvm/functions/Function4;
+	public final fun component3 ()Lkotlin/jvm/functions/Function4;
+	public final fun component4 ()Lkotlin/jvm/functions/Function1;
+	public final fun copy (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function1;)Lio/luminos/CoachmarkAnalytics;
+	public static synthetic fun copy$default (Lio/luminos/CoachmarkAnalytics;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/luminos/CoachmarkAnalytics;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOnAdvance ()Lkotlin/jvm/functions/Function4;
+	public final fun getOnComplete ()Lkotlin/jvm/functions/Function1;
+	public final fun getOnDismiss ()Lkotlin/jvm/functions/Function4;
+	public final fun getOnShow ()Lkotlin/jvm/functions/Function3;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class io/luminos/CoachmarkColors {
 	public static final field $stable I
 	public synthetic fun <init> (JJJJJJJJJJJILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -156,8 +176,8 @@ public final class io/luminos/CoachmarkRepository$Companion {
 }
 
 public final class io/luminos/CoachmarkScrimKt {
-	public static final fun CoachmarkHost (Lio/luminos/CoachmarkController;Landroidx/compose/ui/Modifier;Lio/luminos/CoachmarkConfig;Lio/luminos/CoachmarkColors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;II)V
-	public static final fun CoachmarkScrim (Lio/luminos/CoachmarkController;Landroidx/compose/ui/Modifier;Lio/luminos/CoachmarkConfig;Lio/luminos/CoachmarkColors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)V
+	public static final fun CoachmarkHost (Lio/luminos/CoachmarkController;Landroidx/compose/ui/Modifier;Lio/luminos/CoachmarkConfig;Lio/luminos/CoachmarkColors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lio/luminos/CoachmarkAnalytics;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;II)V
+	public static final fun CoachmarkScrim (Lio/luminos/CoachmarkController;Landroidx/compose/ui/Modifier;Lio/luminos/CoachmarkConfig;Lio/luminos/CoachmarkColors;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lio/luminos/CoachmarkAnalytics;Landroidx/compose/runtime/Composer;II)V
 }
 
 public abstract interface class io/luminos/CoachmarkState {
@@ -357,6 +377,18 @@ public final class io/luminos/CutoutShape$Star : io/luminos/CutoutShape {
 
 public final class io/luminos/DesktopCoachmarkRepositoryKt {
 	public static final fun CoachmarkRepository ()Lio/luminos/CoachmarkRepository;
+}
+
+public final class io/luminos/DismissReason : java/lang/Enum {
+	public static final field BACK_PRESS Lio/luminos/DismissReason;
+	public static final field DIALOG_INTERRUPTED Lio/luminos/DismissReason;
+	public static final field PROGRAMMATIC Lio/luminos/DismissReason;
+	public static final field SCRIM_TAP Lio/luminos/DismissReason;
+	public static final field SKIP_BUTTON Lio/luminos/DismissReason;
+	public static final field SUPPRESSED Lio/luminos/DismissReason;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/luminos/DismissReason;
+	public static fun values ()[Lio/luminos/DismissReason;
 }
 
 public final class io/luminos/HighlightAnimation : java/lang/Enum {
