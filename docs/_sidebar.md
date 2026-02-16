@@ -14,6 +14,7 @@
   - [Dialog Coordination](guide.md#dialog-coordination)
   - [Target Tap Behavior](guide.md#target-tap-behavior)
   - [Analytics](guide.md#analytics)
+  - [Don't Show Again](guide.md#dont-show-again)
 
 - **API Reference**
   - [CoachmarkHost](api-reference.md#coachmarkhost)

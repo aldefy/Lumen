@@ -45,6 +45,10 @@ val controller = rememberCoachmarkController()
 // With dialog coordination
 val overlayCoordinator = rememberOverlayCoordinator()
 val controller = rememberCoachmarkController(overlayCoordinator)
+
+// With persistence (for "Don't show again")
+val repository = CoachmarkRepository()
+val controller = rememberCoachmarkController(repository = repository)
 ```
 
 ### Properties
@@ -64,6 +68,7 @@ val controller = rememberCoachmarkController(overlayCoordinator)
 | `next()` | Advance to next step, or dismiss if on last step |
 | `previous()` | Go back one step (no-op on first step) |
 | `dismiss()` | Dismiss the coachmark immediately |
+| `markDontShowAgain(target)` | Persist suppression for a target via repository |
 | `registerTarget(id: String, bounds: Rect)` | Internal: register target bounds |
 | `unregisterTarget(id: String)` | Internal: unregister target |
 | `getTargetBounds(id: String): Rect?` | Get bounds for a registered target |
@@ -89,6 +94,8 @@ data class CoachmarkTarget(
     val showProgressIndicator: Boolean? = null,
     val highlightAnimation: HighlightAnimation? = null,
     val targetTapBehavior: TargetTapBehavior = TargetTapBehavior.PASS_THROUGH,
+    val showDontShowAgain: Boolean = false,
+    val persistKey: String? = null,
 )
 ```
 
@@ -107,6 +114,8 @@ data class CoachmarkTarget(
 | `showProgressIndicator` | `Boolean?` | `null` | Override global progress setting |
 | `highlightAnimation` | `HighlightAnimation?` | `null` | Override global animation |
 | `targetTapBehavior` | `TargetTapBehavior` | `PASS_THROUGH` | What happens when user taps the cutout area |
+| `showDontShowAgain` | `Boolean` | `false` | Show "Don't show again" checkbox in tooltip |
+| `persistKey` | `String?` | `null` | Custom persistence key (defaults to `id`) |
 
 ---
 
@@ -214,6 +223,7 @@ data class CoachmarkConfig(
     val showSkipButton: Boolean = false,
     val skipButtonText: String = "Skip",
     val delayBeforeShow: Long = 0L,
+    val dontShowAgainText: String = "Don't show again",
 )
 ```
 
@@ -241,6 +251,7 @@ data class CoachmarkConfig(
 | `showSkipButton` | `Boolean` | `false` | Show skip button in tooltip |
 | `skipButtonText` | `String` | `"Skip"` | Text for skip button |
 | `delayBeforeShow` | `Long` | `0L` | Delay before appearing (ms) |
+| `dontShowAgainText` | `String` | `"Don't show again"` | Text for the "Don't show again" checkbox |
 
 ---
 
