@@ -13,6 +13,7 @@
   - [Theming](guide.md#theming)
   - [Dialog Coordination](guide.md#dialog-coordination)
   - [Target Tap Behavior](guide.md#target-tap-behavior)
+  - [Analytics](guide.md#analytics)
 
 - **API Reference**
   - [CoachmarkHost](api-reference.md#coachmarkhost)

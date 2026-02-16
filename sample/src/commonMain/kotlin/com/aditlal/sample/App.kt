@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.aditlal.sample.examples.AnalyticsExample
 import com.aditlal.sample.examples.AnimationsExample
 import com.aditlal.sample.examples.BasicExample
 import com.aditlal.sample.examples.ConnectorsExample
@@ -81,6 +82,10 @@ fun App() {
                 onBack = { currentExample = null }
             )
             Example.TAP_THROUGH -> TapThroughExample(
+                modifier = Modifier.fillMaxSize(),
+                onBack = { currentExample = null }
+            )
+            Example.ANALYTICS -> AnalyticsExample(
                 modifier = Modifier.fillMaxSize(),
                 onBack = { currentExample = null }
             )
