@@ -80,6 +80,7 @@ data class CoachmarkTarget(
     val tooltipPosition: TooltipPosition = TooltipPosition.AUTO,
     val connectorStyle: ConnectorStyle = ConnectorStyle.AUTO,
     val connectorLength: Dp = Dp.Unspecified,
+    val connectorEndStyle: ConnectorEndStyle = ConnectorEndStyle.DOT,
     val ctaText: String = "Got it!",
     val showProgressIndicator: Boolean? = null,
     val highlightAnimation: HighlightAnimation? = null,
@@ -96,6 +97,7 @@ data class CoachmarkTarget(
 | `tooltipPosition` | `TooltipPosition` | `AUTO` | Where tooltip appears relative to target |
 | `connectorStyle` | `ConnectorStyle` | `AUTO` | Style of connector line |
 | `connectorLength` | `Dp` | `Unspecified` | Connector length (auto: 40dp) |
+| `connectorEndStyle` | `ConnectorEndStyle` | `DOT` | Endpoint decoration style |
 | `ctaText` | `String` | `"Got it!"` | Call-to-action button text |
 | `showProgressIndicator` | `Boolean?` | `null` | Override global progress setting |
 | `highlightAnimation` | `HighlightAnimation?` | `null` | Override global animation |
@@ -186,6 +188,9 @@ Configuration for coachmark appearance and behavior.
 data class CoachmarkConfig(
     val strokeWidth: Dp = 2.dp,
     val connectorDotRadius: Dp = 4.dp,
+    val connectorArrowSize: Dp = 10.dp,
+    val connectorArrowAngle: Float = 30f,
+    val customConnectorEnd: (DrawScope.(center: Offset, angle: Float) -> Unit)? = null,
     val tooltipMargin: Dp = 16.dp,
     val tooltipGap: Dp = 16.dp,
     val tooltipCornerRadius: Dp = 16.dp,
@@ -210,6 +215,9 @@ data class CoachmarkConfig(
 |----------|------|---------|-------------|
 | `strokeWidth` | `Dp` | `2.dp` | Cutout border stroke width |
 | `connectorDotRadius` | `Dp` | `4.dp` | Radius of connector endpoint dot |
+| `connectorArrowSize` | `Dp` | `10.dp` | Length of arrowhead for `ARROW` end style |
+| `connectorArrowAngle` | `Float` | `30f` | Half-angle of arrowhead wings in degrees |
+| `customConnectorEnd` | `DrawScope.(Offset, Float) -> Unit` | `null` | Custom endpoint rendering lambda for `CUSTOM` end style |
 | `tooltipMargin` | `Dp` | `16.dp` | Minimum distance from screen edges |
 | `tooltipGap` | `Dp` | `16.dp` | Gap between cutout and tooltip |
 | `tooltipCornerRadius` | `Dp` | `16.dp` | Corner radius for tooltip card |
@@ -299,6 +307,18 @@ enum class ConnectorStyle {
     HORIZONTAL,  // Horizontal line with dot
     VERTICAL,    // Vertical line with dot
     ELBOW,       // L-shaped connector
+    CURVED,      // Smooth quadratic Bezier curve
+}
+```
+
+### ConnectorEndStyle
+
+```kotlin
+enum class ConnectorEndStyle {
+    DOT,     // Small filled circle (default)
+    ARROW,   // Directional arrowhead toward tooltip
+    NONE,    // No endpoint decoration
+    CUSTOM,  // Custom rendering via CoachmarkConfig.customConnectorEnd
 }
 ```
 

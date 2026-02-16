@@ -9,6 +9,7 @@
   - [Multi-Step Sequences](guide.md#multi-step-sequences)
   - [Cutout Shapes](guide.md#cutout-shapes)
   - [Highlight Animations](guide.md#highlight-animations)
+  - [Connector End Styles](guide.md#connector-end-styles)
   - [Theming](guide.md#theming)
   - [Dialog Coordination](guide.md#dialog-coordination)
 

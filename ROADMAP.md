@@ -90,9 +90,9 @@ CoachmarkConfig(
 ```
 
 #### Connector Enhancements
-- [ ] **Arrow End Style** — Optional arrow head on connector
-- [ ] **Custom Connector End** — DrawScope lambda for custom shapes
-- [ ] **Curved Connectors** — Bezier curve option
+- [x] **Arrow End Style** — Optional arrow head on connector
+- [x] **Custom Connector End** — DrawScope lambda for custom shapes
+- [x] **Curved Connectors** — Bezier curve option
 
 ```kotlin
 enum class ConnectorEndStyle {
@@ -228,8 +228,8 @@ True cross-platform coachmarks:
 #### Platform Support
 - [x] **Android** — Full feature parity (shipping)
 - [x] **iOS** — Compose Multiplatform for iOS (shipping)
-- [ ] **Desktop** — macOS, Windows, Linux
-- [ ] **Web** — Compose for Web (Wasm)
+- [x] **Desktop** — macOS, Windows, Linux
+- [x] **Web** — Compose for Web (Wasm)
 
 #### Platform Abstractions
 - [x] **Interface-based Persistence** (CoachmarkStorage interface, not expect/actual)

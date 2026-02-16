@@ -192,12 +192,72 @@ The connector line links the cutout to the tooltip:
 | `HORIZONTAL` | Straight horizontal line |
 | `ELBOW` | L-shaped with 90° bend |
 | `DIRECT` | Diagonal line pointing directly to tooltip |
+| `CURVED` | Smooth quadratic Bezier curve |
 
 ```kotlin
 CoachmarkTarget(
     id = "target",
     connectorStyle = ConnectorStyle.ELBOW,
     connectorLength = 60.dp,  // Custom length (default: auto)
+    // ...
+)
+
+// Smooth curved connector
+CoachmarkTarget(
+    id = "curved-target",
+    connectorStyle = ConnectorStyle.CURVED,
+    // ...
+)
+```
+
+## Connector End Styles
+
+Customize the endpoint decoration where the connector meets the tooltip:
+
+| Style | Description |
+|-------|-------------|
+| `DOT` | Small filled circle (default) |
+| `ARROW` | Directional arrowhead pointing toward the tooltip |
+| `NONE` | No endpoint decoration |
+| `CUSTOM` | Custom rendering via `DrawScope` lambda |
+
+```kotlin
+// Arrow endpoint
+CoachmarkTarget(
+    id = "arrow-target",
+    connectorEndStyle = ConnectorEndStyle.ARROW,
+    // ...
+)
+```
+
+### Configuring Arrow Size
+
+```kotlin
+CoachmarkConfig(
+    connectorArrowSize = 10.dp,   // Length of arrowhead (default: 10.dp)
+    connectorArrowAngle = 30f,    // Half-angle of arrowhead wings in degrees (default: 30f)
+)
+```
+
+### Custom Endpoint Rendering
+
+Provide a `DrawScope` lambda for full control over the endpoint:
+
+```kotlin
+CoachmarkConfig(
+    customConnectorEnd = { center, angle ->
+        // Draw a diamond shape at the connector endpoint
+        drawCircle(
+            color = Color.Red,
+            radius = 6f,
+            center = center,
+        )
+    },
+)
+
+CoachmarkTarget(
+    id = "custom-end",
+    connectorEndStyle = ConnectorEndStyle.CUSTOM,
     // ...
 )
 ```
