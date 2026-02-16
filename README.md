@@ -15,6 +15,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"/></a>
   <a href="https://aldefy.github.io/Lumen/"><img src="https://img.shields.io/badge/Docs-Website-blue.svg?logo=readthedocs" alt="Documentation"/></a>
   <a href="https://aldefy.github.io/Lumen/demo/"><img src="https://img.shields.io/badge/Live_Demo-Try_It-10B981.svg?logo=googlechrome&logoColor=white" alt="Live Demo"/></a>
+  <a href="https://aldefy.github.io/Lumen/dashboard/"><img src="https://img.shields.io/badge/Dashboard_Demo-Try_It-6366F1.svg?logo=googlechrome&logoColor=white" alt="Dashboard Demo"/></a>
   <img src="https://img.shields.io/badge/Android-3DDC84.svg?logo=android&logoColor=white" alt="Android"/>
   <img src="https://img.shields.io/badge/iOS-000000.svg?logo=apple&logoColor=white" alt="iOS"/>
   <img src="https://img.shields.io/badge/Desktop-JVM-orange.svg?logo=openjdk&logoColor=white" alt="Desktop"/>
@@ -27,7 +28,7 @@ A Compose Multiplatform coachmark library that creates **true transparent cutout
 
 > **Supports Android, iOS, Desktop, and Web** via Kotlin Multiplatform.
 
-**[Live Demo](https://aldefy.github.io/Lumen/demo/)** — Try it in your browser, no install required.
+**[Live Demo](https://aldefy.github.io/Lumen/demo/)** | **[Dashboard Demo](https://aldefy.github.io/Lumen/dashboard/)** — Try it in your browser, no install required.
 
 ## Installation
 
@@ -185,6 +186,7 @@ controller.show(
 | `showSkipButton` | `false` | Show skip button in tooltip |
 | `showProgressIndicator` | `true` | Show step dots for sequences |
 | `delayBeforeShow` | `0L` | Milliseconds to wait before showing |
+| `connectorCutoutGap` | `12.dp` | Minimum gap between cutout animation edge and connector dot |
 
 ### Controller Methods
 
@@ -197,9 +199,11 @@ controller.dismiss()              // Hide coachmark
 controller.enabled = false        // Disable all coachmarks
 ```
 
-## Sample App
+## Sample Apps
 
-The `sample` module is a Compose Multiplatform app with interactive demos for all features.
+### Feature Catalog (`sample`)
+
+A Compose Multiplatform app with interactive demos for all features.
 
 - **Android:** Open the project in Android Studio and run the `sample` configuration.
 - **iOS:** Open `iosApp/iosApp.xcodeproj` in Xcode and run on a simulator or device.
@@ -209,6 +213,13 @@ The `sample` module is a Compose Multiplatform app with interactive demos for al
 <p align="center">
   <img src="art/ios-sample-screenshot.png" width="280" alt="iOS Sample App"/>
 </p>
+
+### Analytics Dashboard (`sample-web`)
+
+A web-only (wasmJs) dashboard demo showing Lumen coachmarks in a real-world SaaS onboarding scenario. Features a 7-step auto-starting feature tour with varied cutout shapes, animations, and connector styles.
+
+- **Web:** Run `./gradlew :sample-web:wasmJsBrowserDevelopmentRun` to open the dashboard in a browser.
+- **[Live Dashboard Demo](https://aldefy.github.io/Lumen/dashboard/)**
 
 ## Platform Support
 

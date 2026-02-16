@@ -198,3 +198,6 @@ jobs:
 
       - name: Build Wasm sample
         run: ./gradlew :sample:wasmJsBrowserDistribution
+
+      - name: Build Wasm dashboard
+        run: ./gradlew :sample-web:wasmJsBrowserDistribution

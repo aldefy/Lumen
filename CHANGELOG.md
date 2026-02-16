@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Features
+- **Web dashboard demo** — New `sample-web` module with a "Lumen Analytics" SaaS dashboard showcasing a 7-step coachmark tour with varied shapes, animations, and connectors
+- **Connector cutout gap** — New `connectorCutoutGap` config property (default `12.dp`) that ensures the connector dot clears the cutout's outermost animation effect (glow rings, ripple rings, pulse/bounce scale)
+
+### Bug Fixes
+- Fixed connector dot overlapping cutout stroke during PULSE and BOUNCE animations — dot position now accounts for max animation scale
+- Fixed connector dot rendering inside glow/ripple visual effects — gap calculation now considers the true outer bounds of each animation type
+
 ## [1.0.0-beta05] - 2026-02-16
 
 ### Features
