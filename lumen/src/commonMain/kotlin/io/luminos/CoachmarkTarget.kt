@@ -177,6 +177,22 @@ enum class ConnectorStyle {
     CURVED,
 }
 
+/**
+ * Defines what happens when user taps on the coachmark target cutout area.
+ *
+ * Note: The scrim overlay intercepts all taps. True pass-through to the underlying UI
+ * is not possible. Use the [CoachmarkHost.onTargetTap] callback to programmatically
+ * trigger the target's action when needed.
+ */
+enum class TargetTapBehavior {
+    /** Default — tap on cutout does nothing; only the CTA button advances. */
+    PASS_THROUGH,
+    /** Tap on cutout area advances to the next step or dismisses. */
+    ADVANCE,
+    /** Tap on cutout fires [CoachmarkHost.onTargetTap] callback AND advances. */
+    BOTH,
+}
+
 /** Visual style at the endpoint of the connector line. */
 enum class ConnectorEndStyle {
     /** Small filled circle (current default). */
@@ -209,6 +225,10 @@ enum class ConnectorEndStyle {
  * @property highlightAnimation Animation style for the cutout highlight.
  *           - `null` (default): Use global [CoachmarkConfig.highlightAnimation]
  *           - Explicit value: Override for this specific target
+ * @property targetTapBehavior What happens when user taps the cutout area.
+ *           [TargetTapBehavior.PASS_THROUGH] (default) — tap does nothing.
+ *           [TargetTapBehavior.ADVANCE] — tap advances/dismisses.
+ *           [TargetTapBehavior.BOTH] — fires onTargetTap callback and advances.
  */
 @Immutable
 data class CoachmarkTarget(
@@ -224,4 +244,5 @@ data class CoachmarkTarget(
     val ctaText: String = "Got it!",
     val showProgressIndicator: Boolean? = null,
     val highlightAnimation: HighlightAnimation? = null,
+    val targetTapBehavior: TargetTapBehavior = TargetTapBehavior.PASS_THROUGH,
 )
