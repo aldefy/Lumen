@@ -79,6 +79,7 @@ import kotlin.math.roundToInt
  * @param onTargetTap Callback when the target cutout area is tapped.
  *        Only invoked when [CoachmarkTarget.targetTapBehavior] is
  *        [TargetTapBehavior.PASS_THROUGH] or [TargetTapBehavior.BOTH].
+ * @param analytics Optional analytics callbacks for coachmark lifecycle events.
  * @param content The content to render underneath the coachmark scrim
  */
 @Composable
@@ -90,6 +91,7 @@ fun CoachmarkHost(
     onDismiss: () -> Unit = {},
     onStepCompleted: (stepIndex: Int, targetId: String) -> Unit = { _, _ -> },
     onTargetTap: (targetId: String) -> Unit = {},
+    analytics: CoachmarkAnalytics? = null,
     content: @Composable () -> Unit,
 ) {
     // Auto-dismiss coachmark when a dialog appears
@@ -97,9 +99,19 @@ fun CoachmarkHost(
     val dialogCount by coordinator?.activeDialogCount?.collectAsState()
         ?: remember { mutableStateOf(0) }
     val coachmarkState by controller.state.collectAsState()
+    val currentAnalytics by rememberUpdatedState(analytics)
 
     LaunchedEffect(dialogCount) {
         if (dialogCount > 0 && coachmarkState !is CoachmarkState.Hidden) {
+            // Fire analytics for dialog-interrupted dismiss
+            val (targetId, stepIndex, totalSteps) = when (val s = coachmarkState) {
+                is CoachmarkState.Showing -> Triple(s.target.id, 0, s.totalSteps)
+                is CoachmarkState.Sequence -> Triple(s.currentTarget.id, s.currentIndex, s.totalSteps)
+                CoachmarkState.Hidden -> Triple("", 0, 0)
+            }
+            if (targetId.isNotEmpty()) {
+                currentAnalytics?.onDismiss?.invoke(targetId, stepIndex, totalSteps, DismissReason.DIALOG_INTERRUPTED)
+            }
             controller.dismiss()
         }
     }
@@ -129,6 +141,7 @@ fun CoachmarkHost(
             onDismiss = onDismiss,
             onStepCompleted = onStepCompleted,
             onTargetTap = onTargetTap,
+            analytics = analytics,
         )
     }
 }
@@ -237,12 +250,14 @@ fun CoachmarkScrim(
     onDismiss: () -> Unit = {},
     onStepCompleted: (stepIndex: Int, targetId: String) -> Unit = { _, _ -> },
     onTargetTap: (targetId: String) -> Unit = {},
+    analytics: CoachmarkAnalytics? = null,
 ) {
     val state by controller.state.collectAsState()
 
     val currentOnDismiss by rememberUpdatedState(onDismiss)
     val currentOnStepCompleted by rememberUpdatedState(onStepCompleted)
     val currentOnTargetTap by rememberUpdatedState(onTargetTap)
+    val currentAnalytics by rememberUpdatedState(analytics)
 
     // Track visibility state with delay for smooth appearance after scroll stops
     var isReadyToShow by remember { mutableStateOf(false) }
@@ -311,6 +326,18 @@ fun CoachmarkScrim(
         return
     }
 
+    // Fire analytics onShow when a new target becomes visible
+    LaunchedEffect(currentTargetId) {
+        if (currentTargetId != null) {
+            val (stepIndex, totalSteps) = when (val s = state) {
+                is CoachmarkState.Showing -> 0 to s.totalSteps
+                is CoachmarkState.Sequence -> s.currentIndex to s.totalSteps
+                CoachmarkState.Hidden -> return@LaunchedEffect
+            }
+            currentAnalytics?.onShow?.invoke(currentTargetId, stepIndex, totalSteps)
+        }
+    }
+
     when (val currentState = state) {
         CoachmarkState.Hidden -> {
             // Nothing to render
@@ -325,14 +352,22 @@ fun CoachmarkScrim(
                 colors = colors,
                 onNext = {
                     currentOnStepCompleted(0, currentState.target.id)
+                    currentAnalytics?.onAdvance?.invoke(currentState.target.id, null, 0, 1)
+                    currentAnalytics?.onComplete?.invoke(1)
                     controller.next()
                     currentOnDismiss()
                 },
                 onBack = {
+                    currentAnalytics?.onDismiss?.invoke(
+                        currentState.target.id, 0, 1, DismissReason.BACK_PRESS,
+                    )
                     controller.dismiss()
                     currentOnDismiss()
                 },
-                onDismiss = {
+                onDismiss = { reason ->
+                    currentAnalytics?.onDismiss?.invoke(
+                        currentState.target.id, 0, 1, reason,
+                    )
                     controller.dismiss()
                     currentOnDismiss()
                 },
@@ -351,7 +386,16 @@ fun CoachmarkScrim(
                 onNext = {
                     val stepIndex = currentState.currentIndex
                     val targetId = currentState.currentTarget.id
+                    val nextTargetId = if (currentState.hasNext) {
+                        currentState.targets[currentState.currentIndex + 1].id
+                    } else {
+                        null
+                    }
                     currentOnStepCompleted(stepIndex, targetId)
+                    currentAnalytics?.onAdvance?.invoke(targetId, nextTargetId, stepIndex, currentState.totalSteps)
+                    if (!currentState.hasNext) {
+                        currentAnalytics?.onComplete?.invoke(currentState.totalSteps)
+                    }
                     controller.next()
                     if (!currentState.hasNext) {
                         currentOnDismiss()
@@ -361,11 +405,23 @@ fun CoachmarkScrim(
                     if (config.backPressBehavior == BackPressBehavior.NAVIGATE && currentState.hasPrevious) {
                         controller.previous()
                     } else {
+                        currentAnalytics?.onDismiss?.invoke(
+                            currentState.currentTarget.id,
+                            currentState.currentIndex,
+                            currentState.totalSteps,
+                            DismissReason.BACK_PRESS,
+                        )
                         controller.dismiss()
                         currentOnDismiss()
                     }
                 },
-                onDismiss = {
+                onDismiss = { reason ->
+                    currentAnalytics?.onDismiss?.invoke(
+                        currentState.currentTarget.id,
+                        currentState.currentIndex,
+                        currentState.totalSteps,
+                        reason,
+                    )
                     controller.dismiss()
                     currentOnDismiss()
                 },
@@ -386,7 +442,7 @@ private fun CoachmarkScrimContent(
     colors: CoachmarkColors,
     onNext: () -> Unit,
     onBack: () -> Unit,
-    onDismiss: () -> Unit,
+    onDismiss: (DismissReason) -> Unit,
     onTargetTap: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -594,7 +650,7 @@ private fun CoachmarkScrimContent(
                 detectTapGestures { offset ->
                     if (!target.bounds.contains(offset)) {
                         when (config.scrimTapBehavior) {
-                            ScrimTapBehavior.DISMISS -> onDismiss()
+                            ScrimTapBehavior.DISMISS -> onDismiss(DismissReason.SCRIM_TAP)
                             ScrimTapBehavior.ADVANCE -> onNext()
                             ScrimTapBehavior.NONE -> { /* Do nothing */ }
                         }
@@ -737,7 +793,7 @@ private fun CoachmarkScrimContent(
             config = config,
             onSizeChanged = { tooltipSize = it },
             onNext = onNext,
-            onSkip = onDismiss,
+            onSkip = { onDismiss(DismissReason.SKIP_BUTTON) },
         )
     }
 }
