@@ -12,6 +12,7 @@ import com.aditlal.sample.examples.AnimationsExample
 import com.aditlal.sample.examples.BasicExample
 import com.aditlal.sample.examples.ConnectorsExample
 import com.aditlal.sample.examples.DialogCoordinationExample
+import com.aditlal.sample.examples.DontShowAgainExample
 import com.aditlal.sample.examples.ExampleGallery
 import com.aditlal.sample.examples.LazyColumnExample
 import com.aditlal.sample.examples.ScrimOpacityExample
@@ -86,6 +87,10 @@ fun App() {
                 onBack = { currentExample = null }
             )
             Example.ANALYTICS -> AnalyticsExample(
+                modifier = Modifier.fillMaxSize(),
+                onBack = { currentExample = null }
+            )
+            Example.DONT_SHOW_AGAIN -> DontShowAgainExample(
                 modifier = Modifier.fillMaxSize(),
                 onBack = { currentExample = null }
             )

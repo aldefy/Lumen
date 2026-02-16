@@ -430,6 +430,62 @@ The `onDismiss` callback provides the reason for dismissal:
 | `SUPPRESSED` | Target was suppressed (e.g., "Don't show again") |
 | `DIALOG_INTERRUPTED` | A dialog appeared and auto-dismissed the coachmark |
 
+## Don't Show Again
+
+Let users suppress individual coachmarks with a built-in checkbox:
+
+```kotlin
+CoachmarkTarget(
+    id = "onboarding-tip",
+    title = "Pro Tip",
+    description = "Swipe left to archive.",
+    showDontShowAgain = true,  // Shows checkbox in tooltip
+)
+```
+
+### How It Works
+
+1. Set `showDontShowAgain = true` on a target
+2. User sees a "Don't show again" checkbox in the tooltip
+3. If checked and the coachmark is dismissed, it's persisted via `CoachmarkRepository`
+4. Next time `show()` or `showSequence()` is called, suppressed targets are filtered out
+
+### Setup
+
+Pass a `CoachmarkRepository` to the controller:
+
+```kotlin
+val repository = CoachmarkRepository()  // or CoachmarkRepository(context) on Android
+val controller = rememberCoachmarkController(repository = repository)
+```
+
+### Custom Checkbox Text
+
+```kotlin
+CoachmarkConfig(
+    dontShowAgainText = "Never show this tip",
+)
+```
+
+### Custom Persist Key
+
+By default, the target's `id` is used as the persistence key. Override with `persistKey`:
+
+```kotlin
+CoachmarkTarget(
+    id = "v2-onboarding",
+    persistKey = "onboarding",  // shares suppression with any target using this key
+    showDontShowAgain = true,
+)
+```
+
+### Reset
+
+```kotlin
+repository.resetCoachmark("onboarding")  // Reset one
+repository.resetAllCoachmarks()           // Reset all
+```
+
 ## Disabling Coachmarks
 
 Temporarily disable all coachmarks:
