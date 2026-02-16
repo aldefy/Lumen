@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -87,6 +88,7 @@ fun ExampleGallery(
                         Example.LAZY_COLUMN -> Icons.AutoMirrored.Filled.List
                         Example.DIALOG_COORDINATION -> Icons.Default.CheckCircle
                         Example.TAP_THROUGH -> Icons.Default.TouchApp
+                        Example.ANALYTICS -> Icons.Default.Timeline
                     },
                     onClick = { onExampleSelected(example) }
                 )
