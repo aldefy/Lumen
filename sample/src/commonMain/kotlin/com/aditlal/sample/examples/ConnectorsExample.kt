@@ -35,10 +35,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 import io.luminos.CoachmarkConfig
 import io.luminos.CoachmarkHost
 import io.luminos.CoachmarkTarget
+import io.luminos.ConnectorEndStyle
 import io.luminos.ConnectorStyle
 import io.luminos.CutoutShape
 import io.luminos.HighlightAnimation
@@ -63,6 +69,26 @@ fun ConnectorsExample(
             showSkipButton = true,
             skipButtonText = "Skip",
             scrimTapBehavior = ScrimTapBehavior.NONE,
+            customConnectorEnd = { center, angle ->
+                // Diamond shape endpoint
+                val size = 10f
+                val path = Path()
+                path.moveTo(center.x + size * cos(angle), center.y + size * sin(angle))
+                path.lineTo(
+                    center.x + size * cos(angle + PI.toFloat() / 2f),
+                    center.y + size * sin(angle + PI.toFloat() / 2f),
+                )
+                path.lineTo(
+                    center.x + size * cos(angle + PI.toFloat()),
+                    center.y + size * sin(angle + PI.toFloat()),
+                )
+                path.lineTo(
+                    center.x + size * cos(angle - PI.toFloat() / 2f),
+                    center.y + size * sin(angle - PI.toFloat() / 2f),
+                )
+                path.close()
+                drawPath(path = path, color = Color.White)
+            },
         ),
         colors = coachmarkColors(),
     ) {
@@ -108,7 +134,7 @@ fun ConnectorsExample(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Five different ways to connect tooltips to targets",
+                    text = "Eight different ways to connect tooltips to targets",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -226,11 +252,40 @@ fun ConnectorsExample(
                     ctaText = "Next",
                 ),
                 CoachmarkTarget(
+                    id = "horizontal",
+                    title = "Arrow Connector",
+                    description = "Arrowhead endpoint pointing toward the tooltip for clear directionality.",
+                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
+                    connectorStyle = ConnectorStyle.DIRECT,
+                    connectorEndStyle = ConnectorEndStyle.ARROW,
+                    connectorLength = 80.dp,
+                    ctaText = "Next",
+                ),
+                CoachmarkTarget(
+                    id = "vertical",
+                    title = "Curved Connector",
+                    description = "Smooth Bezier curve for an elegant flowing line.",
+                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
+                    connectorStyle = ConnectorStyle.CURVED,
+                    connectorLength = 80.dp,
+                    ctaText = "Next",
+                ),
+                CoachmarkTarget(
                     id = "settings",
                     title = "Auto Connector",
                     description = "Automatically picks the best connector style based on target position. Recommended for most use cases.",
                     shape = CutoutShape.Circle(radiusPadding = 10.dp),
                     connectorStyle = ConnectorStyle.AUTO,
+                    connectorLength = 90.dp,
+                    ctaText = "Next",
+                ),
+                CoachmarkTarget(
+                    id = "notifications",
+                    title = "Custom Endpoint",
+                    description = "Provide a DrawScope lambda for fully custom endpoint rendering.",
+                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
+                    connectorStyle = ConnectorStyle.ELBOW,
+                    connectorEndStyle = ConnectorEndStyle.CUSTOM,
                     connectorLength = 90.dp,
                     ctaText = "Got it!",
                 ),

@@ -32,8 +32,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.ui.graphics.graphicsLayer
@@ -134,6 +136,12 @@ data class CoachmarkConfig(
     val strokeWidth: Dp = 2.dp,
     /** Radius of the dot at the end of the connector line */
     val connectorDotRadius: Dp = 4.dp,
+    /** Size (length) of arrowhead when using ConnectorEndStyle.ARROW */
+    val connectorArrowSize: Dp = 10.dp,
+    /** Half-angle of arrowhead wings in degrees */
+    val connectorArrowAngle: Float = 30f,
+    /** Custom endpoint DrawScope lambda for ConnectorEndStyle.CUSTOM */
+    val customConnectorEnd: (DrawScope.(center: Offset, angle: Float) -> Unit)? = null,
     /** Minimum distance from screen edges for the tooltip */
     val tooltipMargin: Dp = 16.dp,
     /** Gap between the cutout and the tooltip */
@@ -405,9 +413,9 @@ private fun CoachmarkScrimContent(
     val connectorTooltipGapPx = with(density) { config.connectorTooltipGap.toPx() }
     val strokeWidthPx = with(density) { config.strokeWidth.toPx() }
     val connectorDotRadiusPx = with(density) { config.connectorDotRadius.toPx() }
-    val connectorPoints =
+    val connectorPathData =
         remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx) {
-            calculateConnectorPoints(
+            calculateConnectorPath(
                 target = target,
                 tooltipPosition = tooltipPosition,
                 tooltipSize = tooltipSize,
@@ -662,14 +670,39 @@ private fun CoachmarkScrimContent(
                 scale = effectiveScale,
             )
 
-            if (connectorProgress.value > 0f && connectorPoints.isNotEmpty()) {
-                drawConnectorPath(
-                    points = connectorPoints,
-                    progress = connectorProgress.value,
-                    color = colors.connectorColor,
-                    strokeWidth = with(density) { config.strokeWidth.toPx() },
-                    dotRadius = with(density) { config.connectorDotRadius.toPx() },
-                )
+            if (connectorProgress.value > 0f) {
+                val arrowSizePx = with(density) { config.connectorArrowSize.toPx() }
+                val arrowHalfAngleRad = (config.connectorArrowAngle * PI / 180f).toFloat()
+                when (connectorPathData) {
+                    is ConnectorPathData.Segments -> {
+                        if (connectorPathData.points.isNotEmpty()) {
+                            drawConnectorPath(
+                                points = connectorPathData.points,
+                                progress = connectorProgress.value,
+                                color = colors.connectorColor,
+                                strokeWidth = strokeWidthPx,
+                                dotRadius = connectorDotRadiusPx,
+                                endStyle = target.connectorEndStyle,
+                                arrowSize = arrowSizePx,
+                                arrowHalfAngle = arrowHalfAngleRad,
+                                customEnd = config.customConnectorEnd,
+                            )
+                        }
+                    }
+                    is ConnectorPathData.Curve -> {
+                        drawConnectorCurve(
+                            curve = connectorPathData,
+                            progress = connectorProgress.value,
+                            color = colors.connectorColor,
+                            strokeWidth = strokeWidthPx,
+                            dotRadius = connectorDotRadiusPx,
+                            endStyle = target.connectorEndStyle,
+                            arrowSize = arrowSizePx,
+                            arrowHalfAngle = arrowHalfAngleRad,
+                            customEnd = config.customConnectorEnd,
+                        )
+                    }
+                }
             }
         }
 
@@ -910,6 +943,10 @@ private fun DrawScope.drawConnectorPath(
     color: Color,
     strokeWidth: Float,
     dotRadius: Float,
+    endStyle: ConnectorEndStyle = ConnectorEndStyle.DOT,
+    arrowSize: Float = 0f,
+    arrowHalfAngle: Float = 0f,
+    customEnd: (DrawScope.(Offset, Float) -> Unit)? = null,
 ) {
     if (points.size < 2) return
 
@@ -949,11 +986,108 @@ private fun DrawScope.drawConnectorPath(
     }
 
     if (progress >= 1f) {
-        drawCircle(
+        val angle = calculateConnectorAngle(points)
+        drawConnectorEndpoint(endStyle, color, dotRadius, points.last(), angle, arrowSize, arrowHalfAngle, customEnd)
+    }
+}
+
+/** Draws the endpoint decoration based on the chosen [ConnectorEndStyle]. */
+private fun DrawScope.drawConnectorEndpoint(
+    endStyle: ConnectorEndStyle,
+    color: Color,
+    dotRadius: Float,
+    center: Offset,
+    angle: Float,
+    arrowSize: Float,
+    arrowHalfAngle: Float,
+    customEnd: (DrawScope.(Offset, Float) -> Unit)?,
+) {
+    when (endStyle) {
+        ConnectorEndStyle.DOT -> {
+            drawCircle(color = color, radius = dotRadius, center = center)
+        }
+        ConnectorEndStyle.ARROW -> {
+            drawArrowHead(center, angle, arrowSize, arrowHalfAngle, color)
+        }
+        ConnectorEndStyle.NONE -> { /* no-op */ }
+        ConnectorEndStyle.CUSTOM -> {
+            customEnd?.invoke(this, center, angle)
+        }
+    }
+}
+
+/** Angle (radians) of the last segment of a connector path. */
+private fun calculateConnectorAngle(points: List<Offset>): Float {
+    if (points.size < 2) return 0f
+    val from = points[points.size - 2]
+    val to = points.last()
+    return atan2(to.y - from.y, to.x - from.x)
+}
+
+/** Draws a filled triangle arrowhead at the given point. */
+private fun DrawScope.drawArrowHead(
+    center: Offset,
+    angle: Float,
+    size: Float,
+    halfAngle: Float,
+    color: Color,
+) {
+    val path = Path()
+    path.moveTo(center.x, center.y)
+    val leftAngle = angle + PI.toFloat() + halfAngle
+    path.lineTo(center.x + size * cos(leftAngle), center.y + size * sin(leftAngle))
+    val rightAngle = angle + PI.toFloat() - halfAngle
+    path.lineTo(center.x + size * cos(rightAngle), center.y + size * sin(rightAngle))
+    path.close()
+    drawPath(path = path, color = color)
+}
+
+/** Draws a Bezier curve connector with progressive animation. */
+private fun DrawScope.drawConnectorCurve(
+    curve: ConnectorPathData.Curve,
+    progress: Float,
+    color: Color,
+    strokeWidth: Float,
+    dotRadius: Float,
+    endStyle: ConnectorEndStyle = ConnectorEndStyle.DOT,
+    arrowSize: Float = 0f,
+    arrowHalfAngle: Float = 0f,
+    customEnd: (DrawScope.(Offset, Float) -> Unit)? = null,
+) {
+    val steps = 50
+    val totalSteps = (steps * progress).toInt().coerceAtLeast(1)
+    val points = mutableListOf<Offset>()
+    for (i in 0..totalSteps) {
+        val t = i.toFloat() / steps
+        val oneMinusT = 1f - t
+        val x = oneMinusT * oneMinusT * curve.start.x +
+            2f * oneMinusT * t * curve.control.x +
+            t * t * curve.end.x
+        val y = oneMinusT * oneMinusT * curve.start.y +
+            2f * oneMinusT * t * curve.control.y +
+            t * t * curve.end.y
+        points.add(Offset(x, y))
+    }
+
+    if (points.size >= 2) {
+        val path = Path()
+        path.moveTo(points[0].x, points[0].y)
+        for (i in 1 until points.size) {
+            path.lineTo(points[i].x, points[i].y)
+        }
+        drawPath(
+            path = path,
             color = color,
-            radius = dotRadius,
-            center = points.last(),
+            style = Stroke(width = strokeWidth),
         )
+    }
+
+    if (progress >= 1f && points.size >= 2) {
+        val angle = atan2(
+            points.last().y - points[points.size - 2].y,
+            points.last().x - points[points.size - 2].x,
+        )
+        drawConnectorEndpoint(endStyle, color, dotRadius, points.last(), angle, arrowSize, arrowHalfAngle, customEnd)
     }
 }
 
@@ -1018,7 +1152,12 @@ private fun calculateTooltipPosition(
     return Offset(x, y)
 }
 
-private fun calculateConnectorPoints(
+private sealed interface ConnectorPathData {
+    data class Segments(val points: List<Offset>) : ConnectorPathData
+    data class Curve(val start: Offset, val control: Offset, val end: Offset) : ConnectorPathData
+}
+
+private fun calculateConnectorPath(
     target: CoachmarkTarget,
     tooltipPosition: Offset,
     tooltipSize: IntSize,
@@ -1026,9 +1165,9 @@ private fun calculateConnectorPoints(
     connectorTooltipGap: Float,
     strokeWidth: Float = 0f,
     connectorDotRadius: Float = 0f,
-): List<Offset> {
+): ConnectorPathData {
     if (tooltipSize == IntSize.Zero) {
-        return emptyList()
+        return ConnectorPathData.Segments(emptyList())
     }
 
     val targetBounds = target.bounds
@@ -1097,7 +1236,7 @@ private fun calculateConnectorPoints(
     }
 
     return when (resolvedStyle) {
-        ConnectorStyle.AUTO -> emptyList()
+        ConnectorStyle.AUTO -> ConnectorPathData.Segments(emptyList())
 
         ConnectorStyle.HORIZONTAL -> {
             val goingLeft = tooltipCenterX < targetCenter.x
@@ -1112,7 +1251,7 @@ private fun calculateConnectorPoints(
                 cutoutEdgePoint.x + lineLength
             }
             val endPoint = Offset(x = endPointX, y = targetCenter.y)
-            listOf(cutoutEdgePoint, endPoint)
+            ConnectorPathData.Segments(listOf(cutoutEdgePoint, endPoint))
         }
 
         ConnectorStyle.VERTICAL -> {
@@ -1128,7 +1267,7 @@ private fun calculateConnectorPoints(
                 tooltipPosition.y + tooltipSize.height + connectorTooltipGap
             }
             val endPoint = Offset(x = targetCenter.x, y = endPointY)
-            listOf(cutoutEdgePoint, endPoint)
+            ConnectorPathData.Segments(listOf(cutoutEdgePoint, endPoint))
         }
 
         ConnectorStyle.ELBOW -> {
@@ -1150,7 +1289,7 @@ private fun calculateConnectorPoints(
                 tooltipPosition.y + tooltipSize.height + connectorTooltipGap
             }
             val endPoint = Offset(x = cornerX, y = endPointY)
-            listOf(cutoutEdgePoint, cornerPoint, endPoint)
+            ConnectorPathData.Segments(listOf(cutoutEdgePoint, cornerPoint, endPoint))
         }
 
         ConnectorStyle.DIRECT -> {
@@ -1178,7 +1317,7 @@ private fun calculateConnectorPoints(
             val distance = kotlin.math.sqrt(dx * dx + dy * dy)
 
             if (distance < 1f) {
-                return emptyList()
+                return ConnectorPathData.Segments(emptyList())
             }
 
             val normalizedDx = dx / distance
@@ -1189,7 +1328,21 @@ private fun calculateConnectorPoints(
                 x = targetCenter.x + normalizedDx * startRadius,
                 y = targetCenter.y + normalizedDy * startRadius,
             )
-            listOf(cutoutEdgePoint, tooltipConnectionPoint)
+            ConnectorPathData.Segments(listOf(cutoutEdgePoint, tooltipConnectionPoint))
+        }
+
+        ConnectorStyle.CURVED -> {
+            val direction = if (isTooltipBelow) 1f else -1f
+            val startRadius = cutoutRadius + cutoutStrokeGap
+            val cutoutEdgePoint = Offset(targetCenter.x, targetCenter.y + direction * startRadius)
+            val endPointY = if (isTooltipBelow) {
+                tooltipPosition.y - connectorTooltipGap
+            } else {
+                tooltipPosition.y + tooltipSize.height + connectorTooltipGap
+            }
+            val endPoint = Offset(tooltipCenterX, endPointY)
+            val controlPoint = Offset(targetCenter.x, (cutoutEdgePoint.y + endPoint.y) / 2f)
+            ConnectorPathData.Curve(cutoutEdgePoint, controlPoint, endPoint)
         }
     }
 }

@@ -172,6 +172,21 @@ enum class ConnectorStyle {
      * L-shaped connector: horizontal from cutout edge, then 90 degree turn down/up to tooltip.
      */
     ELBOW,
+
+    /** Smooth curved connector using a quadratic Bezier curve. */
+    CURVED,
+}
+
+/** Visual style at the endpoint of the connector line. */
+enum class ConnectorEndStyle {
+    /** Small filled circle (current default). */
+    DOT,
+    /** Directional arrowhead pointing toward the tooltip. */
+    ARROW,
+    /** No endpoint decoration. */
+    NONE,
+    /** Custom rendering via CoachmarkConfig.customConnectorEnd lambda. */
+    CUSTOM,
 }
 
 /**
@@ -185,6 +200,7 @@ enum class ConnectorStyle {
  * @property tooltipPosition Where to position the tooltip relative to the target
  * @property connectorStyle The style/angle of the connector line
  * @property connectorLength Length of connector line (Dp.Unspecified = auto/default 40dp)
+ * @property connectorEndStyle Visual style at the endpoint of the connector line
  * @property ctaText Custom CTA button text (defaults to "Got it!")
  * @property showProgressIndicator Override for progress indicator visibility.
  *           - `null` (default): Use global [CoachmarkConfig.showProgressIndicator]
@@ -204,6 +220,7 @@ data class CoachmarkTarget(
     val tooltipPosition: TooltipPosition = TooltipPosition.AUTO,
     val connectorStyle: ConnectorStyle = ConnectorStyle.AUTO,
     val connectorLength: Dp = Dp.Unspecified,
+    val connectorEndStyle: ConnectorEndStyle = ConnectorEndStyle.DOT,
     val ctaText: String = "Got it!",
     val showProgressIndicator: Boolean? = null,
     val highlightAnimation: HighlightAnimation? = null,
