@@ -398,6 +398,7 @@ private fun CoachmarkScrimContent(
                 margin = with(density) { config.tooltipMargin.toPx() },
                 gap = with(density) { config.tooltipGap.toPx() },
                 connectorLength = connectorLengthPx,
+                connectorStyle = target.connectorStyle,
             )
         }
 
@@ -964,19 +965,37 @@ private fun calculateTooltipPosition(
     margin: Float,
     gap: Float,
     connectorLength: Float,
+    connectorStyle: ConnectorStyle = ConnectorStyle.AUTO,
 ): Offset {
     if (screenSize == IntSize.Zero) {
         return Offset.Zero
     }
 
     val screenCenterX = screenSize.width / 2f
+    val targetCenterX = targetBounds.center.x
     val targetCenterY = targetBounds.center.y
-
-    val preferBottom = tooltipPosition == TooltipPosition.BOTTOM ||
-        (tooltipPosition == TooltipPosition.AUTO && targetCenterY < screenSize.height / 2)
 
     // Use connectorLength if specified, otherwise use the default gap
     val effectiveGap = if (connectorLength > 0f) connectorLength else gap
+
+    // For HORIZONTAL connector style, position tooltip beside the target
+    if (connectorStyle == ConnectorStyle.HORIZONTAL) {
+        val goingLeft = targetCenterX >= screenCenterX
+        val x = if (goingLeft) {
+            (targetBounds.left - effectiveGap - tooltipSize.width)
+                .coerceIn(margin, screenSize.width - tooltipSize.width - margin)
+        } else {
+            (targetBounds.right + effectiveGap)
+                .coerceIn(margin, screenSize.width - tooltipSize.width - margin)
+        }
+        // Align tooltip top with connector line (target center Y)
+        val y = targetCenterY
+            .coerceIn(margin, screenSize.height - tooltipSize.height - margin)
+        return Offset(x, y)
+    }
+
+    val preferBottom = tooltipPosition == TooltipPosition.BOTTOM ||
+        (tooltipPosition == TooltipPosition.AUTO && targetCenterY < screenSize.height / 2)
 
     val y = if (preferBottom) {
         targetBounds.bottom + effectiveGap
@@ -988,7 +1007,6 @@ private fun calculateTooltipPosition(
         TooltipPosition.START -> margin
         TooltipPosition.END -> screenSize.width - tooltipSize.width - margin
         else -> {
-            val targetCenterX = targetBounds.center.x
             if (targetCenterX < screenCenterX) {
                 margin
             } else {
