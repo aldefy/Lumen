@@ -152,12 +152,29 @@ class CoachmarkTargetTest {
     @Test
     fun connectorStyle_values() {
         val values = ConnectorStyle.entries
-        assertEquals(5, values.size)
+        assertEquals(6, values.size)
         assertTrue(values.contains(ConnectorStyle.AUTO))
         assertTrue(values.contains(ConnectorStyle.DIRECT))
         assertTrue(values.contains(ConnectorStyle.HORIZONTAL))
         assertTrue(values.contains(ConnectorStyle.VERTICAL))
         assertTrue(values.contains(ConnectorStyle.ELBOW))
+        assertTrue(values.contains(ConnectorStyle.CURVED))
+    }
+
+    @Test
+    fun default_connectorEndStyle_is_DOT() {
+        val target = CoachmarkTarget(id = "t1", title = "T", description = "D")
+        assertEquals(ConnectorEndStyle.DOT, target.connectorEndStyle)
+    }
+
+    @Test
+    fun connectorEndStyle_values() {
+        val values = ConnectorEndStyle.entries
+        assertEquals(4, values.size)
+        assertTrue(values.contains(ConnectorEndStyle.DOT))
+        assertTrue(values.contains(ConnectorEndStyle.ARROW))
+        assertTrue(values.contains(ConnectorEndStyle.NONE))
+        assertTrue(values.contains(ConnectorEndStyle.CUSTOM))
     }
 
     // ── CutoutShape sealed hierarchy ─────────────────────────────────────
