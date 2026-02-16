@@ -41,6 +41,10 @@ controller.show(
 )
 ```
 
+## Live Demo
+
+Try the interactive [Wasm demo](demo/) in your browser — no install required.
+
 ## Get Started
 
 Check out the [Getting Started](getting-started.md) guide to add Lumen to your project.
