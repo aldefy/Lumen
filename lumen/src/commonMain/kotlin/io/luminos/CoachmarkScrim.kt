@@ -1246,9 +1246,9 @@ private fun calculateConnectorPath(
                 y = targetCenter.y,
             )
             val endPointX = if (goingLeft) {
-                cutoutEdgePoint.x - lineLength
+                tooltipPosition.x + tooltipSize.width + connectorTooltipGap
             } else {
-                cutoutEdgePoint.x + lineLength
+                tooltipPosition.x - connectorTooltipGap
             }
             val endPoint = Offset(x = endPointX, y = targetCenter.y)
             ConnectorPathData.Segments(listOf(cutoutEdgePoint, endPoint))
