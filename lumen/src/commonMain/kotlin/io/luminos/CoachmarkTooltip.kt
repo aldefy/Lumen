@@ -38,6 +38,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 
 /**
@@ -78,6 +79,9 @@ fun CoachmarkTooltip(
     dontShowAgainText: String = "Don't show again",
     dontShowAgainChecked: Boolean = false,
     onDontShowAgainChanged: (Boolean) -> Unit = {},
+    ctaMinWidth: Dp = Dp.Unspecified,
+    ctaMinHeight: Dp = 48.dp,
+    ctaCornerRadius: Dp = 22.dp,
     onCtaClick: () -> Unit,
     onSkipClick: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -188,7 +192,11 @@ fun CoachmarkTooltip(
                 onClick = onCtaClick,
                 modifier =
                     Modifier
-                        .heightIn(min = 48.dp)
+                        .heightIn(min = ctaMinHeight)
+                        .then(
+                            if (ctaMinWidth.isSpecified) Modifier.widthIn(min = ctaMinWidth)
+                            else Modifier
+                        )
                         .semantics {
                             role = Role.Button
                             contentDescription = "$ctaText. Advances to next step."
@@ -198,7 +206,7 @@ fun CoachmarkTooltip(
                         containerColor = colors.ctaButtonColor,
                         contentColor = colors.ctaTextColor,
                     ),
-                shape = RoundedCornerShape(22.dp),
+                shape = RoundedCornerShape(ctaCornerRadius),
             ) {
                 Text(
                     text = ctaText,

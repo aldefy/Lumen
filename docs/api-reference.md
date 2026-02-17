@@ -225,6 +225,9 @@ data class CoachmarkConfig(
     val delayBeforeShow: Long = 0L,
     val dontShowAgainText: String = "Don't show again",
     val connectorCutoutGap: Dp = 12.dp,
+    val ctaMinWidth: Dp = Dp.Unspecified,
+    val ctaMinHeight: Dp = 48.dp,
+    val ctaCornerRadius: Dp = 22.dp,
 )
 ```
 
@@ -254,6 +257,9 @@ data class CoachmarkConfig(
 | `connectorCutoutGap` | `Dp` | `12.dp` | Minimum gap between cutout animation edge and connector dot |
 | `delayBeforeShow` | `Long` | `0L` | Delay before appearing (ms) |
 | `dontShowAgainText` | `String` | `"Don't show again"` | Text for the "Don't show again" checkbox |
+| `ctaMinWidth` | `Dp` | `Dp.Unspecified` | Minimum width for the CTA button (unspecified = wrap content) |
+| `ctaMinHeight` | `Dp` | `48.dp` | Minimum height for the CTA button |
+| `ctaCornerRadius` | `Dp` | `22.dp` | Corner radius for the CTA button shape |
 
 ---
 

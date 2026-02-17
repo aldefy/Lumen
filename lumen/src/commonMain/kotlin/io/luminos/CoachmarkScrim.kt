@@ -219,6 +219,12 @@ data class CoachmarkConfig(
     val scrollTimeout: Long = 2000L,
     /** Minimum gap between the cutout's outermost visual effect and the connector dot */
     val connectorCutoutGap: Dp = 12.dp,
+    /** Minimum width for the CTA button (Dp.Unspecified = wrap content) */
+    val ctaMinWidth: Dp = Dp.Unspecified,
+    /** Minimum height for the CTA button */
+    val ctaMinHeight: Dp = 48.dp,
+    /** Corner radius for the CTA button shape */
+    val ctaCornerRadius: Dp = 22.dp,
 )
 
 /**
@@ -910,6 +916,9 @@ private fun BoxScope.TooltipContainer(
             dontShowAgainText = dontShowAgainText,
             dontShowAgainChecked = dontShowAgainChecked,
             onDontShowAgainChanged = onDontShowAgainChanged,
+            ctaMinWidth = config.ctaMinWidth,
+            ctaMinHeight = config.ctaMinHeight,
+            ctaCornerRadius = config.ctaCornerRadius,
             onCtaClick = onNext,
             onSkipClick = onSkip,
         )
