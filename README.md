@@ -187,6 +187,9 @@ controller.show(
 | `showProgressIndicator` | `true` | Show step dots for sequences |
 | `delayBeforeShow` | `0L` | Milliseconds to wait before showing |
 | `connectorCutoutGap` | `12.dp` | Minimum gap between cutout animation edge and connector dot |
+| `ctaMinWidth` | `Dp.Unspecified` | Minimum width for the CTA button (unspecified = wrap content) |
+| `ctaMinHeight` | `48.dp` | Minimum height for the CTA button |
+| `ctaCornerRadius` | `22.dp` | Corner radius for the CTA button shape |
 
 ### Controller Methods
 
