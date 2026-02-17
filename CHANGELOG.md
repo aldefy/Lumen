@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta06] - 2026-02-17
+
 ### Features
+- **CTA button customization** — New `ctaMinWidth`, `ctaMinHeight`, and `ctaCornerRadius` properties on `CoachmarkConfig` to control CTA button dimensions and shape (#40)
 - **Web dashboard demo** — New `sample-web` module with a "Lumen Analytics" SaaS dashboard showcasing a 7-step coachmark tour with varied shapes, animations, and connectors
 - **Connector cutout gap** — New `connectorCutoutGap` config property (default `12.dp`) that ensures the connector dot clears the cutout's outermost animation effect (glow rings, ripple rings, pulse/bounce scale)
 
