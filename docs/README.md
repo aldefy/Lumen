@@ -41,9 +41,11 @@ controller.show(
 )
 ```
 
-## Live Demo
+## Live Demos
 
-Try the interactive [Wasm demo](demo/) in your browser — no install required.
+Try the interactive [Wasm demo](https://aldefy.github.io/Lumen/demo/) in your browser — no install required.
+
+Check out the [Dashboard demo](https://aldefy.github.io/Lumen/dashboard/) for a real-world SaaS onboarding scenario.
 
 ## Get Started
 
