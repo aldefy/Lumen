@@ -25,7 +25,8 @@
   - [CoachmarkColors](api-reference.md#coachmarkcolors)
 
 - **Links**
-  - [Live Demo](demo/)
+  - [Live Demo](https://aldefy.github.io/Lumen/demo/)
+  - [Dashboard Demo](https://aldefy.github.io/Lumen/dashboard/)
   - [GitHub](https://github.com/aldefy/Lumen)
   - [Maven Central](https://central.sonatype.com/artifact/io.github.aldefy/lumen)
   - [Sample App](https://github.com/aldefy/Lumen/tree/main/sample)
