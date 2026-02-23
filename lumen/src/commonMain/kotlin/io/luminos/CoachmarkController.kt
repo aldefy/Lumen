@@ -304,15 +304,30 @@ class CoachmarkController(
      * Skips the current target if it's not visible.
      * In a sequence: advances to next step (or dismisses if last).
      * For single target: dismisses.
+     *
+     * @param retry If true, moves the current target to the end of the sequence
+     *   instead of permanently skipping it. Only applies to Sequence state.
      */
-    internal fun skipCurrentIfNotVisible() {
+    internal fun skipCurrentIfNotVisible(retry: Boolean = false) {
         _state.update { currentState ->
             when (currentState) {
                 is CoachmarkState.Sequence -> {
-                    if (currentState.hasNext) {
-                        currentState.copy(currentIndex = currentState.currentIndex + 1)
+                    if (retry) {
+                        val reordered = currentState.targets.toMutableList()
+                        val skipped = reordered.removeAt(currentState.currentIndex)
+                        reordered.add(skipped)
+                        val newIndex = if (currentState.currentIndex >= reordered.size) {
+                            reordered.size - 1
+                        } else {
+                            currentState.currentIndex
+                        }
+                        currentState.copy(targets = reordered, currentIndex = newIndex)
                     } else {
-                        CoachmarkState.Hidden
+                        if (currentState.hasNext) {
+                            currentState.copy(currentIndex = currentState.currentIndex + 1)
+                        } else {
+                            CoachmarkState.Hidden
+                        }
                     }
                 }
                 is CoachmarkState.Showing -> CoachmarkState.Hidden

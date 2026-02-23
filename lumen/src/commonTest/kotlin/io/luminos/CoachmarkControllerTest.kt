@@ -630,6 +630,53 @@ class CoachmarkControllerTest {
         assertIs<CoachmarkState.Hidden>(controller.state.value)
     }
 
+    @Test
+    fun skipCurrentIfNotVisible_retry_moves_target_to_end() = runTest {
+        val controller = CoachmarkController()
+        controller.showSequence(listOf(target("a"), target("b"), target("c"), target("d")))
+        controller.next() // index 0 -> 1, now on "b"
+        controller.skipCurrentIfNotVisible(retry = true)
+        val state = controller.state.value
+        assertIs<CoachmarkState.Sequence>(state)
+        // "b" moved to end: [a, c, d, b], index stays at 1 -> now points to "c"
+        assertEquals("c", state.currentTarget.id)
+        assertEquals(1, state.currentIndex)
+        assertEquals(listOf("a", "c", "d", "b"), state.targets.map { it.id })
+    }
+
+    @Test
+    fun skipCurrentIfNotVisible_retry_on_last_item_keeps_sequence() = runTest {
+        val controller = CoachmarkController()
+        controller.showSequence(listOf(target("a"), target("b"), target("c")))
+        controller.next() // -> 1
+        controller.next() // -> 2 (last, "c")
+        controller.skipCurrentIfNotVisible(retry = true)
+        val state = controller.state.value
+        assertIs<CoachmarkState.Sequence>(state)
+        // "c" removed and re-appended: [a, b, c], index clamped to 2
+        assertEquals("c", state.currentTarget.id)
+        assertEquals(2, state.currentIndex)
+    }
+
+    @Test
+    fun skipCurrentIfNotVisible_retry_false_preserves_current_behavior() = runTest {
+        val controller = CoachmarkController()
+        controller.showSequence(listOf(target("a"), target("b"), target("c")))
+        controller.skipCurrentIfNotVisible(retry = false)
+        val state = controller.state.value
+        assertIs<CoachmarkState.Sequence>(state)
+        assertEquals(1, state.currentIndex)
+        assertEquals("b", state.currentTarget.id)
+    }
+
+    @Test
+    fun skipCurrentIfNotVisible_retry_on_Showing_still_dismisses() = runTest {
+        val controller = CoachmarkController()
+        controller.show(target("t1"))
+        controller.skipCurrentIfNotVisible(retry = true)
+        assertIs<CoachmarkState.Hidden>(controller.state.value)
+    }
+
     // ═══════════════════════════════════════════════════════════════════
     // scrollRequester property
     // ═══════════════════════════════════════════════════════════════════
