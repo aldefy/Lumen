@@ -217,7 +217,10 @@ data class CoachmarkConfig(
     val dontShowAgainText: String = "Don't show again",
     /** Timeout in ms after auto-scroll to wait for target visibility. If still not visible, skip. */
     val scrollTimeout: Long = 2000L,
-    /** Minimum gap between the cutout's outermost visual effect and the connector dot */
+    /** When true and waitForVisibility is true, off-screen targets are moved to the end
+     *  of the sequence instead of permanently skipped. Default: false. */
+    val retrySkippedTargets: Boolean = false,
+    /** Gap between the cutout stroke edge and the connector dot */
     val connectorCutoutGap: Dp = 12.dp,
     /** Minimum width for the CTA button (Dp.Unspecified = wrap content) */
     val ctaMinWidth: Dp = Dp.Unspecified,
@@ -293,6 +296,15 @@ fun CoachmarkScrim(
         is CoachmarkState.Showing -> s.target.id
         is CoachmarkState.Sequence -> s.currentTarget.id
         CoachmarkState.Hidden -> null
+    }
+
+    // Reset isReadyToShow synchronously when step changes
+    if (config.waitForVisibility) {
+        val previousTargetId = remember { mutableStateOf(currentTargetId) }
+        if (previousTargetId.value != currentTargetId) {
+            isReadyToShow = false
+            previousTargetId.value = currentTargetId
+        }
     }
 
     // Auto-scroll or skip when target is off-screen
@@ -514,9 +526,8 @@ private fun CoachmarkScrimContent(
     val strokeWidthPx = with(density) { config.strokeWidth.toPx() }
     val connectorDotRadiusPx = with(density) { config.connectorDotRadius.toPx() }
     val connectorCutoutGapPx = with(density) { config.connectorCutoutGap.toPx() }
-    val resolvedHighlightAnimation = target.highlightAnimation ?: config.highlightAnimation
     val connectorPathData =
-        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx, connectorCutoutGapPx, resolvedHighlightAnimation) {
+        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx, connectorCutoutGapPx) {
             calculateConnectorPath(
                 target = target,
                 tooltipPosition = tooltipPosition,
@@ -526,7 +537,6 @@ private fun CoachmarkScrimContent(
                 strokeWidth = strokeWidthPx,
                 connectorDotRadius = connectorDotRadiusPx,
                 connectorCutoutGap = connectorCutoutGapPx,
-                highlightAnimation = resolvedHighlightAnimation,
             )
         }
 
@@ -1326,7 +1336,6 @@ private fun calculateConnectorPath(
     strokeWidth: Float = 0f,
     connectorDotRadius: Float = 0f,
     connectorCutoutGap: Float = 0f,
-    highlightAnimation: HighlightAnimation = HighlightAnimation.NONE,
 ): ConnectorPathData {
     if (tooltipSize == IntSize.Zero) {
         return ConnectorPathData.Segments(emptyList())
@@ -1344,7 +1353,7 @@ private fun calculateConnectorPath(
         defaultLineLength
     }
 
-    // Minimum visual padding between the outermost animation effect and the
+    // Minimum visual padding between the cutout stroke edge and the
     // connector dot edge — ensures the dot never looks cramped against the cutout.
     val breathingRoom = connectorCutoutGap
 
@@ -1374,36 +1383,9 @@ private fun calculateConnectorPath(
             maxOf(targetBounds.width, targetBounds.height) / 2 + padding
         }
     }
-    // Compute the maximum visual outer edge of the cutout including all
-    // animation effects (glow rings, ripple rings, pulse/bounce scale).
-    // The connector dot must start beyond this so it never overlaps.
-    val maxVisualOuterEdge = when (highlightAnimation) {
-        HighlightAnimation.GLOW -> {
-            // Outermost glow layer: strokeWidth * 6 * glowMultiplier(max 2)
-            // Stroke is centered on baseCutoutRadius, outer edge = radius + half that width.
-            baseCutoutRadius + strokeWidth * 6f
-        }
-        HighlightAnimation.RIPPLE -> {
-            // Ripple rings expand up to 1.3x scale with stroke up to 2x width.
-            baseCutoutRadius * 1.3f + strokeWidth
-        }
-        HighlightAnimation.PULSE -> {
-            // Stroke scales to 1.08x.
-            baseCutoutRadius * 1.08f + strokeWidth / 2f
-        }
-        HighlightAnimation.BOUNCE -> {
-            // Stroke scales to 1.15x.
-            baseCutoutRadius * 1.15f + strokeWidth / 2f
-        }
-        HighlightAnimation.SHIMMER,
-        HighlightAnimation.NONE -> {
-            baseCutoutRadius + strokeWidth / 2f
-        }
-    }
-
-    // Connector dot center = maxVisualOuterEdge + breathingRoom + dotRadius
-    // so the dot's nearest edge sits breathingRoom away from the animation.
-    val cutoutStrokeGap = maxVisualOuterEdge - baseCutoutRadius + breathingRoom + connectorDotRadius
+    // Connector dot center = stroke outer edge + breathingRoom + dotRadius
+    // so the dot's nearest edge sits breathingRoom away from the cutout stroke.
+    val cutoutStrokeGap = strokeWidth / 2f + breathingRoom + connectorDotRadius
     val cutoutRadius = baseCutoutRadius
 
     val tooltipCenterX = tooltipPosition.x + tooltipSize.width / 2f
