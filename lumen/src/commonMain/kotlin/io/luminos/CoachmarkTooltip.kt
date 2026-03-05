@@ -35,6 +35,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -85,6 +86,7 @@ fun CoachmarkTooltip(
     onCtaClick: () -> Unit,
     onSkipClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Start,
 ) {
     val cardModifier =
         if (showCard) {
@@ -139,6 +141,7 @@ fun CoachmarkTooltip(
                         color = if (showCard) colors.descriptionColor else colors.strokeColor.copy(alpha = 0.7f),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
+                        textAlign = textAlign,
                         style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
                     )
                 }
@@ -152,8 +155,9 @@ fun CoachmarkTooltip(
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             lineHeight = 26.sp,
+            textAlign = textAlign,
             style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
-            modifier = Modifier.semantics { heading() },
+            modifier = Modifier.fillMaxWidth().semantics { heading() },
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -164,7 +168,9 @@ fun CoachmarkTooltip(
             color = descriptionTextColor,
             fontSize = 14.sp,
             lineHeight = 20.sp,
+            textAlign = textAlign,
             style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -243,6 +249,7 @@ fun CoachmarkTooltip(
                     text = dontShowAgainText,
                     color = if (showCard) colors.descriptionColor else colors.strokeColor.copy(alpha = 0.8f),
                     fontSize = 13.sp,
+                    textAlign = textAlign,
                     style = if (!showCard) {
                         TextStyle(
                             shadow = Shadow(

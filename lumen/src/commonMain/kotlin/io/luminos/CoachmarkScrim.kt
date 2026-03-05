@@ -861,6 +861,7 @@ private fun CoachmarkScrimContent(
         }
 
         val tooltipEffectiveAlpha = if (tooltipSize == IntSize.Zero) 0f else tooltipAlpha.value
+        val resolvedTextAlign = target.tooltipTextAlign ?: config.tooltipTextAlign
 
         TooltipContainer(
             target = target,
@@ -884,6 +885,7 @@ private fun CoachmarkScrimContent(
             dontShowAgainText = config.dontShowAgainText,
             dontShowAgainChecked = dontShowAgainChecked,
             onDontShowAgainChanged = { dontShowAgainChecked = it },
+            textAlign = resolvedTextAlign,
         )
 
         // Request focus on tooltip after animation completes for a11y
@@ -917,6 +919,7 @@ private fun BoxScope.TooltipContainer(
     dontShowAgainText: String = "Don't show again",
     dontShowAgainChecked: Boolean = false,
     onDontShowAgainChanged: (Boolean) -> Unit = {},
+    textAlign: TextAlign = TextAlign.Start,
 ) {
     val showProgressIndicator = target.showProgressIndicator ?: config.showProgressIndicator
 
@@ -952,6 +955,7 @@ private fun BoxScope.TooltipContainer(
             ctaCornerRadius = config.ctaCornerRadius,
             onCtaClick = onNext,
             onSkipClick = onSkip,
+            textAlign = textAlign,
         )
     }
 }
