@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -228,6 +229,9 @@ data class CoachmarkConfig(
     val ctaMinHeight: Dp = 48.dp,
     /** Corner radius for the CTA button shape */
     val ctaCornerRadius: Dp = 22.dp,
+    /** Text alignment for tooltip title, description, and other text elements.
+     *  Per-target override via [CoachmarkTarget.tooltipTextAlign]. */
+    val tooltipTextAlign: TextAlign = TextAlign.Start,
 )
 
 /**

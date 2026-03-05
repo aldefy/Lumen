@@ -2,6 +2,7 @@ package io.luminos
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -251,4 +252,5 @@ data class CoachmarkTarget(
     val targetTapBehavior: TargetTapBehavior = TargetTapBehavior.PASS_THROUGH,
     val showDontShowAgain: Boolean = false,
     val persistKey: String? = null,
+    val tooltipTextAlign: TextAlign? = null,
 )

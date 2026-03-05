@@ -3,6 +3,7 @@ package io.luminos
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -206,6 +207,20 @@ class CoachmarkTargetTest {
     fun default_persistKey_is_null() {
         val target = CoachmarkTarget(id = "t1", title = "T", description = "D")
         assertNull(target.persistKey)
+    }
+
+    // ── Tooltip text align ─────────────────────────────────────────────
+
+    @Test
+    fun default_tooltipTextAlign_is_null() {
+        val target = CoachmarkTarget(id = "t1", title = "T", description = "D")
+        assertNull(target.tooltipTextAlign)
+    }
+
+    @Test
+    fun custom_tooltipTextAlign() {
+        val target = CoachmarkTarget(id = "t1", title = "T", description = "D", tooltipTextAlign = TextAlign.Center)
+        assertEquals(TextAlign.Center, target.tooltipTextAlign)
     }
 
     // ── CutoutShape sealed hierarchy ─────────────────────────────────────
