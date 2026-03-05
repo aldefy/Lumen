@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta09] - 2026-03-05
+
+### Features
+- **Tooltip text alignment** — New `tooltipTextAlign` property on `CoachmarkConfig` (global default) and `CoachmarkTarget` (per-target override) to control text alignment for title, description, and other tooltip text elements. Supports `TextAlign.Start` (default), `TextAlign.Center`, and `TextAlign.End`
+- **Inline title with connector** — New `titleInlineWithConnector` property on `CoachmarkConfig` and `CoachmarkTarget` that renders the tooltip title beside the connector dot on the same horizontal line instead of below it. Active only for vertical connectors. The canvas-drawn dot is automatically suppressed when inline mode is active, replaced by a composed dot indicator for pixel-perfect alignment
+
 ## [1.0.0-beta08] - 2026-02-25
 
 ### Bug Fixes
