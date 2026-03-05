@@ -87,6 +87,9 @@ fun CoachmarkTooltip(
     onSkipClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
+    titleInlineWithConnector: Boolean = false,
+    connectorDotColor: Color = Color.White,
+    connectorDotRadius: Dp = 4.dp,
 ) {
     val cardModifier =
         if (showCard) {
@@ -149,16 +152,41 @@ fun CoachmarkTooltip(
         }
 
         // Title
-        Text(
-            text = title,
-            color = titleTextColor,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 26.sp,
-            textAlign = textAlign,
-            style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
-            modifier = Modifier.fillMaxWidth().semantics { heading() },
-        )
+        if (titleInlineWithConnector) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(connectorDotRadius * 2)
+                        .clip(CircleShape)
+                        .background(connectorDotColor),
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = title,
+                    color = titleTextColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 26.sp,
+                    textAlign = textAlign,
+                    style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
+                    modifier = Modifier.weight(1f).semantics { heading() },
+                )
+            }
+        } else {
+            Text(
+                text = title,
+                color = titleTextColor,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 26.sp,
+                textAlign = textAlign,
+                style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
+                modifier = Modifier.fillMaxWidth().semantics { heading() },
+            )
+        }
 
         Spacer(modifier = Modifier.height(4.dp))
 
