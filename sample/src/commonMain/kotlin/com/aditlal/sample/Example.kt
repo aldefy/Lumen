@@ -8,6 +8,7 @@ enum class Example(val title: String, val description: String) {
     ANIMATIONS("Highlight Animations", "None, Pulse, Glow, Ripple, Shimmer, Bounce"),
     TOOLTIP_POSITION("Tooltip Position", "Top, Bottom, Start, End, Auto"),
     TOOLTIP_OPTIONS("Tooltip Options", "Card wrapper, Skip button, CTA text"),
+    TEXT_ALIGNMENT("Text Alignment", "Center-aligned text and inline title with connector"),
     THEMING("Theming & Colors", "Custom color schemes"),
     SCRIM_OPACITY("Scrim Opacity", "Light, Medium, Dark, Extra Dark"),
     LAZY_COLUMN("LazyColumn", "Coachmarks in scrollable lists"),
@@ -15,5 +16,4 @@ enum class Example(val title: String, val description: String) {
     TAP_THROUGH("Tap-Through Behavior", "Pass-through, Advance, Both tap modes"),
     ANALYTICS("Analytics Callbacks", "Track onShow, onDismiss, onAdvance, onComplete"),
     DONT_SHOW_AGAIN("Don't Show Again", "Suppress coachmarks with checkbox + persistence"),
-    TEXT_ALIGNMENT("Text Alignment", "Center-aligned text and inline title with connector"),
 }
