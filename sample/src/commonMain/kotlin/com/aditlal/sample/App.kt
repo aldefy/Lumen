@@ -25,6 +25,7 @@ import com.aditlal.sample.examples.ShapesExample
 import com.aditlal.sample.examples.ThemingExample
 import com.aditlal.sample.examples.TooltipOptionsExample
 import com.aditlal.sample.examples.TapThroughExample
+import com.aditlal.sample.examples.TextAlignmentExample
 import com.aditlal.sample.examples.TooltipPositionExample
 import com.aditlal.sample.ui.theme.LumenSampleTheme
 
@@ -98,6 +99,10 @@ fun App() {
                     onBack = { currentExample = null }
                 )
                 Example.DONT_SHOW_AGAIN -> DontShowAgainExample(
+                    modifier = exampleModifier,
+                    onBack = { currentExample = null }
+                )
+                Example.TEXT_ALIGNMENT -> TextAlignmentExample(
                     modifier = exampleModifier,
                     onBack = { currentExample = null }
                 )

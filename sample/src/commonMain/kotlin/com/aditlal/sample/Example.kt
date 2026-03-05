@@ -15,4 +15,5 @@ enum class Example(val title: String, val description: String) {
     TAP_THROUGH("Tap-Through Behavior", "Pass-through, Advance, Both tap modes"),
     ANALYTICS("Analytics Callbacks", "Track onShow, onDismiss, onAdvance, onComplete"),
     DONT_SHOW_AGAIN("Don't Show Again", "Suppress coachmarks with checkbox + persistence"),
+    TEXT_ALIGNMENT("Text Alignment", "Center-aligned text and inline title with connector"),
 }

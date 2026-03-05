@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.FormatAlignCenter
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
@@ -101,6 +102,7 @@ fun ExampleGallery(
                             Example.TAP_THROUGH -> Icons.Default.TouchApp
                             Example.ANALYTICS -> Icons.Default.Timeline
                             Example.DONT_SHOW_AGAIN -> Icons.Default.Block
+                            Example.TEXT_ALIGNMENT -> Icons.Default.FormatAlignCenter
                         },
                         onClick = { onExampleSelected(example) }
                     )
