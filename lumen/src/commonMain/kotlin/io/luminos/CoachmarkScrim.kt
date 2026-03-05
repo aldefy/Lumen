@@ -232,6 +232,9 @@ data class CoachmarkConfig(
     /** Text alignment for tooltip title, description, and other text elements.
      *  Per-target override via [CoachmarkTarget.tooltipTextAlign]. */
     val tooltipTextAlign: TextAlign = TextAlign.Start,
+    /** When true and connector is vertical, renders the title beside the connector dot
+     *  on the same horizontal line. Per-target override via [CoachmarkTarget.titleInlineWithConnector]. */
+    val titleInlineWithConnector: Boolean = false,
 )
 
 /**

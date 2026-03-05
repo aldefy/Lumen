@@ -253,4 +253,5 @@ data class CoachmarkTarget(
     val showDontShowAgain: Boolean = false,
     val persistKey: String? = null,
     val tooltipTextAlign: TextAlign? = null,
+    val titleInlineWithConnector: Boolean? = null,
 )

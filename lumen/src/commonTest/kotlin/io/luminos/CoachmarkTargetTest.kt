@@ -223,6 +223,20 @@ class CoachmarkTargetTest {
         assertEquals(TextAlign.Center, target.tooltipTextAlign)
     }
 
+    // ── Title inline with connector ──────────────────────────────────────
+
+    @Test
+    fun default_titleInlineWithConnector_is_null() {
+        val target = CoachmarkTarget(id = "t1", title = "T", description = "D")
+        assertNull(target.titleInlineWithConnector)
+    }
+
+    @Test
+    fun custom_titleInlineWithConnector() {
+        val target = CoachmarkTarget(id = "t1", title = "T", description = "D", titleInlineWithConnector = true)
+        assertEquals(true, target.titleInlineWithConnector)
+    }
+
     // ── CutoutShape sealed hierarchy ─────────────────────────────────────
 
     @Test
