@@ -299,7 +299,7 @@ public final class io/luminos/CoachmarkTarget {
 }
 
 public final class io/luminos/CoachmarkTooltipKt {
-	public static final fun CoachmarkTooltip-KgCetnw (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILio/luminos/CoachmarkColors;FZZZLjava/lang/String;ZLjava/lang/String;ZLkotlin/jvm/functions/Function1;FFFLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;IZJFLandroidx/compose/runtime/Composer;IIII)V
+	public static final fun CoachmarkTooltip-iU8z5ho (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILio/luminos/CoachmarkColors;FZZZLjava/lang/String;ZLjava/lang/String;ZLkotlin/jvm/functions/Function1;FFFLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;IZJFFLkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;IIII)V
 }
 
 public final class io/luminos/ConnectorEndStyle : java/lang/Enum {

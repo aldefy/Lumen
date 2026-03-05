@@ -1,3 +1,6 @@
+# MCP config
+.mcp.json
+
 # Built application files
 *.apk
 *.aar

@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.semantics.Role
@@ -90,6 +92,8 @@ fun CoachmarkTooltip(
     titleInlineWithConnector: Boolean = false,
     connectorDotColor: Color = Color.White,
     connectorDotRadius: Dp = 4.dp,
+    connectorDotOffsetX: Dp = 0.dp,
+    onDotPositioned: (Offset) -> Unit = {},
 ) {
     val cardModifier =
         if (showCard) {
@@ -157,11 +161,22 @@ fun CoachmarkTooltip(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
             ) {
+                if (connectorDotOffsetX > 0.dp) {
+                    Spacer(modifier = Modifier.width(connectorDotOffsetX))
+                }
                 Box(
                     modifier = Modifier
                         .size(connectorDotRadius * 2)
                         .clip(CircleShape)
-                        .background(connectorDotColor),
+                        .background(connectorDotColor)
+                        .onGloballyPositioned { coords ->
+                            val pos = coords.positionInRoot()
+                            val center = Offset(
+                                pos.x + coords.size.width / 2f,
+                                pos.y + coords.size.height / 2f,
+                            )
+                            onDotPositioned(center)
+                        },
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(

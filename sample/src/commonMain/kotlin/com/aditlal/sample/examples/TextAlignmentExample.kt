@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -78,94 +81,130 @@ fun TextAlignmentExample(
                 )
             }
         ) { paddingValues ->
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(24.dp),
+                    .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
-                    text = "Text Alignment & Inline Title",
-                    style = MaterialTheme.typography.headlineSmall,
-                )
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "Text Alignment & Inline Title",
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Simulates tooltip above/below targets in a scrollable list",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { showSequence = true }) {
+                        Text("Show Text Alignment Demo")
+                    }
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
 
-                Text(
-                    text = "Center-aligned tooltip text and title inline with connector",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-
-                Spacer(modifier = Modifier.height(48.dp))
-
-                // Default (start-aligned) target
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .coachmarkTarget(controller, "start_aligned"),
-                        contentAlignment = Alignment.Center,
+                // Target near top — tooltip will appear BELOW (inline dot works)
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
                     ) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = "Start aligned",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .coachmarkTarget(controller, "top_target"),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Top target",
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                // Spacer items to push next target toward bottom
+                items(8) { index ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                ),
                         )
+                        Spacer(modifier = Modifier.padding(start = 12.dp))
+                        Column {
+                            Text(
+                                text = "Contact ${index + 1}",
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Text(
+                                text = "List item to fill space",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                // Target near bottom — tooltip will appear ABOVE (tests inline title fallback)
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.errorContainer)
+                                .coachmarkTarget(controller, "bottom_target"),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                Icons.Default.Call,
+                                contentDescription = "Bottom target (muted)",
+                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // Center-aligned target
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                        .coachmarkTarget(controller, "center_aligned"),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = "Center aligned",
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Inline title target
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                ) {
+                item {
                     Box(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.tertiaryContainer)
-                            .coachmarkTarget(controller, "inline_title"),
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .coachmarkTarget(controller, "center_aligned"),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            Icons.Default.Email,
-                            contentDescription = "Inline title",
-                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                            Icons.Default.Star,
+                            contentDescription = "Center aligned",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         )
                     }
-                }
-
-                Spacer(modifier = Modifier.height(48.dp))
-
-                Button(onClick = { showSequence = true }) {
-                    Text("Show Text Alignment Demo")
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
             }
         }
@@ -174,44 +213,39 @@ fun TextAlignmentExample(
     if (showSequence) {
         controller.showSequence(
             listOf(
+                // Step 1: Target near top — tooltip BELOW — inline title active (dot at top)
                 CoachmarkTarget(
-                    id = "start_aligned",
-                    title = "Start Aligned (Default)",
-                    description = "This tooltip uses the default start-aligned text. Title and description are left-aligned as usual.",
+                    id = "top_target",
+                    title = "Muted Call",
+                    description = "This call has been muted for you. Inline title with dot beside it.",
                     shape = CutoutShape.Circle(radiusPadding = 10.dp),
                     connectorStyle = ConnectorStyle.VERTICAL,
-                    connectorLength = 80.dp,
+                    connectorLength = 56.dp,
+                    tooltipTextAlign = TextAlign.Center,
+                    titleInlineWithConnector = true,
                     ctaText = "Next",
                 ),
+                // Step 2: Target near bottom — tooltip ABOVE — inline title should gracefully fallback
+                CoachmarkTarget(
+                    id = "bottom_target",
+                    title = "Muted Call",
+                    description = "Tooltip is above the target. Inline title should fall back to standard layout since dot is at bottom.",
+                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
+                    connectorStyle = ConnectorStyle.VERTICAL,
+                    connectorLength = 56.dp,
+                    tooltipTextAlign = TextAlign.Center,
+                    titleInlineWithConnector = true,
+                    ctaText = "Next",
+                ),
+                // Step 3: Center-aligned only (no inline title)
                 CoachmarkTarget(
                     id = "center_aligned",
                     title = "Center Aligned",
-                    description = "This tooltip text is center-aligned for a cleaner, more balanced look when the tooltip is centered on screen.",
+                    description = "Plain center-aligned text without inline title.",
                     shape = CutoutShape.Circle(radiusPadding = 10.dp),
                     connectorStyle = ConnectorStyle.VERTICAL,
-                    connectorLength = 80.dp,
+                    connectorLength = 56.dp,
                     tooltipTextAlign = TextAlign.Center,
-                    ctaText = "Next",
-                ),
-                CoachmarkTarget(
-                    id = "inline_title",
-                    title = "Inline Title",
-                    description = "The title sits beside the connector dot on the same line, creating a compact layout that connects the title visually to the target.",
-                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
-                    connectorStyle = ConnectorStyle.VERTICAL,
-                    connectorLength = 80.dp,
-                    titleInlineWithConnector = true,
-                    ctaText = "Next",
-                ),
-                CoachmarkTarget(
-                    id = "center_aligned",
-                    title = "Both Combined",
-                    description = "Center-aligned text combined with an inline title creates a polished tooltip that feels well-connected and balanced.",
-                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
-                    connectorStyle = ConnectorStyle.VERTICAL,
-                    connectorLength = 80.dp,
-                    tooltipTextAlign = TextAlign.Center,
-                    titleInlineWithConnector = true,
                     ctaText = "Got it!",
                 ),
             )

@@ -525,6 +525,9 @@ private fun CoachmarkScrimContent(
 
     var screenSize by remember { mutableStateOf(IntSize.Zero) }
     var tooltipSize by remember { mutableStateOf(IntSize.Zero) }
+    // Actual center of the composed inline dot, reported via onGloballyPositioned.
+    // Used to aim the connector line at the exact dot position.
+    var inlineDotCenter by remember(target.id) { mutableStateOf(Offset.Unspecified) }
 
     val connectorLengthPx = if (target.connectorLength.isSpecified) {
         with(density) { target.connectorLength.toPx() }
@@ -550,8 +553,33 @@ private fun CoachmarkScrimContent(
     val strokeWidthPx = with(density) { config.strokeWidth.toPx() }
     val connectorDotRadiusPx = with(density) { config.connectorDotRadius.toPx() }
     val connectorCutoutGapPx = with(density) { config.connectorCutoutGap.toPx() }
+    val tooltipMarginPx = with(density) { config.tooltipMargin.toPx() }
+
+    val resolvedTitleInline = target.titleInlineWithConnector ?: config.titleInlineWithConnector
+
+    // Determine if inline title is actually active.
+    // Only activates for vertical connectors when tooltip is BELOW the target,
+    // because the composed dot renders at the top of the tooltip (beside the title).
+    // When tooltip is above, the connector endpoint is at the bottom — the dot
+    // would be at the wrong end, so we fall back to standard layout.
+    val isInlineTitleActive = if (resolvedTitleInline && tooltipSize != IntSize.Zero) {
+        val tooltipCenterX = tooltipPosition.x + tooltipSize.width / 2f
+        val tooltipCenterY = tooltipPosition.y + tooltipSize.height / 2f
+        val isTooltipBelow = tooltipPosition.y > target.bounds.bottom
+        val resolvedStyle = resolveConnectorStyle(
+            connectorStyle = target.connectorStyle,
+            targetCenter = target.bounds.center,
+            tooltipCenterX = tooltipCenterX,
+            tooltipCenterY = tooltipCenterY,
+            cutoutRadius = maxOf(target.bounds.width, target.bounds.height) / 2f,
+        )
+        resolvedStyle == ConnectorStyle.VERTICAL && isTooltipBelow
+    } else {
+        false
+    }
+
     val connectorPathData =
-        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx, connectorCutoutGapPx) {
+        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx, connectorCutoutGapPx, isInlineTitleActive, inlineDotCenter) {
             calculateConnectorPath(
                 target = target,
                 tooltipPosition = tooltipPosition,
@@ -561,6 +589,8 @@ private fun CoachmarkScrimContent(
                 strokeWidth = strokeWidthPx,
                 connectorDotRadius = connectorDotRadiusPx,
                 connectorCutoutGap = connectorCutoutGapPx,
+                isInlineTitleActive = isInlineTitleActive,
+                inlineDotCenter = inlineDotCenter,
             )
         }
 
@@ -753,24 +783,6 @@ private fun CoachmarkScrimContent(
                 }
             },
     ) {
-        val resolvedTitleInline = target.titleInlineWithConnector ?: config.titleInlineWithConnector
-
-        // Determine if inline title is actually active (only for vertical connectors)
-        val isInlineTitleActive = if (resolvedTitleInline && tooltipSize != IntSize.Zero) {
-            val tooltipCenterX = tooltipPosition.x + tooltipSize.width / 2f
-            val tooltipCenterY = tooltipPosition.y + tooltipSize.height / 2f
-            val resolvedStyle = resolveConnectorStyle(
-                connectorStyle = target.connectorStyle,
-                targetCenter = target.bounds.center,
-                tooltipCenterX = tooltipCenterX,
-                tooltipCenterY = tooltipCenterY,
-                cutoutRadius = maxOf(target.bounds.width, target.bounds.height) / 2f,
-            )
-            resolvedStyle == ConnectorStyle.VERTICAL
-        } else {
-            false
-        }
-
         Canvas(modifier = Modifier.fillMaxSize()) {
             val scrimColor = config.scrimOpacity?.let {
                 Color.Black.copy(alpha = it.alpha)
@@ -911,6 +923,15 @@ private fun CoachmarkScrimContent(
             titleInlineWithConnector = isInlineTitleActive,
             connectorDotColor = colors.connectorColor,
             connectorDotRadius = config.connectorDotRadius,
+            connectorDotOffsetX = if (isInlineTitleActive) {
+                with(density) {
+                    (target.bounds.center.x - tooltipPosition.x - tooltipMarginPx - connectorDotRadiusPx)
+                        .coerceAtLeast(0f).toDp()
+                }
+            } else {
+                0.dp
+            },
+            onDotPositioned = { center -> inlineDotCenter = center },
         )
 
         // Request focus on tooltip after animation completes for a11y
@@ -948,6 +969,8 @@ private fun BoxScope.TooltipContainer(
     titleInlineWithConnector: Boolean = false,
     connectorDotColor: Color = Color.White,
     connectorDotRadius: Dp = 4.dp,
+    connectorDotOffsetX: Dp = 0.dp,
+    onDotPositioned: (Offset) -> Unit = {},
 ) {
     val showProgressIndicator = target.showProgressIndicator ?: config.showProgressIndicator
 
@@ -987,6 +1010,8 @@ private fun BoxScope.TooltipContainer(
             titleInlineWithConnector = titleInlineWithConnector,
             connectorDotColor = connectorDotColor,
             connectorDotRadius = connectorDotRadius,
+            connectorDotOffsetX = connectorDotOffsetX,
+            onDotPositioned = onDotPositioned,
         )
     }
 }
@@ -1411,6 +1436,8 @@ private fun calculateConnectorPath(
     strokeWidth: Float = 0f,
     connectorDotRadius: Float = 0f,
     connectorCutoutGap: Float = 0f,
+    isInlineTitleActive: Boolean = false,
+    inlineDotCenter: Offset = Offset.Unspecified,
 ): ConnectorPathData {
     if (tooltipSize == IntSize.Zero) {
         return ConnectorPathData.Segments(emptyList())
@@ -1511,13 +1538,19 @@ private fun calculateConnectorPath(
                 x = targetCenter.x,
                 y = targetCenter.y + direction * startRadius,
             )
-            val endPointY = if (isTooltipBelow) {
-                tooltipPosition.y - connectorTooltipGap
+            if (isInlineTitleActive && isTooltipBelow && inlineDotCenter != Offset.Unspecified) {
+                // Use the actual measured position of the composed dot.
+                // Connector goes straight from cutout edge to the dot center.
+                ConnectorPathData.Segments(listOf(cutoutEdgePoint, inlineDotCenter))
             } else {
-                tooltipPosition.y + tooltipSize.height + connectorTooltipGap
+                val endPointY = if (isTooltipBelow) {
+                    tooltipPosition.y - connectorTooltipGap
+                } else {
+                    tooltipPosition.y + tooltipSize.height + connectorTooltipGap
+                }
+                val endPoint = Offset(x = targetCenter.x, y = endPointY)
+                ConnectorPathData.Segments(listOf(cutoutEdgePoint, endPoint))
             }
-            val endPoint = Offset(x = targetCenter.x, y = endPointY)
-            ConnectorPathData.Segments(listOf(cutoutEdgePoint, endPoint))
         }
 
         ConnectorStyle.ELBOW -> {

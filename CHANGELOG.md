@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta10] - 2026-03-05
+
+### Bug Fixes
+- Fixed inline title connector line not reaching the composed dot — connector endpoint now uses the dot's actual measured position via `onGloballyPositioned` instead of estimating offsets, ensuring the line always connects to the dot regardless of skip button or other content above it
+
 ## [1.0.0-beta09] - 2026-03-05
 
 ### Features
