@@ -96,6 +96,8 @@ data class CoachmarkTarget(
     val targetTapBehavior: TargetTapBehavior = TargetTapBehavior.PASS_THROUGH,
     val showDontShowAgain: Boolean = false,
     val persistKey: String? = null,
+    val tooltipTextAlign: TextAlign? = null,
+    val titleInlineWithConnector: Boolean? = null,
 )
 ```
 
@@ -116,6 +118,8 @@ data class CoachmarkTarget(
 | `targetTapBehavior` | `TargetTapBehavior` | `PASS_THROUGH` | What happens when user taps the cutout area |
 | `showDontShowAgain` | `Boolean` | `false` | Show "Don't show again" checkbox in tooltip |
 | `persistKey` | `String?` | `null` | Custom persistence key (defaults to `id`) |
+| `tooltipTextAlign` | `TextAlign?` | `null` | Per-target text alignment override (null = use config default) |
+| `titleInlineWithConnector` | `Boolean?` | `null` | Per-target override to render title beside connector dot (null = use config default) |
 
 ---
 
@@ -228,6 +232,8 @@ data class CoachmarkConfig(
     val ctaMinWidth: Dp = Dp.Unspecified,
     val ctaMinHeight: Dp = 48.dp,
     val ctaCornerRadius: Dp = 22.dp,
+    val tooltipTextAlign: TextAlign = TextAlign.Start,
+    val titleInlineWithConnector: Boolean = false,
 )
 ```
 
@@ -260,6 +266,8 @@ data class CoachmarkConfig(
 | `ctaMinWidth` | `Dp` | `Dp.Unspecified` | Minimum width for the CTA button (unspecified = wrap content) |
 | `ctaMinHeight` | `Dp` | `48.dp` | Minimum height for the CTA button |
 | `ctaCornerRadius` | `Dp` | `22.dp` | Corner radius for the CTA button shape |
+| `tooltipTextAlign` | `TextAlign` | `TextAlign.Start` | Text alignment for tooltip title, description, and other text. Per-target override via `CoachmarkTarget.tooltipTextAlign` |
+| `titleInlineWithConnector` | `Boolean` | `false` | When true and connector is vertical, renders the title beside the connector dot on the same line. Per-target override via `CoachmarkTarget.titleInlineWithConnector` |
 
 ---
 
