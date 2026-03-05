@@ -753,6 +753,24 @@ private fun CoachmarkScrimContent(
                 }
             },
     ) {
+        val resolvedTitleInline = target.titleInlineWithConnector ?: config.titleInlineWithConnector
+
+        // Determine if inline title is actually active (only for vertical connectors)
+        val isInlineTitleActive = if (resolvedTitleInline && tooltipSize != IntSize.Zero) {
+            val tooltipCenterX = tooltipPosition.x + tooltipSize.width / 2f
+            val tooltipCenterY = tooltipPosition.y + tooltipSize.height / 2f
+            val resolvedStyle = resolveConnectorStyle(
+                connectorStyle = target.connectorStyle,
+                targetCenter = target.bounds.center,
+                tooltipCenterX = tooltipCenterX,
+                tooltipCenterY = tooltipCenterY,
+                cutoutRadius = maxOf(target.bounds.width, target.bounds.height) / 2f,
+            )
+            resolvedStyle == ConnectorStyle.VERTICAL
+        } else {
+            false
+        }
+
         Canvas(modifier = Modifier.fillMaxSize()) {
             val scrimColor = config.scrimOpacity?.let {
                 Color.Black.copy(alpha = it.alpha)
@@ -830,6 +848,7 @@ private fun CoachmarkScrimContent(
             if (connectorProgress.value > 0f) {
                 val arrowSizePx = with(density) { config.connectorArrowSize.toPx() }
                 val arrowHalfAngleRad = (config.connectorArrowAngle * PI / 180f).toFloat()
+                val effectiveEndStyle = if (isInlineTitleActive) ConnectorEndStyle.NONE else target.connectorEndStyle
                 when (connectorPathData) {
                     is ConnectorPathData.Segments -> {
                         if (connectorPathData.points.isNotEmpty()) {
@@ -839,7 +858,7 @@ private fun CoachmarkScrimContent(
                                 color = colors.connectorColor,
                                 strokeWidth = strokeWidthPx,
                                 dotRadius = connectorDotRadiusPx,
-                                endStyle = target.connectorEndStyle,
+                                endStyle = effectiveEndStyle,
                                 arrowSize = arrowSizePx,
                                 arrowHalfAngle = arrowHalfAngleRad,
                                 customEnd = config.customConnectorEnd,
@@ -853,7 +872,7 @@ private fun CoachmarkScrimContent(
                             color = colors.connectorColor,
                             strokeWidth = strokeWidthPx,
                             dotRadius = connectorDotRadiusPx,
-                            endStyle = target.connectorEndStyle,
+                            endStyle = effectiveEndStyle,
                             arrowSize = arrowSizePx,
                             arrowHalfAngle = arrowHalfAngleRad,
                             customEnd = config.customConnectorEnd,
@@ -889,6 +908,9 @@ private fun CoachmarkScrimContent(
             dontShowAgainChecked = dontShowAgainChecked,
             onDontShowAgainChanged = { dontShowAgainChecked = it },
             textAlign = resolvedTextAlign,
+            titleInlineWithConnector = isInlineTitleActive,
+            connectorDotColor = colors.connectorColor,
+            connectorDotRadius = config.connectorDotRadius,
         )
 
         // Request focus on tooltip after animation completes for a11y
@@ -923,6 +945,9 @@ private fun BoxScope.TooltipContainer(
     dontShowAgainChecked: Boolean = false,
     onDontShowAgainChanged: (Boolean) -> Unit = {},
     textAlign: TextAlign = TextAlign.Start,
+    titleInlineWithConnector: Boolean = false,
+    connectorDotColor: Color = Color.White,
+    connectorDotRadius: Dp = 4.dp,
 ) {
     val showProgressIndicator = target.showProgressIndicator ?: config.showProgressIndicator
 
@@ -959,6 +984,9 @@ private fun BoxScope.TooltipContainer(
             onCtaClick = onNext,
             onSkipClick = onSkip,
             textAlign = textAlign,
+            titleInlineWithConnector = titleInlineWithConnector,
+            connectorDotColor = connectorDotColor,
+            connectorDotRadius = connectorDotRadius,
         )
     }
 }
@@ -1355,6 +1383,25 @@ private sealed interface ConnectorPathData {
     data class Curve(val start: Offset, val control: Offset, val end: Offset) : ConnectorPathData
 }
 
+private fun resolveConnectorStyle(
+    connectorStyle: ConnectorStyle,
+    targetCenter: Offset,
+    tooltipCenterX: Float,
+    tooltipCenterY: Float,
+    cutoutRadius: Float,
+): ConnectorStyle {
+    if (connectorStyle != ConnectorStyle.AUTO) return connectorStyle
+    val horizontalDistance = kotlin.math.abs(tooltipCenterX - targetCenter.x)
+    val verticalDistance = kotlin.math.abs(tooltipCenterY - targetCenter.y)
+    val hasSignificantHorizontal = horizontalDistance > cutoutRadius * 2
+    val hasSignificantVertical = verticalDistance > cutoutRadius * 2
+    return when {
+        hasSignificantHorizontal && hasSignificantVertical -> ConnectorStyle.ELBOW
+        verticalDistance > horizontalDistance -> ConnectorStyle.VERTICAL
+        else -> ConnectorStyle.HORIZONTAL
+    }
+}
+
 private fun calculateConnectorPath(
     target: CoachmarkTarget,
     tooltipPosition: Offset,
@@ -1420,21 +1467,13 @@ private fun calculateConnectorPath(
     val tooltipCenterY = tooltipPosition.y + tooltipSize.height / 2f
     val isTooltipBelow = tooltipPosition.y > targetBounds.bottom
 
-    val resolvedStyle = if (connectorStyle == ConnectorStyle.AUTO) {
-        val horizontalDistance = kotlin.math.abs(tooltipCenterX - targetCenter.x)
-        val verticalDistance = kotlin.math.abs(tooltipCenterY - targetCenter.y)
-
-        val hasSignificantHorizontal = horizontalDistance > cutoutRadius * 2
-        val hasSignificantVertical = verticalDistance > cutoutRadius * 2
-
-        when {
-            hasSignificantHorizontal && hasSignificantVertical -> ConnectorStyle.ELBOW
-            verticalDistance > horizontalDistance -> ConnectorStyle.VERTICAL
-            else -> ConnectorStyle.HORIZONTAL
-        }
-    } else {
-        connectorStyle
-    }
+    val resolvedStyle = resolveConnectorStyle(
+        connectorStyle = connectorStyle,
+        targetCenter = targetCenter,
+        tooltipCenterX = tooltipCenterX,
+        tooltipCenterY = tooltipCenterY,
+        cutoutRadius = cutoutRadius,
+    )
 
     return when (resolvedStyle) {
         ConnectorStyle.AUTO -> ConnectorPathData.Segments(emptyList())
