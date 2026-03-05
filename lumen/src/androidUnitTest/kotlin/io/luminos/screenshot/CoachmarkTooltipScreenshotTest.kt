@@ -8,6 +8,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
@@ -208,5 +209,72 @@ class CoachmarkTooltipScreenshotTest {
             }
         }
         capture("tooltip_skipButton_cardMode_dark")
+    }
+
+    @Test
+    fun tooltip_centerAligned() {
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = lightColorScheme()) {
+                Box(modifier = Modifier.background(Color(0xFF1A1A2E)).padding(16.dp)) {
+                    CoachmarkTooltip(
+                        title = "Muted Call",
+                        description = "This call has been muted for you.",
+                        ctaText = "Got it!",
+                        currentStep = 1,
+                        totalSteps = 1,
+                        colors = LightCoachmarkColors,
+                        textAlign = TextAlign.Center,
+                        onCtaClick = {},
+                    )
+                }
+            }
+        }
+        capture("tooltip_centerAligned")
+    }
+
+    @Test
+    fun tooltip_inlineTitle() {
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = lightColorScheme()) {
+                Box(modifier = Modifier.background(Color(0xFF1A1A2E)).padding(16.dp)) {
+                    CoachmarkTooltip(
+                        title = "Muted Call",
+                        description = "This call has been muted for you.",
+                        ctaText = "Got it!",
+                        currentStep = 1,
+                        totalSteps = 1,
+                        colors = LightCoachmarkColors,
+                        titleInlineWithConnector = true,
+                        connectorDotColor = Color.White,
+                        onCtaClick = {},
+                    )
+                }
+            }
+        }
+        capture("tooltip_inlineTitle")
+    }
+
+    @Test
+    fun tooltip_inlineTitle_centerAligned_card() {
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = lightColorScheme()) {
+                Box(modifier = Modifier.background(Color(0xFF1A1A2E)).padding(16.dp)) {
+                    CoachmarkTooltip(
+                        title = "Muted Call",
+                        description = "This call has been muted for you.",
+                        ctaText = "Got it!",
+                        currentStep = 1,
+                        totalSteps = 3,
+                        colors = LightCoachmarkColors,
+                        showCard = true,
+                        textAlign = TextAlign.Center,
+                        titleInlineWithConnector = true,
+                        connectorDotColor = LightCoachmarkColors.titleColor,
+                        onCtaClick = {},
+                    )
+                }
+            }
+        }
+        capture("tooltip_inlineTitle_centerAligned_card")
     }
 }
