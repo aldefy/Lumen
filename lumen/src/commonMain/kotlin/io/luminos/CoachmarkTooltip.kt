@@ -94,6 +94,7 @@ fun CoachmarkTooltip(
     connectorDotRadius: Dp = 4.dp,
     connectorDotOffsetX: Dp = 0.dp,
     onDotPositioned: (Offset) -> Unit = {},
+    isTooltipBelow: Boolean = true,
 ) {
     val cardModifier =
         if (showCard) {
@@ -156,7 +157,7 @@ fun CoachmarkTooltip(
         }
 
         // Title
-        if (titleInlineWithConnector) {
+        if (titleInlineWithConnector && isTooltipBelow) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
@@ -304,6 +305,29 @@ fun CoachmarkTooltip(
                     } else {
                         TextStyle.Default
                     },
+                )
+            }
+        }
+
+        // Bottom dot for tooltip-above-target inline connector alignment
+        if (titleInlineWithConnector && !isTooltipBelow) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                if (connectorDotOffsetX > 0.dp) {
+                    Spacer(modifier = Modifier.width(connectorDotOffsetX))
+                }
+                Box(
+                    modifier = Modifier
+                        .size(connectorDotRadius * 2)
+                        .clip(CircleShape)
+                        .background(connectorDotColor)
+                        .onGloballyPositioned { coords ->
+                            val pos = coords.positionInRoot()
+                            val center = Offset(
+                                pos.x + coords.size.width / 2f,
+                                pos.y + coords.size.height / 2f,
+                            )
+                            onDotPositioned(center)
+                        },
                 )
             }
         }

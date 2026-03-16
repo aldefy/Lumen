@@ -558,14 +558,17 @@ private fun CoachmarkScrimContent(
     val resolvedTitleInline = target.titleInlineWithConnector ?: config.titleInlineWithConnector
 
     // Determine if inline title is actually active.
-    // Only activates for vertical connectors when tooltip is BELOW the target,
-    // because the composed dot renders at the top of the tooltip (beside the title).
-    // When tooltip is above, the connector endpoint is at the bottom — the dot
-    // would be at the wrong end, so we fall back to standard layout.
+    // Activates for vertical connectors in both tooltip-below and tooltip-above cases.
+    // When below: composed dot renders at the top of the tooltip (beside the title).
+    // When above: composed dot renders at the bottom of the tooltip.
+    val isTooltipBelow = if (tooltipSize != IntSize.Zero) {
+        tooltipPosition.y > target.bounds.bottom
+    } else {
+        true
+    }
     val isInlineTitleActive = if (resolvedTitleInline && tooltipSize != IntSize.Zero) {
         val tooltipCenterX = tooltipPosition.x + tooltipSize.width / 2f
         val tooltipCenterY = tooltipPosition.y + tooltipSize.height / 2f
-        val isTooltipBelow = tooltipPosition.y > target.bounds.bottom
         val resolvedStyle = resolveConnectorStyle(
             connectorStyle = target.connectorStyle,
             targetCenter = target.bounds.center,
@@ -573,7 +576,7 @@ private fun CoachmarkScrimContent(
             tooltipCenterY = tooltipCenterY,
             cutoutRadius = maxOf(target.bounds.width, target.bounds.height) / 2f,
         )
-        resolvedStyle == ConnectorStyle.VERTICAL && isTooltipBelow
+        resolvedStyle == ConnectorStyle.VERTICAL
     } else {
         false
     }
@@ -923,7 +926,7 @@ private fun CoachmarkScrimContent(
             titleInlineWithConnector = isInlineTitleActive,
             connectorDotColor = colors.connectorColor,
             connectorDotRadius = config.connectorDotRadius,
-            connectorDotOffsetX = if (isInlineTitleActive) {
+            connectorDotOffsetX = if (isInlineTitleActive && isTooltipBelow) {
                 with(density) {
                     (target.bounds.center.x - tooltipPosition.x - tooltipMarginPx - connectorDotRadiusPx)
                         .coerceAtLeast(0f).toDp()
@@ -932,6 +935,7 @@ private fun CoachmarkScrimContent(
                 0.dp
             },
             onDotPositioned = { center -> inlineDotCenter = center },
+            isTooltipBelow = isTooltipBelow,
         )
 
         // Request focus on tooltip after animation completes for a11y
@@ -971,6 +975,7 @@ private fun BoxScope.TooltipContainer(
     connectorDotRadius: Dp = 4.dp,
     connectorDotOffsetX: Dp = 0.dp,
     onDotPositioned: (Offset) -> Unit = {},
+    isTooltipBelow: Boolean = true,
 ) {
     val showProgressIndicator = target.showProgressIndicator ?: config.showProgressIndicator
 
@@ -1012,6 +1017,7 @@ private fun BoxScope.TooltipContainer(
             connectorDotRadius = connectorDotRadius,
             connectorDotOffsetX = connectorDotOffsetX,
             onDotPositioned = onDotPositioned,
+            isTooltipBelow = isTooltipBelow,
         )
     }
 }
@@ -1538,7 +1544,7 @@ private fun calculateConnectorPath(
                 x = targetCenter.x,
                 y = targetCenter.y + direction * startRadius,
             )
-            if (isInlineTitleActive && isTooltipBelow && inlineDotCenter != Offset.Unspecified) {
+            if (isInlineTitleActive && inlineDotCenter != Offset.Unspecified) {
                 // Use the actual measured position of the composed dot.
                 // Connector goes straight from cutout edge to the dot center.
                 ConnectorPathData.Segments(listOf(cutoutEdgePoint, inlineDotCenter))
