@@ -926,7 +926,7 @@ private fun CoachmarkScrimContent(
             titleInlineWithConnector = isInlineTitleActive,
             connectorDotColor = colors.connectorColor,
             connectorDotRadius = config.connectorDotRadius,
-            connectorDotOffsetX = if (isInlineTitleActive && isTooltipBelow) {
+            connectorDotOffsetX = if (isInlineTitleActive) {
                 with(density) {
                     (target.bounds.center.x - tooltipPosition.x - tooltipMarginPx - connectorDotRadiusPx)
                         .coerceAtLeast(0f).toDp()
