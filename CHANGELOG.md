@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta11] - 2026-03-16
+
+### Bug Fixes
+- Fixed inline connector dot alignment for tooltip-above-target — when `titleInlineWithConnector` is enabled and the tooltip appears above the target, the connector dot now renders at the bottom of the tooltip aligned with the target center, with the connector line drawing directly to the measured dot position
+
 ## [1.0.0-beta10] - 2026-03-05
 
 ### Bug Fixes
