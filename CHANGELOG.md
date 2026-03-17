@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta13] - 2026-03-17
+
+### Bug Fixes
+- Fixed title text not aligning with connector dot for tooltip-above-target — title is now indented to match the dot's X position
+- Forced `TextAlign.Start` on title when `titleInlineWithConnector` is active, preventing `tooltipTextAlign` from breaking dot-title alignment
+
 ## [1.0.0-beta12] - 2026-03-17
 
 ### Bug Fixes
