@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta12] - 2026-03-17
+
+### Bug Fixes
+- Fixed title text alignment for tooltip-above-target — when `titleInlineWithConnector` is enabled, the title left edge now aligns with the connector dot position
+
 ## [1.0.0-beta11] - 2026-03-16
 
 ### Bug Fixes
