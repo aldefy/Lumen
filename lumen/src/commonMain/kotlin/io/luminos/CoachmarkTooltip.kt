@@ -64,6 +64,9 @@ import androidx.compose.ui.unit.sp
  * @param onDontShowAgainChanged Callback when the checkbox state changes
  * @param onCtaClick Callback when CTA is clicked
  * @param onSkipClick Callback when Skip is clicked (dismisses entire coachmark)
+ * @param titleInlineWithConnector When true, the title is rendered inline with the connector dot.
+ *   This forces [TextAlign.Start] on the title regardless of [textAlign] to ensure proper alignment
+ *   with the dot. The [textAlign] value still applies to the description and other tooltip text.
  */
 @Composable
 fun CoachmarkTooltip(
@@ -186,7 +189,7 @@ fun CoachmarkTooltip(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 26.sp,
-                    textAlign = textAlign,
+                    textAlign = TextAlign.Start,
                     style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
                     modifier = Modifier.weight(1f).semantics { heading() },
                 )
