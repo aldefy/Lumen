@@ -191,6 +191,26 @@ fun CoachmarkTooltip(
                     modifier = Modifier.weight(1f).semantics { heading() },
                 )
             }
+        } else if (titleInlineWithConnector && !isTooltipBelow) {
+            // Tooltip above target: indent title to align with the bottom dot's X position
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                if (connectorDotOffsetX > 0.dp) {
+                    Spacer(modifier = Modifier.width(connectorDotOffsetX))
+                }
+                Text(
+                    text = title,
+                    color = titleTextColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 26.sp,
+                    textAlign = TextAlign.Start,
+                    style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
+                    modifier = Modifier.weight(1f).semantics { heading() },
+                )
+            }
         } else {
             Text(
                 text = title,
