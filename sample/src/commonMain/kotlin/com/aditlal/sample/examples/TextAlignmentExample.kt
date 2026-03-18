@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +59,7 @@ fun TextAlignmentExample(
 ) {
     val controller = rememberCoachmarkController()
     var showSequence by remember { mutableStateOf(false) }
+    var showSingleCoachmark by remember { mutableStateOf(false) }
 
     CoachmarkHost(
         controller = controller,
@@ -108,6 +111,47 @@ fun TextAlignmentExample(
                     Spacer(modifier = Modifier.height(32.dp))
                 }
 
+                // Text alignment icon — single coachmark (no sequence)
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                .coachmarkTarget(controller, "text_align_target"),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = "Text alignment",
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                            )
+                        }
+                        Spacer(modifier = Modifier.padding(start = 12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Text Alignment",
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Text(
+                                text = "Tap to show single coachmark",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Button(onClick = { showSingleCoachmark = true }) {
+                            Text("Show")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 // Target near top — tooltip will appear BELOW (inline dot works)
                 item {
                     Row(
@@ -133,7 +177,7 @@ fun TextAlignmentExample(
                 }
 
                 // Spacer items to push next target toward bottom
-                items(8) { index ->
+                items(4) { index ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -163,12 +207,12 @@ fun TextAlignmentExample(
                     }
                 }
 
-                // Target near bottom — tooltip will appear ABOVE (tests inline title fallback)
+                // Target near bottom-left — tooltip will appear ABOVE (tests elbow + inline title)
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
+                        horizontalArrangement = Arrangement.Start,
                     ) {
                         Box(
                             modifier = Modifier
@@ -225,17 +269,16 @@ fun TextAlignmentExample(
                     titleInlineWithConnector = true,
                     ctaText = "Next",
                 ),
-                // Step 2: Target near bottom — tooltip ABOVE — inline title should gracefully fallback
+                // Step 2: Target near bottom-left — tooltip ABOVE — elbow + inline title
                 CoachmarkTarget(
                     id = "bottom_target",
                     title = "Muted Call",
-                    description = "Tooltip is above the target. Inline title should fall back to standard layout since dot is at bottom.",
-                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
-                    connectorStyle = ConnectorStyle.VERTICAL,
+                    description = "Your AI Assistant will not connect muted calls to you.",
+                    shape = CutoutShape.Circle(radiusPadding = 12.dp),
+                    connectorStyle = ConnectorStyle.ELBOW,
                     connectorLength = 56.dp,
-                    tooltipTextAlign = TextAlign.Center,
                     titleInlineWithConnector = true,
-                    ctaText = "Next",
+                    ctaText = "Got it!",
                 ),
                 // Step 3: Center-aligned only (no inline title)
                 CoachmarkTarget(
@@ -251,5 +294,23 @@ fun TextAlignmentExample(
             )
         )
         showSequence = false
+    }
+
+    LaunchedEffect(showSingleCoachmark) {
+        if (showSingleCoachmark) {
+            controller.show(
+                CoachmarkTarget(
+                    id = "text_align_target",
+                    title = "Text Alignment",
+                    description = "Control how tooltip text is aligned — start, center, or end.",
+                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
+                    connectorStyle = ConnectorStyle.VERTICAL,
+                    connectorLength = 56.dp,
+                    tooltipTextAlign = TextAlign.Center,
+                    ctaText = "Got it!",
+                )
+            )
+            showSingleCoachmark = false
+        }
     }
 }

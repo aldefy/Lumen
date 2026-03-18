@@ -566,20 +566,21 @@ private fun CoachmarkScrimContent(
     } else {
         true
     }
-    val isInlineTitleActive = if (resolvedTitleInline && tooltipSize != IntSize.Zero) {
+    val resolvedConnectorStyle = if (tooltipSize != IntSize.Zero) {
         val tooltipCenterX = tooltipPosition.x + tooltipSize.width / 2f
         val tooltipCenterY = tooltipPosition.y + tooltipSize.height / 2f
-        val resolvedStyle = resolveConnectorStyle(
+        resolveConnectorStyle(
             connectorStyle = target.connectorStyle,
             targetCenter = target.bounds.center,
             tooltipCenterX = tooltipCenterX,
             tooltipCenterY = tooltipCenterY,
             cutoutRadius = maxOf(target.bounds.width, target.bounds.height) / 2f,
         )
-        resolvedStyle == ConnectorStyle.VERTICAL
     } else {
-        false
+        null
     }
+    val isInlineTitleActive = resolvedTitleInline && resolvedConnectorStyle != null &&
+        (resolvedConnectorStyle == ConnectorStyle.VERTICAL || resolvedConnectorStyle == ConnectorStyle.ELBOW)
 
     val connectorPathData =
         remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx, connectorCutoutGapPx, isInlineTitleActive, inlineDotCenter) {
@@ -928,8 +929,32 @@ private fun CoachmarkScrimContent(
             connectorDotRadius = config.connectorDotRadius,
             connectorDotOffsetX = if (isInlineTitleActive) {
                 with(density) {
-                    (target.bounds.center.x - tooltipPosition.x - tooltipMarginPx - connectorDotRadiusPx)
-                        .coerceAtLeast(0f).toDp()
+                    when (resolvedConnectorStyle) {
+                        ConnectorStyle.VERTICAL -> {
+                            (target.bounds.center.x - tooltipPosition.x - tooltipMarginPx - connectorDotRadiusPx)
+                                .coerceAtLeast(0f).toDp()
+                        }
+                        ConnectorStyle.ELBOW -> {
+                            // Dot at elbow corner X: target edge + connectorLength
+                            val tooltipCenterX = tooltipPosition.x + tooltipSize.width / 2f
+                            val goingLeft = tooltipCenterX < target.bounds.center.x
+                            val startRadius = maxOf(target.bounds.width, target.bounds.height) / 2f +
+                                with(density) { config.connectorCutoutGap.toPx() }
+                            val cutoutEdgeX = if (goingLeft) {
+                                target.bounds.center.x - startRadius
+                            } else {
+                                target.bounds.center.x + startRadius
+                            }
+                            val cornerX = if (goingLeft) {
+                                cutoutEdgeX - connectorLengthPx
+                            } else {
+                                cutoutEdgeX + connectorLengthPx
+                            }
+                            (cornerX - tooltipPosition.x - tooltipMarginPx - connectorDotRadiusPx)
+                                .coerceAtLeast(0f).toDp()
+                        }
+                        else -> 0.dp
+                    }
                 }
             } else {
                 0.dp
@@ -1566,19 +1591,25 @@ private fun calculateConnectorPath(
                 x = if (goingLeft) targetCenter.x - startRadius else targetCenter.x + startRadius,
                 y = targetCenter.y,
             )
-            val cornerX = if (goingLeft) {
-                cutoutEdgePoint.x - lineLength
+            if (isInlineTitleActive && inlineDotCenter != Offset.Unspecified) {
+                // Elbow from cutout edge → corner at dot's X → dot center
+                val cornerPoint = Offset(x = inlineDotCenter.x, y = targetCenter.y)
+                ConnectorPathData.Segments(listOf(cutoutEdgePoint, cornerPoint, inlineDotCenter))
             } else {
-                cutoutEdgePoint.x + lineLength
+                val cornerX = if (goingLeft) {
+                    cutoutEdgePoint.x - lineLength
+                } else {
+                    cutoutEdgePoint.x + lineLength
+                }
+                val cornerPoint = Offset(x = cornerX, y = targetCenter.y)
+                val endPointY = if (isTooltipBelow) {
+                    tooltipPosition.y - connectorTooltipGap
+                } else {
+                    tooltipPosition.y + tooltipSize.height + connectorTooltipGap
+                }
+                val endPoint = Offset(x = cornerX, y = endPointY)
+                ConnectorPathData.Segments(listOf(cutoutEdgePoint, cornerPoint, endPoint))
             }
-            val cornerPoint = Offset(x = cornerX, y = targetCenter.y)
-            val endPointY = if (isTooltipBelow) {
-                tooltipPosition.y - connectorTooltipGap
-            } else {
-                tooltipPosition.y + tooltipSize.height + connectorTooltipGap
-            }
-            val endPoint = Offset(x = cornerX, y = endPointY)
-            ConnectorPathData.Segments(listOf(cutoutEdgePoint, cornerPoint, endPoint))
         }
 
         ConnectorStyle.DIRECT -> {
