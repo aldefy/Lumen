@@ -1,5 +1,6 @@
 package io.luminos
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.style.TextAlign
@@ -253,5 +254,10 @@ data class CoachmarkTarget(
     val showDontShowAgain: Boolean = false,
     val persistKey: String? = null,
     val tooltipTextAlign: TextAlign? = null,
+    val titleTextAlign: TextAlign? = null,
+    val descriptionTextAlign: TextAlign? = null,
+    val skipButtonTextAlign: TextAlign? = null,
+    val dontShowAgainTextAlign: TextAlign? = null,
+    val ctaHorizontalArrangement: Arrangement.Horizontal? = null,
     val titleInlineWithConnector: Boolean? = null,
 )

@@ -11,6 +11,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -230,8 +231,20 @@ data class CoachmarkConfig(
     /** Corner radius for the CTA button shape */
     val ctaCornerRadius: Dp = 22.dp,
     /** Text alignment for tooltip title, description, and other text elements.
-     *  Per-target override via [CoachmarkTarget.tooltipTextAlign]. */
+     *  Per-target override via [CoachmarkTarget.tooltipTextAlign].
+     *  Also serves as the fallback when per-element alignments are not set. */
     val tooltipTextAlign: TextAlign = TextAlign.Start,
+    /** Text alignment for the title. Falls back to [tooltipTextAlign]. */
+    val titleTextAlign: TextAlign = TextAlign.Start,
+    /** Text alignment for the description. Falls back to [tooltipTextAlign]. */
+    val descriptionTextAlign: TextAlign = TextAlign.Start,
+    /** Text alignment for the skip button text. Falls back to [tooltipTextAlign]. */
+    val skipButtonTextAlign: TextAlign = TextAlign.End,
+    /** Text alignment for the "Don't show again" label. Falls back to [tooltipTextAlign]. */
+    val dontShowAgainTextAlign: TextAlign = TextAlign.Start,
+    /** Horizontal arrangement for the CTA button row when no progress indicator is shown.
+     *  Per-target override via [CoachmarkTarget.ctaHorizontalArrangement]. */
+    val ctaHorizontalArrangement: Arrangement.Horizontal = Arrangement.End,
     /** When true and connector is vertical, renders the title beside the connector dot
      *  on the same horizontal line. Per-target override via [CoachmarkTarget.titleInlineWithConnector]. */
     val titleInlineWithConnector: Boolean = false,
@@ -899,7 +912,11 @@ private fun CoachmarkScrimContent(
         }
 
         val tooltipEffectiveAlpha = if (tooltipSize == IntSize.Zero) 0f else tooltipAlpha.value
-        val resolvedTextAlign = target.tooltipTextAlign ?: config.tooltipTextAlign
+        val resolvedTitleTextAlign = resolveTextAlign(target.titleTextAlign, target.tooltipTextAlign, config.titleTextAlign)
+        val resolvedDescriptionTextAlign = resolveTextAlign(target.descriptionTextAlign, target.tooltipTextAlign, config.descriptionTextAlign)
+        val resolvedSkipButtonTextAlign = resolveTextAlign(target.skipButtonTextAlign, target.tooltipTextAlign, config.skipButtonTextAlign)
+        val resolvedDontShowAgainTextAlign = resolveTextAlign(target.dontShowAgainTextAlign, target.tooltipTextAlign, config.dontShowAgainTextAlign)
+        val resolvedCtaArrangement = target.ctaHorizontalArrangement ?: config.ctaHorizontalArrangement
 
         TooltipContainer(
             target = target,
@@ -923,7 +940,11 @@ private fun CoachmarkScrimContent(
             dontShowAgainText = config.dontShowAgainText,
             dontShowAgainChecked = dontShowAgainChecked,
             onDontShowAgainChanged = { dontShowAgainChecked = it },
-            textAlign = resolvedTextAlign,
+            titleTextAlign = resolvedTitleTextAlign,
+            descriptionTextAlign = resolvedDescriptionTextAlign,
+            skipButtonTextAlign = resolvedSkipButtonTextAlign,
+            dontShowAgainTextAlign = resolvedDontShowAgainTextAlign,
+            ctaHorizontalArrangement = resolvedCtaArrangement,
             titleInlineWithConnector = isInlineTitleActive,
             connectorDotColor = colors.connectorColor,
             connectorDotRadius = config.connectorDotRadius,
@@ -994,7 +1015,11 @@ private fun BoxScope.TooltipContainer(
     dontShowAgainText: String = "Don't show again",
     dontShowAgainChecked: Boolean = false,
     onDontShowAgainChanged: (Boolean) -> Unit = {},
-    textAlign: TextAlign = TextAlign.Start,
+    titleTextAlign: TextAlign = TextAlign.Start,
+    descriptionTextAlign: TextAlign = TextAlign.Start,
+    skipButtonTextAlign: TextAlign = TextAlign.End,
+    dontShowAgainTextAlign: TextAlign = TextAlign.Start,
+    ctaHorizontalArrangement: Arrangement.Horizontal = Arrangement.End,
     titleInlineWithConnector: Boolean = false,
     connectorDotColor: Color = Color.White,
     connectorDotRadius: Dp = 4.dp,
@@ -1036,7 +1061,11 @@ private fun BoxScope.TooltipContainer(
             ctaCornerRadius = config.ctaCornerRadius,
             onCtaClick = onNext,
             onSkipClick = onSkip,
-            textAlign = textAlign,
+            titleTextAlign = titleTextAlign,
+            descriptionTextAlign = descriptionTextAlign,
+            skipButtonTextAlign = skipButtonTextAlign,
+            dontShowAgainTextAlign = dontShowAgainTextAlign,
+            ctaHorizontalArrangement = ctaHorizontalArrangement,
             titleInlineWithConnector = titleInlineWithConnector,
             connectorDotColor = connectorDotColor,
             connectorDotRadius = connectorDotRadius,
@@ -1046,6 +1075,16 @@ private fun BoxScope.TooltipContainer(
         )
     }
 }
+
+/**
+ * Resolves a per-element text alignment with fallback chain:
+ * per-element override -> per-target blanket override -> global config default.
+ */
+private fun resolveTextAlign(
+    perElement: TextAlign?,
+    targetFallback: TextAlign?,
+    configDefault: TextAlign,
+): TextAlign = perElement ?: targetFallback ?: configDefault
 
 private fun DrawScope.drawCutout(
     target: CoachmarkTarget,

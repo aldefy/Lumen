@@ -11,22 +11,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -51,6 +49,18 @@ import io.luminos.coachmarkColors
 import io.luminos.coachmarkTarget
 import io.luminos.rememberCoachmarkController
 
+private enum class AlignOption(val label: String, val textAlign: TextAlign) {
+    START("Start", TextAlign.Start),
+    CENTER("Center", TextAlign.Center),
+    END("End", TextAlign.End),
+}
+
+private enum class CtaAlignOption(val label: String, val arrangement: Arrangement.Horizontal) {
+    START("Start", Arrangement.Start),
+    CENTER("Center", Arrangement.Center),
+    END("End", Arrangement.End),
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextAlignmentExample(
@@ -58,14 +68,20 @@ fun TextAlignmentExample(
     onBack: () -> Unit,
 ) {
     val controller = rememberCoachmarkController()
-    var showSequence by remember { mutableStateOf(false) }
-    var showSingleCoachmark by remember { mutableStateOf(false) }
+    var showDemo by remember { mutableStateOf(false) }
+
+    var titleAlign by remember { mutableStateOf(AlignOption.START) }
+    var descAlign by remember { mutableStateOf(AlignOption.START) }
+    var skipAlign by remember { mutableStateOf(AlignOption.END) }
+    var ctaAlign by remember { mutableStateOf(CtaAlignOption.END) }
+    var showSkipButton by remember { mutableStateOf(true) }
+    var titleInline by remember { mutableStateOf(true) }
 
     CoachmarkHost(
         controller = controller,
         config = CoachmarkConfig(
             highlightAnimation = HighlightAnimation.PULSE,
-            showSkipButton = true,
+            showSkipButton = showSkipButton,
             skipButtonText = "Skip",
             scrimTapBehavior = ScrimTapBehavior.NONE,
         ),
@@ -84,233 +100,211 @@ fun TextAlignmentExample(
                 )
             }
         ) { paddingValues ->
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 24.dp),
+                    .padding(horizontal = 24.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                item {
-                    Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = "Per-Element Text Alignment",
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Configure alignment for each tooltip element, then tap Show Demo",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Title alignment selector
+                AlignSelector(
+                    label = "Title",
+                    selected = titleAlign,
+                    onSelect = { titleAlign = it },
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Description alignment selector
+                AlignSelector(
+                    label = "Description",
+                    selected = descAlign,
+                    onSelect = { descAlign = it },
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Skip button alignment selector
+                AlignSelector(
+                    label = "Skip Button",
+                    selected = skipAlign,
+                    onSelect = { skipAlign = it },
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // CTA alignment selector
+                CtaAlignSelector(
+                    label = "CTA Button",
+                    selected = ctaAlign,
+                    onSelect = { ctaAlign = it },
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Toggle switches
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
                     Text(
-                        text = "Text Alignment & Inline Title",
-                        style = MaterialTheme.typography.headlineSmall,
+                        text = "Show Skip Button",
+                        style = MaterialTheme.typography.labelLarge,
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Switch(
+                        checked = showSkipButton,
+                        onCheckedChange = { showSkipButton = it },
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
                     Text(
-                        text = "Simulates tooltip above/below targets in a scrollable list",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = "Title Inline With Connector",
+                        style = MaterialTheme.typography.labelLarge,
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Button(onClick = { showSequence = true }) {
-                        Text("Show Text Alignment Demo")
-                    }
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Switch(
+                        checked = titleInline,
+                        onCheckedChange = { titleInline = it },
+                    )
                 }
 
-                // Text alignment icon — single coachmark (no sequence)
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.tertiaryContainer)
-                                .coachmarkTarget(controller, "text_align_target"),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                Icons.Default.Menu,
-                                contentDescription = "Text alignment",
-                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                            )
-                        }
-                        Spacer(modifier = Modifier.padding(start = 12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Text Alignment",
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = "Tap to show single coachmark",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Button(onClick = { showSingleCoachmark = true }) {
-                            Text("Show")
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                Spacer(modifier = Modifier.height(32.dp))
 
-                // Target near top — tooltip will appear BELOW (inline dot works)
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .coachmarkTarget(controller, "top_target"),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = "Top target",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                // Spacer items to push next target toward bottom
-                items(4) { index ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                                ),
-                        )
-                        Spacer(modifier = Modifier.padding(start = 12.dp))
-                        Column {
-                            Text(
-                                text = "Contact ${index + 1}",
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = "List item to fill space",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-
-                // Target near bottom-left — tooltip will appear ABOVE (tests elbow + inline title)
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.errorContainer)
-                                .coachmarkTarget(controller, "bottom_target"),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                Icons.Default.Call,
-                                contentDescription = "Bottom target (muted)",
-                                tint = MaterialTheme.colorScheme.onErrorContainer,
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                // Center-aligned target
-                item {
+                // Target
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Box(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.secondaryContainer)
-                            .coachmarkTarget(controller, "center_aligned"),
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .coachmarkTarget(controller, "demo_target"),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            Icons.Default.Star,
-                            contentDescription = "Center aligned",
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            Icons.Default.Call,
+                            contentDescription = "Demo target",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.padding(start = 12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Sarah Connor", style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            "Last called 2 hours ago",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(onClick = { showDemo = true }) {
+                    Text("Show Demo")
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
 
-    if (showSequence) {
-        controller.showSequence(
-            listOf(
-                // Step 1: Target near top — tooltip BELOW — inline title active (dot at top)
+    LaunchedEffect(showDemo) {
+        if (showDemo) {
+            controller.show(
                 CoachmarkTarget(
-                    id = "top_target",
-                    title = "Muted Call",
-                    description = "This call has been muted for you. Inline title with dot beside it.",
-                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
-                    connectorStyle = ConnectorStyle.VERTICAL,
-                    connectorLength = 56.dp,
-                    tooltipTextAlign = TextAlign.Center,
-                    titleInlineWithConnector = true,
-                    ctaText = "Next",
-                ),
-                // Step 2: Target near bottom-left — tooltip ABOVE — elbow + inline title
-                CoachmarkTarget(
-                    id = "bottom_target",
-                    title = "Muted Call",
-                    description = "Your AI Assistant will not connect muted calls to you.",
+                    id = "demo_target",
+                    title = "Quick Call",
+                    description = "Tap to start a call. Long press to send a voice message instead.",
                     shape = CutoutShape.Circle(radiusPadding = 12.dp),
                     connectorStyle = ConnectorStyle.ELBOW,
                     connectorLength = 56.dp,
-                    titleInlineWithConnector = true,
-                    ctaText = "Got it!",
-                ),
-                // Step 3: Center-aligned only (no inline title)
-                CoachmarkTarget(
-                    id = "center_aligned",
-                    title = "Center Aligned",
-                    description = "Plain center-aligned text without inline title.",
-                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
-                    connectorStyle = ConnectorStyle.VERTICAL,
-                    connectorLength = 56.dp,
-                    tooltipTextAlign = TextAlign.Center,
-                    ctaText = "Got it!",
-                ),
-            )
-        )
-        showSequence = false
-    }
-
-    LaunchedEffect(showSingleCoachmark) {
-        if (showSingleCoachmark) {
-            controller.show(
-                CoachmarkTarget(
-                    id = "text_align_target",
-                    title = "Text Alignment",
-                    description = "Control how tooltip text is aligned — start, center, or end.",
-                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
-                    connectorStyle = ConnectorStyle.VERTICAL,
-                    connectorLength = 56.dp,
-                    tooltipTextAlign = TextAlign.Center,
+                    titleInlineWithConnector = titleInline,
+                    titleTextAlign = titleAlign.textAlign,
+                    descriptionTextAlign = descAlign.textAlign,
+                    skipButtonTextAlign = skipAlign.textAlign,
+                    ctaHorizontalArrangement = ctaAlign.arrangement,
                     ctaText = "Got it!",
                 )
             )
-            showSingleCoachmark = false
+            showDemo = false
+        }
+    }
+}
+
+@Composable
+private fun AlignSelector(
+    label: String,
+    selected: AlignOption,
+    onSelect: (AlignOption) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            AlignOption.entries.forEach { option ->
+                FilterChip(
+                    selected = selected == option,
+                    onClick = { onSelect(option) },
+                    label = { Text(option.label) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CtaAlignSelector(
+    label: String,
+    selected: CtaAlignOption,
+    onSelect: (CtaAlignOption) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            CtaAlignOption.entries.forEach { option ->
+                FilterChip(
+                    selected = selected == option,
+                    onClick = { onSelect(option) },
+                    label = { Text(option.label) },
+                )
+            }
         }
     }
 }

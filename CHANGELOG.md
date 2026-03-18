@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta15] - 2026-03-18
+
+### Features
+- Per-element text alignment: `titleTextAlign`, `descriptionTextAlign`, `skipButtonTextAlign`, `dontShowAgainTextAlign` on both `CoachmarkConfig` and `CoachmarkTarget`
+- `ctaHorizontalArrangement` to control CTA button horizontal positioning (Start/Center/End)
+- Description and CTA row auto-indent to align with title when `titleInlineWithConnector` is active
+- Existing `tooltipTextAlign` preserved as fallback for backward compatibility
+
+### Sample App
+- Reworked TextAlignmentExample with per-element alignment chip selectors and toggle switches for Skip Button and Title Inline With Connector
+
+## [1.0.0-beta14] - 2026-03-18
+
+### Sample App
+- Added single coachmark demo with text alignment icon row in TextAlignmentExample
+- Reduced contact list spacer items from 8 to 4
+
 ## [1.0.0-beta13] - 2026-03-17
 
 ### Bug Fixes

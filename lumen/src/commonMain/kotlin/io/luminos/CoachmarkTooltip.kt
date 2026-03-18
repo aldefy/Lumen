@@ -65,8 +65,8 @@ import androidx.compose.ui.unit.sp
  * @param onCtaClick Callback when CTA is clicked
  * @param onSkipClick Callback when Skip is clicked (dismisses entire coachmark)
  * @param titleInlineWithConnector When true, the title is rendered inline with the connector dot.
- *   This forces [TextAlign.Start] on the title regardless of [textAlign] to ensure proper alignment
- *   with the dot. The [textAlign] value still applies to the description and other tooltip text.
+ *   This forces [TextAlign.Start] on the title regardless of [titleTextAlign] to ensure proper alignment
+ *   with the dot.
  */
 @Composable
 fun CoachmarkTooltip(
@@ -91,7 +91,11 @@ fun CoachmarkTooltip(
     onCtaClick: () -> Unit,
     onSkipClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-    textAlign: TextAlign = TextAlign.Start,
+    titleTextAlign: TextAlign = TextAlign.Start,
+    descriptionTextAlign: TextAlign = TextAlign.Start,
+    skipButtonTextAlign: TextAlign = TextAlign.End,
+    dontShowAgainTextAlign: TextAlign = TextAlign.Start,
+    ctaHorizontalArrangement: Arrangement.Horizontal = Arrangement.End,
     titleInlineWithConnector: Boolean = false,
     connectorDotColor: Color = Color.White,
     connectorDotRadius: Dp = 4.dp,
@@ -152,7 +156,7 @@ fun CoachmarkTooltip(
                         color = if (showCard) colors.descriptionColor else colors.strokeColor.copy(alpha = 0.7f),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        textAlign = textAlign,
+                        textAlign = skipButtonTextAlign,
                         style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
                     )
                 }
@@ -221,7 +225,7 @@ fun CoachmarkTooltip(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 lineHeight = 26.sp,
-                textAlign = textAlign,
+                textAlign = titleTextAlign,
                 style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
                 modifier = Modifier.fillMaxWidth().semantics { heading() },
             )
@@ -229,35 +233,45 @@ fun CoachmarkTooltip(
 
         Spacer(modifier = Modifier.height(4.dp))
 
+        // When title is inline with connector, indent description to align with title text
+        val descriptionStartPadding = if (titleInlineWithConnector && isTooltipBelow) {
+            // Tooltip below: title row has [offset + dot + 4dp spacer + text]
+            connectorDotOffsetX + connectorDotRadius * 2 + 4.dp
+        } else if (titleInlineWithConnector && !isTooltipBelow) {
+            // Tooltip above: title row has [offset + text] (dot is at bottom)
+            connectorDotOffsetX
+        } else {
+            0.dp
+        }
+
         // Description
         Text(
             text = description,
             color = descriptionTextColor,
             fontSize = 14.sp,
             lineHeight = 20.sp,
-            textAlign = textAlign,
+            textAlign = descriptionTextAlign,
             style = textShadow?.let { TextStyle(shadow = it) } ?: TextStyle.Default,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(start = descriptionStartPadding),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Footer with progress indicator and CTA
+        val hasProgressIndicator = totalSteps > 1 && showProgressIndicator
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(start = descriptionStartPadding),
+            horizontalArrangement = if (hasProgressIndicator) Arrangement.SpaceBetween else ctaHorizontalArrangement,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Progress indicator (only show for sequences with multiple steps, if enabled)
-            if (totalSteps > 1 && showProgressIndicator) {
+            if (hasProgressIndicator) {
                 ProgressIndicator(
                     currentStep = currentStep,
                     totalSteps = totalSteps,
                     activeColor = colors.progressActiveColor,
                     inactiveColor = colors.progressInactiveColor,
                 )
-            } else {
-                Spacer(modifier = Modifier.width(1.dp))
             }
 
             // CTA Button
@@ -316,7 +330,7 @@ fun CoachmarkTooltip(
                     text = dontShowAgainText,
                     color = if (showCard) colors.descriptionColor else colors.strokeColor.copy(alpha = 0.8f),
                     fontSize = 13.sp,
-                    textAlign = textAlign,
+                    textAlign = dontShowAgainTextAlign,
                     style = if (!showCard) {
                         TextStyle(
                             shadow = Shadow(
