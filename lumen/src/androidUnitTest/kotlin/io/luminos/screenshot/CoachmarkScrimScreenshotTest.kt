@@ -12,6 +12,7 @@ import io.luminos.CoachmarkConfig
 import io.luminos.CoachmarkController
 import io.luminos.CoachmarkScrim
 import io.luminos.CoachmarkTarget
+import io.luminos.ConnectorEndStyle
 import io.luminos.ConnectorStyle
 import io.luminos.CutoutShape
 import io.luminos.DarkCoachmarkColors
@@ -181,6 +182,38 @@ class CoachmarkScrimScreenshotTest {
                 connectorStyle = ConnectorStyle.DIRECT,
             ),
             filePath = "src/androidUnitTest/snapshots/scrim_directConnector.png",
+        )
+    }
+
+    @Test
+    fun scrim_teardropConnector() {
+        showScrimAndCapture(
+            target = CoachmarkTarget(
+                id = "teardrop",
+                bounds = targetBounds,
+                shape = CutoutShape.Circle(),
+                title = "Teardrop Connector",
+                description = "A rounded teardrop nub anchored on the tooltip edge, no connector line.",
+                connectorStyle = ConnectorStyle.TEARDROP,
+            ),
+            config = noAnimConfig.copy(showTooltipCard = true),
+            filePath = "src/androidUnitTest/snapshots/scrim_teardropConnector.png",
+        )
+    }
+
+    @Test
+    fun scrim_teardropEndStyle() {
+        showScrimAndCapture(
+            target = CoachmarkTarget(
+                id = "teardropEnd",
+                bounds = targetBounds,
+                shape = CutoutShape.Circle(),
+                title = "Teardrop Endpoint",
+                description = "A rounded petal shape at the end of a direct connector line.",
+                connectorStyle = ConnectorStyle.DIRECT,
+                connectorEndStyle = ConnectorEndStyle.TEARDROP,
+            ),
+            filePath = "src/androidUnitTest/snapshots/scrim_teardropEndStyle.png",
         )
     }
 

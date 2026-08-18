@@ -69,6 +69,9 @@ fun ConnectorsExample(
             showSkipButton = true,
             skipButtonText = "Skip",
             scrimTapBehavior = ScrimTapBehavior.NONE,
+            // TEARDROP connector style anchors its nub directly on the tooltip card edge,
+            // so it reads best with the card background enabled.
+            showTooltipCard = true,
             customConnectorEnd = { center, angle ->
                 // Diamond shape endpoint
                 val size = 10f
@@ -134,7 +137,7 @@ fun ConnectorsExample(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Eight different ways to connect tooltips to targets",
+                    text = "Ten different ways to connect tooltips to targets",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -287,6 +290,24 @@ fun ConnectorsExample(
                     connectorStyle = ConnectorStyle.ELBOW,
                     connectorEndStyle = ConnectorEndStyle.CUSTOM,
                     connectorLength = 90.dp,
+                    ctaText = "Got it!",
+                ),
+                CoachmarkTarget(
+                    id = "vertical",
+                    title = "Teardrop Connector",
+                    description = "A rounded teardrop nub grows straight out of the tooltip card toward the target — no connector line at all, like a classic speech-bubble tail.",
+                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
+                    connectorStyle = ConnectorStyle.TEARDROP,
+                    ctaText = "Next",
+                ),
+                CoachmarkTarget(
+                    id = "direct",
+                    title = "Teardrop Endpoint",
+                    description = "Same idea, applied to the connector line's endpoint instead: a rounded petal shape with smooth curved sides, in place of the sharp arrowhead.",
+                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
+                    connectorStyle = ConnectorStyle.DIRECT,
+                    connectorEndStyle = ConnectorEndStyle.TEARDROP,
+                    connectorLength = 80.dp,
                     ctaText = "Got it!",
                 ),
             )

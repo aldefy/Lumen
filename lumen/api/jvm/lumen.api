@@ -28,11 +28,12 @@ public final class io/luminos/CoachmarkAnalytics {
 
 public final class io/luminos/CoachmarkColors {
 	public static final field $stable I
-	public synthetic fun <init> (JJJJJJJJJJJILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (JJJJJJJJJJJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJJJJJJJJJJJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JJJJJJJJJJJJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-0d7_KjU ()J
 	public final fun component10-0d7_KjU ()J
 	public final fun component11-0d7_KjU ()J
+	public final fun component12-0d7_KjU ()J
 	public final fun component2-0d7_KjU ()J
 	public final fun component3-0d7_KjU ()J
 	public final fun component4-0d7_KjU ()J
@@ -41,10 +42,11 @@ public final class io/luminos/CoachmarkColors {
 	public final fun component7-0d7_KjU ()J
 	public final fun component8-0d7_KjU ()J
 	public final fun component9-0d7_KjU ()J
-	public final fun copy-KpyCeHw (JJJJJJJJJJJ)Lio/luminos/CoachmarkColors;
-	public static synthetic fun copy-KpyCeHw$default (Lio/luminos/CoachmarkColors;JJJJJJJJJJJILjava/lang/Object;)Lio/luminos/CoachmarkColors;
+	public final fun copy-2qZNXz8 (JJJJJJJJJJJJ)Lio/luminos/CoachmarkColors;
+	public static synthetic fun copy-2qZNXz8$default (Lio/luminos/CoachmarkColors;JJJJJJJJJJJJILjava/lang/Object;)Lio/luminos/CoachmarkColors;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getConnectorColor-0d7_KjU ()J
+	public final fun getConnectorTeardropColor-0d7_KjU ()J
 	public final fun getCtaButtonColor-0d7_KjU ()J
 	public final fun getCtaTextColor-0d7_KjU ()J
 	public final fun getDescriptionColor-0d7_KjU ()J
@@ -68,48 +70,51 @@ public final class io/luminos/CoachmarkColorsKt {
 
 public final class io/luminos/CoachmarkConfig {
 	public static final field $stable I
-	public synthetic fun <init> (FFFFLkotlin/jvm/functions/Function3;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZIILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (FFFFLkotlin/jvm/functions/Function3;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (FFFFFFFLkotlin/jvm/functions/Function3;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (FFFFFFFLkotlin/jvm/functions/Function3;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-D9Ej5fM ()F
-	public final fun component10 ()I
-	public final fun component11 ()I
-	public final fun component12 ()I
-	public final fun component13 ()Lio/luminos/ScrimOpacity;
-	public final fun component14 ()Lio/luminos/ScrimTapBehavior;
-	public final fun component15 ()Z
-	public final fun component16 ()Z
-	public final fun component17 ()Lio/luminos/BackPressBehavior;
-	public final fun component18 ()Lio/luminos/HighlightAnimation;
-	public final fun component19 ()I
+	public final fun component10-D9Ej5fM ()F
+	public final fun component11-D9Ej5fM ()F
+	public final fun component12-D9Ej5fM ()F
+	public final fun component13 ()I
+	public final fun component14 ()I
+	public final fun component15 ()I
+	public final fun component16 ()Lio/luminos/ScrimOpacity;
+	public final fun component17 ()Lio/luminos/ScrimTapBehavior;
+	public final fun component18 ()Z
+	public final fun component19 ()Z
 	public final fun component2-D9Ej5fM ()F
-	public final fun component20 ()Z
-	public final fun component21 ()Ljava/lang/String;
-	public final fun component22 ()J
+	public final fun component20 ()Lio/luminos/BackPressBehavior;
+	public final fun component21 ()Lio/luminos/HighlightAnimation;
+	public final fun component22 ()I
 	public final fun component23 ()Z
-	public final fun component24 ()J
-	public final fun component25 ()Ljava/lang/String;
-	public final fun component26 ()J
-	public final fun component27 ()Z
-	public final fun component28-D9Ej5fM ()F
-	public final fun component29-D9Ej5fM ()F
+	public final fun component24 ()Ljava/lang/String;
+	public final fun component25 ()J
+	public final fun component26 ()Z
+	public final fun component27 ()J
+	public final fun component28 ()Ljava/lang/String;
+	public final fun component29 ()J
 	public final fun component3-D9Ej5fM ()F
-	public final fun component30-D9Ej5fM ()F
+	public final fun component30 ()Z
 	public final fun component31-D9Ej5fM ()F
-	public final fun component32-e0LSkKk ()I
-	public final fun component33-e0LSkKk ()I
-	public final fun component34-e0LSkKk ()I
+	public final fun component32-D9Ej5fM ()F
+	public final fun component33-D9Ej5fM ()F
+	public final fun component34-D9Ej5fM ()F
 	public final fun component35-e0LSkKk ()I
 	public final fun component36-e0LSkKk ()I
-	public final fun component37 ()Landroidx/compose/foundation/layout/Arrangement$Horizontal;
-	public final fun component38 ()Z
+	public final fun component37-e0LSkKk ()I
+	public final fun component38-e0LSkKk ()I
+	public final fun component39-e0LSkKk ()I
 	public final fun component4 ()F
-	public final fun component5 ()Lkotlin/jvm/functions/Function3;
+	public final fun component40 ()Landroidx/compose/foundation/layout/Arrangement$Horizontal;
+	public final fun component41 ()Z
+	public final fun component5-D9Ej5fM ()F
 	public final fun component6-D9Ej5fM ()F
 	public final fun component7-D9Ej5fM ()F
-	public final fun component8-D9Ej5fM ()F
+	public final fun component8 ()Lkotlin/jvm/functions/Function3;
 	public final fun component9-D9Ej5fM ()F
-	public final fun copy-ZvfVXdg (FFFFLkotlin/jvm/functions/Function3;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;Z)Lio/luminos/CoachmarkConfig;
-	public static synthetic fun copy-ZvfVXdg$default (Lio/luminos/CoachmarkConfig;FFFFLkotlin/jvm/functions/Function3;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZIILjava/lang/Object;)Lio/luminos/CoachmarkConfig;
+	public final fun copy-I2SBm6M (FFFFFFFLkotlin/jvm/functions/Function3;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;Z)Lio/luminos/CoachmarkConfig;
+	public static synthetic fun copy-I2SBm6M$default (Lio/luminos/CoachmarkConfig;FFFFFFFLkotlin/jvm/functions/Function3;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZIILjava/lang/Object;)Lio/luminos/CoachmarkConfig;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBackPressBehavior ()Lio/luminos/BackPressBehavior;
 	public final fun getConnectorAnimationDuration ()I
@@ -117,6 +122,9 @@ public final class io/luminos/CoachmarkConfig {
 	public final fun getConnectorArrowSize-D9Ej5fM ()F
 	public final fun getConnectorCutoutGap-D9Ej5fM ()F
 	public final fun getConnectorDotRadius-D9Ej5fM ()F
+	public final fun getConnectorTeardropLength-D9Ej5fM ()F
+	public final fun getConnectorTeardropTargetGap-D9Ej5fM ()F
+	public final fun getConnectorTeardropWidth-D9Ej5fM ()F
 	public final fun getConnectorTooltipGap-D9Ej5fM ()F
 	public final fun getCtaCornerRadius-D9Ej5fM ()F
 	public final fun getCtaHorizontalArrangement ()Landroidx/compose/foundation/layout/Arrangement$Horizontal;
@@ -327,6 +335,7 @@ public final class io/luminos/ConnectorEndStyle : java/lang/Enum {
 	public static final field CUSTOM Lio/luminos/ConnectorEndStyle;
 	public static final field DOT Lio/luminos/ConnectorEndStyle;
 	public static final field NONE Lio/luminos/ConnectorEndStyle;
+	public static final field TEARDROP Lio/luminos/ConnectorEndStyle;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/luminos/ConnectorEndStyle;
 	public static fun values ()[Lio/luminos/ConnectorEndStyle;
@@ -338,6 +347,7 @@ public final class io/luminos/ConnectorStyle : java/lang/Enum {
 	public static final field DIRECT Lio/luminos/ConnectorStyle;
 	public static final field ELBOW Lio/luminos/ConnectorStyle;
 	public static final field HORIZONTAL Lio/luminos/ConnectorStyle;
+	public static final field TEARDROP Lio/luminos/ConnectorStyle;
 	public static final field VERTICAL Lio/luminos/ConnectorStyle;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lio/luminos/ConnectorStyle;

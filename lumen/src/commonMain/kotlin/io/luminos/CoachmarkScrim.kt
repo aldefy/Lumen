@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
@@ -175,6 +176,21 @@ data class CoachmarkConfig(
     val connectorArrowSize: Dp = 10.dp,
     /** Half-angle of arrowhead wings in degrees */
     val connectorArrowAngle: Float = 30f,
+    /**
+     * Height (base to peak) of the teardrop shape used by [ConnectorEndStyle.TEARDROP] and
+     * [ConnectorStyle.TEARDROP]. It's a low, wide hill, not a tall spike — keep this smaller
+     * than [connectorTeardropWidth].
+     */
+    val connectorTeardropLength: Dp = 11.dp,
+    /** Width of the flat base of the teardrop shape. */
+    val connectorTeardropWidth: Dp = 24.dp,
+    /**
+     * For [ConnectorStyle.TEARDROP] only: gap left between the nub's tip and the target's
+     * cutout edge, so the tail points at the target without touching it. The tooltip is
+     * positioned so the total cutout-to-card distance equals [connectorTeardropLength] plus
+     * this value.
+     */
+    val connectorTeardropTargetGap: Dp = 8.dp,
     /** Custom endpoint DrawScope lambda for ConnectorEndStyle.CUSTOM */
     val customConnectorEnd: (DrawScope.(center: Offset, angle: Float) -> Unit)? = null,
     /** Minimum distance from screen edges for the tooltip */
@@ -547,9 +563,12 @@ private fun CoachmarkScrimContent(
     } else {
         0f
     }
+    val teardropLengthPx = with(density) { config.connectorTeardropLength.toPx() }
+    val teardropWidthPx = with(density) { config.connectorTeardropWidth.toPx() }
+    val teardropTargetGapPx = with(density) { config.connectorTeardropTargetGap.toPx() }
 
     val tooltipPosition =
-        remember(target, screenSize, tooltipSize, connectorLengthPx) {
+        remember(target, screenSize, tooltipSize, connectorLengthPx, teardropLengthPx, teardropTargetGapPx) {
             calculateTooltipPosition(
                 targetBounds = target.bounds,
                 tooltipSize = tooltipSize,
@@ -559,6 +578,8 @@ private fun CoachmarkScrimContent(
                 gap = with(density) { config.tooltipGap.toPx() },
                 connectorLength = connectorLengthPx,
                 connectorStyle = target.connectorStyle,
+                teardropLength = teardropLengthPx,
+                teardropTargetGap = teardropTargetGapPx,
             )
         }
 
@@ -575,7 +596,7 @@ private fun CoachmarkScrimContent(
     // When below: composed dot renders at the top of the tooltip (beside the title).
     // When above: composed dot renders at the bottom of the tooltip.
     val isTooltipBelow = if (tooltipSize != IntSize.Zero) {
-        tooltipPosition.y > target.bounds.bottom
+        tooltipPosition.y >= target.bounds.bottom
     } else {
         true
     }
@@ -596,7 +617,7 @@ private fun CoachmarkScrimContent(
         (resolvedConnectorStyle == ConnectorStyle.VERTICAL || resolvedConnectorStyle == ConnectorStyle.ELBOW)
 
     val connectorPathData =
-        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx, connectorCutoutGapPx, isInlineTitleActive, inlineDotCenter) {
+        remember(target, tooltipPosition, tooltipSize, density, connectorTooltipGapPx, strokeWidthPx, connectorDotRadiusPx, connectorCutoutGapPx, isInlineTitleActive, inlineDotCenter, teardropLengthPx) {
             calculateConnectorPath(
                 target = target,
                 tooltipPosition = tooltipPosition,
@@ -608,6 +629,8 @@ private fun CoachmarkScrimContent(
                 connectorCutoutGap = connectorCutoutGapPx,
                 isInlineTitleActive = isInlineTitleActive,
                 inlineDotCenter = inlineDotCenter,
+                teardropLength = teardropLengthPx,
+                tooltipMargin = tooltipMarginPx,
             )
         }
 
@@ -878,6 +901,11 @@ private fun CoachmarkScrimContent(
                 val arrowSizePx = with(density) { config.connectorArrowSize.toPx() }
                 val arrowHalfAngleRad = (config.connectorArrowAngle * PI / 180f).toFloat()
                 val effectiveEndStyle = if (isInlineTitleActive) ConnectorEndStyle.NONE else target.connectorEndStyle
+                val teardropColor = if (colors.connectorTeardropColor.isSpecified) {
+                    colors.connectorTeardropColor
+                } else {
+                    colors.connectorColor
+                }
                 when (connectorPathData) {
                     is ConnectorPathData.Segments -> {
                         if (connectorPathData.points.isNotEmpty()) {
@@ -891,6 +919,9 @@ private fun CoachmarkScrimContent(
                                 arrowSize = arrowSizePx,
                                 arrowHalfAngle = arrowHalfAngleRad,
                                 customEnd = config.customConnectorEnd,
+                                teardropLength = teardropLengthPx,
+                                teardropWidth = teardropWidthPx,
+                                teardropColor = teardropColor,
                             )
                         }
                     }
@@ -905,6 +936,17 @@ private fun CoachmarkScrimContent(
                             arrowSize = arrowSizePx,
                             arrowHalfAngle = arrowHalfAngleRad,
                             customEnd = config.customConnectorEnd,
+                            teardropLength = teardropLengthPx,
+                            teardropWidth = teardropWidthPx,
+                            teardropColor = teardropColor,
+                        )
+                    }
+                    is ConnectorPathData.Teardrop -> {
+                        drawConnectorTeardropNub(
+                            teardrop = connectorPathData,
+                            progress = connectorProgress.value,
+                            color = teardropColor,
+                            width = teardropWidthPx,
                         )
                     }
                 }
@@ -1268,6 +1310,9 @@ private fun DrawScope.drawConnectorPath(
     arrowSize: Float = 0f,
     arrowHalfAngle: Float = 0f,
     customEnd: (DrawScope.(Offset, Float) -> Unit)? = null,
+    teardropLength: Float = 0f,
+    teardropWidth: Float = 0f,
+    teardropColor: Color = Color.Unspecified,
 ) {
     if (points.size < 2) return
 
@@ -1308,7 +1353,7 @@ private fun DrawScope.drawConnectorPath(
 
     if (progress >= 1f) {
         val angle = calculateConnectorAngle(points)
-        drawConnectorEndpoint(endStyle, color, dotRadius, points.last(), angle, arrowSize, arrowHalfAngle, customEnd)
+        drawConnectorEndpoint(endStyle, color, dotRadius, points.last(), angle, arrowSize, arrowHalfAngle, customEnd, teardropLength, teardropWidth, teardropColor)
     }
 }
 
@@ -1322,6 +1367,9 @@ private fun DrawScope.drawConnectorEndpoint(
     arrowSize: Float,
     arrowHalfAngle: Float,
     customEnd: (DrawScope.(Offset, Float) -> Unit)?,
+    teardropLength: Float = 0f,
+    teardropWidth: Float = 0f,
+    teardropColor: Color = Color.Unspecified,
 ) {
     when (endStyle) {
         ConnectorEndStyle.DOT -> {
@@ -1333,6 +1381,11 @@ private fun DrawScope.drawConnectorEndpoint(
         ConnectorEndStyle.NONE -> { /* no-op */ }
         ConnectorEndStyle.CUSTOM -> {
             customEnd?.invoke(this, center, angle)
+        }
+        ConnectorEndStyle.TEARDROP -> {
+            val base = Offset(center.x - teardropLength * cos(angle), center.y - teardropLength * sin(angle))
+            val resolvedColor = if (teardropColor.isSpecified) teardropColor else color
+            drawTeardrop(tip = center, base = base, width = teardropWidth, color = resolvedColor)
         }
     }
 }
@@ -1363,6 +1416,51 @@ private fun DrawScope.drawArrowHead(
     drawPath(path = path, color = color)
 }
 
+/**
+ * Builds a smooth teardrop "hill" outline: a flat base of the given [width] centered on [base],
+ * rising via two mirrored S-curves to a single rounded peak at [tip]. Used for
+ * [ConnectorEndStyle.TEARDROP] and the [ConnectorStyle.TEARDROP] nub. The flat base is meant to
+ * sit flush against (and be partly hidden behind) the tooltip card or connector line it grows
+ * out of, so only the rounded hill silhouette reads as visible.
+ */
+private fun teardropPath(tip: Offset, base: Offset, width: Float): Path {
+    val dirX = tip.x - base.x
+    val dirY = tip.y - base.y
+    val length = kotlin.math.sqrt(dirX * dirX + dirY * dirY)
+    if (length < 0.01f) return Path()
+
+    val ux = dirX / length
+    val uy = dirY / length
+    val perpX = -uy
+    val perpY = ux
+    val halfWidth = width / 2f
+
+    val baseLeft = Offset(base.x - perpX * halfWidth, base.y - perpY * halfWidth)
+    val baseRight = Offset(base.x + perpX * halfWidth, base.y + perpY * halfWidth)
+
+    // Control points a quarter-width in from each base corner, at that corner's own height
+    // (flat tangent at the base) or at the peak's height (flat tangent at the peak).
+    val quarterWidth = halfWidth / 2f
+    val leftNearBase = Offset(baseLeft.x + perpX * quarterWidth, baseLeft.y + perpY * quarterWidth)
+    val leftNearPeak = Offset(tip.x - perpX * quarterWidth, tip.y - perpY * quarterWidth)
+    val rightNearPeak = Offset(tip.x + perpX * quarterWidth, tip.y + perpY * quarterWidth)
+    val rightNearBase = Offset(baseRight.x - perpX * quarterWidth, baseRight.y - perpY * quarterWidth)
+
+    return Path().apply {
+        moveTo(baseLeft.x, baseLeft.y)
+        cubicTo(leftNearBase.x, leftNearBase.y, leftNearPeak.x, leftNearPeak.y, tip.x, tip.y)
+        cubicTo(rightNearPeak.x, rightNearPeak.y, rightNearBase.x, rightNearBase.y, baseRight.x, baseRight.y)
+        lineTo(baseLeft.x, baseLeft.y)
+        close()
+    }
+}
+
+/** Draws a smooth teardrop "hill" shape from [base] (flat, hidden) to [tip] (rounded peak). */
+private fun DrawScope.drawTeardrop(tip: Offset, base: Offset, width: Float, color: Color) {
+    val path = teardropPath(tip, base, width)
+    drawPath(path = path, color = color)
+}
+
 /** Draws a Bezier curve connector with progressive animation. */
 private fun DrawScope.drawConnectorCurve(
     curve: ConnectorPathData.Curve,
@@ -1374,6 +1472,9 @@ private fun DrawScope.drawConnectorCurve(
     arrowSize: Float = 0f,
     arrowHalfAngle: Float = 0f,
     customEnd: (DrawScope.(Offset, Float) -> Unit)? = null,
+    teardropLength: Float = 0f,
+    teardropWidth: Float = 0f,
+    teardropColor: Color = Color.Unspecified,
 ) {
     val steps = 50
     val totalSteps = (steps * progress).toInt().coerceAtLeast(1)
@@ -1408,8 +1509,22 @@ private fun DrawScope.drawConnectorCurve(
             points.last().y - points[points.size - 2].y,
             points.last().x - points[points.size - 2].x,
         )
-        drawConnectorEndpoint(endStyle, color, dotRadius, points.last(), angle, arrowSize, arrowHalfAngle, customEnd)
+        drawConnectorEndpoint(endStyle, color, dotRadius, points.last(), angle, arrowSize, arrowHalfAngle, customEnd, teardropLength, teardropWidth, teardropColor)
     }
+}
+
+/** Draws the [ConnectorStyle.TEARDROP] nub, growing from [ConnectorPathData.Teardrop.base] to its tip as [progress] advances. */
+private fun DrawScope.drawConnectorTeardropNub(
+    teardrop: ConnectorPathData.Teardrop,
+    progress: Float,
+    color: Color,
+    width: Float,
+) {
+    val animatedTip = Offset(
+        x = teardrop.base.x + (teardrop.tip.x - teardrop.base.x) * progress,
+        y = teardrop.base.y + (teardrop.tip.y - teardrop.base.y) * progress,
+    )
+    drawTeardrop(tip = animatedTip, base = teardrop.base, width = width, color = color)
 }
 
 private fun calculateTooltipPosition(
@@ -1421,6 +1536,8 @@ private fun calculateTooltipPosition(
     gap: Float,
     connectorLength: Float,
     connectorStyle: ConnectorStyle = ConnectorStyle.AUTO,
+    teardropLength: Float = 0f,
+    teardropTargetGap: Float = 0f,
 ): Offset {
     if (screenSize == IntSize.Zero) {
         return Offset.Zero
@@ -1430,8 +1547,19 @@ private fun calculateTooltipPosition(
     val targetCenterX = targetBounds.center.x
     val targetCenterY = targetBounds.center.y
 
-    // Use connectorLength if specified, otherwise use the default gap
-    val effectiveGap = if (connectorLength > 0f) connectorLength else gap
+    // TEARDROP replaces the connector line with a nub that spans from the visible card edge
+    // toward the target, leaving teardropTargetGap of clearance before the target — so the
+    // tooltip sits just far enough away for the nub plus that gap to bridge the distance.
+    // connectorLength is ignored. The visible card sits `margin` inside the measured tooltip
+    // box (TooltipContainer pads its content by tooltipMargin), so that inset is subtracted
+    // back out here to keep the total cutout-to-card distance equal to
+    // teardropLength + teardropTargetGap.
+    val effectiveGap = when {
+        connectorStyle == ConnectorStyle.TEARDROP ->
+            (teardropLength + teardropTargetGap - margin).coerceAtLeast(0f)
+        connectorLength > 0f -> connectorLength
+        else -> gap
+    }
 
     // For HORIZONTAL connector style, position tooltip beside the target
     if (connectorStyle == ConnectorStyle.HORIZONTAL) {
@@ -1476,6 +1604,9 @@ private fun calculateTooltipPosition(
 private sealed interface ConnectorPathData {
     data class Segments(val points: List<Offset>) : ConnectorPathData
     data class Curve(val start: Offset, val control: Offset, val end: Offset) : ConnectorPathData
+
+    /** [base] anchors on the tooltip edge (partially hidden behind the card); [tip] points at the target. */
+    data class Teardrop(val base: Offset, val tip: Offset) : ConnectorPathData
 }
 
 private fun resolveConnectorStyle(
@@ -1508,6 +1639,8 @@ private fun calculateConnectorPath(
     connectorCutoutGap: Float = 0f,
     isInlineTitleActive: Boolean = false,
     inlineDotCenter: Offset = Offset.Unspecified,
+    teardropLength: Float = 0f,
+    tooltipMargin: Float = 0f,
 ): ConnectorPathData {
     if (tooltipSize == IntSize.Zero) {
         return ConnectorPathData.Segments(emptyList())
@@ -1562,7 +1695,7 @@ private fun calculateConnectorPath(
 
     val tooltipCenterX = tooltipPosition.x + tooltipSize.width / 2f
     val tooltipCenterY = tooltipPosition.y + tooltipSize.height / 2f
-    val isTooltipBelow = tooltipPosition.y > targetBounds.bottom
+    val isTooltipBelow = tooltipPosition.y >= targetBounds.bottom
 
     val resolvedStyle = resolveConnectorStyle(
         connectorStyle = connectorStyle,
@@ -1702,6 +1835,37 @@ private fun calculateConnectorPath(
             val endPoint = Offset(tooltipCenterX, endPointY)
             val controlPoint = Offset(targetCenter.x, (cutoutEdgePoint.y + endPoint.y) / 2f)
             ConnectorPathData.Curve(cutoutEdgePoint, controlPoint, endPoint)
+        }
+
+        ConnectorStyle.TEARDROP -> {
+            // Anchor on the *visible* card's top/bottom edge — the measured tooltip box is
+            // padded by tooltipMargin on all sides (TooltipContainer), so the actual card sits
+            // inset from tooltipPosition/tooltipSize by that amount. Clamped away from the
+            // card's rounded corners.
+            val cardLeft = tooltipPosition.x + tooltipMargin
+            val cardRight = tooltipPosition.x + tooltipSize.width - tooltipMargin
+            val anchorX = targetCenter.x.coerceIn(
+                cardLeft + 20f,
+                (cardRight - 20f).coerceAtLeast(cardLeft + 20f),
+            )
+            val anchorY = if (isTooltipBelow) {
+                tooltipPosition.y + tooltipMargin
+            } else {
+                tooltipPosition.y + tooltipSize.height - tooltipMargin
+            }
+            val base = Offset(anchorX, anchorY)
+
+            val dx = targetCenter.x - base.x
+            val dy = targetCenter.y - base.y
+            val distance = kotlin.math.sqrt(dx * dx + dy * dy)
+            val (normalizedDx, normalizedDy) = if (distance < 1f) {
+                0f to (if (isTooltipBelow) -1f else 1f)
+            } else {
+                (dx / distance) to (dy / distance)
+            }
+
+            val tip = Offset(base.x + normalizedDx * teardropLength, base.y + normalizedDy * teardropLength)
+            ConnectorPathData.Teardrop(base = base, tip = tip)
         }
     }
 }

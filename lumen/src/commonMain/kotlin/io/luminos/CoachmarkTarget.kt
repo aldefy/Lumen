@@ -177,6 +177,21 @@ enum class ConnectorStyle {
 
     /** Smooth curved connector using a quadratic Bezier curve. */
     CURVED,
+
+    /**
+     * Rounded teardrop-shaped nub anchored directly on the tooltip edge and pointing
+     * toward the target, like a classic speech-bubble tail — no connecting line is drawn.
+     *
+     * [CoachmarkTarget.connectorLength] is ignored for this style; use
+     * [CoachmarkConfig.connectorTeardropLength] and [CoachmarkConfig.connectorTeardropWidth]
+     * to size the nub, and [CoachmarkConfig.connectorTeardropTargetGap] to control the gap
+     * left between the nub's tip and the target. [CoachmarkTarget.connectorEndStyle] is also
+     * ignored, since the nub itself is both the connector and its endpoint.
+     *
+     * Tip: set [CoachmarkColors.connectorTeardropColor] to match your tooltip card background
+     * for a seamless attached-tail look, without affecting other connectors' color.
+     */
+    TEARDROP,
 }
 
 /**
@@ -205,6 +220,12 @@ enum class ConnectorEndStyle {
     NONE,
     /** Custom rendering via CoachmarkConfig.customConnectorEnd lambda. */
     CUSTOM,
+    /**
+     * Rounded teardrop/petal shape pointing toward the tooltip, with smooth curved
+     * sides instead of the sharp edges of [ARROW]. Sized via
+     * [CoachmarkConfig.connectorTeardropLength] and [CoachmarkConfig.connectorTeardropWidth].
+     */
+    TEARDROP,
 }
 
 /**

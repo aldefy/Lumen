@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta16] - 2026-08-18
+
+### Features
+- New `ConnectorStyle.TEARDROP`: a rounded teardrop nub anchored directly on the tooltip card edge and pointing toward the target — no connector line at all, like a classic speech-bubble tail
+- New `ConnectorEndStyle.TEARDROP`: a rounded petal-shaped connector line endpoint, as a smoother alternative to `ARROW`
+- `CoachmarkConfig.connectorTeardropLength` / `connectorTeardropWidth` to size the teardrop shape
+- `CoachmarkConfig.connectorTeardropTargetGap` to control the gap left between the teardrop nub and the target it points at
+- `CoachmarkColors.connectorTeardropColor` to color the teardrop shape independently of `connectorColor` — e.g. match it to the tooltip card background for a seamless attached-tail look
+
+### Sample App
+- Added "Teardrop Connector" and "Teardrop Endpoint" demos to the Connector Styles example
+
 ## [1.0.0-beta15] - 2026-03-18
 
 ### Features

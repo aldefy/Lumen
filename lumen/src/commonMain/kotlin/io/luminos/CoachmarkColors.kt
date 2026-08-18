@@ -17,6 +17,12 @@ data class CoachmarkColors(
     val strokeColor: Color = Color.White,
     /** Color for the connector line from cutout to tooltip */
     val connectorColor: Color = Color.White,
+    /**
+     * Color for the [ConnectorStyle.TEARDROP] nub and [ConnectorEndStyle.TEARDROP] endpoint.
+     * [Color.Unspecified] (default) falls back to [connectorColor]. Set this to match your
+     * tooltip card background (e.g. [tooltipCardColor]) for a seamless attached-tail look.
+     */
+    val connectorTeardropColor: Color = Color.Unspecified,
     /** Background color for the tooltip card */
     val tooltipBackground: Color = Color.White,
     /** Background color for the tooltip card when showCard is enabled */
