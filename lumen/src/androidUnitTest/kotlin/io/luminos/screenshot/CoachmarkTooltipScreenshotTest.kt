@@ -223,7 +223,8 @@ class CoachmarkTooltipScreenshotTest {
                         currentStep = 1,
                         totalSteps = 1,
                         colors = LightCoachmarkColors,
-                        textAlign = TextAlign.Center,
+                        titleTextAlign = TextAlign.Center,
+                        descriptionTextAlign = TextAlign.Center,
                         onCtaClick = {},
                     )
                 }
@@ -267,7 +268,8 @@ class CoachmarkTooltipScreenshotTest {
                         totalSteps = 3,
                         colors = LightCoachmarkColors,
                         showCard = true,
-                        textAlign = TextAlign.Center,
+                        titleTextAlign = TextAlign.Center,
+                        descriptionTextAlign = TextAlign.Center,
                         titleInlineWithConnector = true,
                         connectorDotColor = LightCoachmarkColors.titleColor,
                         onCtaClick = {},
