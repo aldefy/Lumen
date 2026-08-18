@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.0-beta16] - 2026-08-18
+
+### Features
+- New `ProgressIndicatorStyle.PILL`: the current step in a multi-step progress indicator renders as an elongated pill while the other steps stay small dots, like an iOS-style page indicator. `CoachmarkConfig.progressIndicatorStyle` (default `DOTS`, preserving the existing fill-up-to-current-step look) and `CoachmarkConfig.progressActivePillWidth` control it
+
+### Sample App
+- Added a "Start Tour (Pill)" button to the Multi-Step Sequence example to demo `ProgressIndicatorStyle.PILL`
+
 ## [1.0.0-beta15] - 2026-03-18
 
 ### Features

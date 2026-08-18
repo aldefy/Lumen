@@ -55,6 +55,8 @@ import androidx.compose.ui.unit.sp
  * @param colors Theme colors
  * @param cornerRadius Corner radius for the card
  * @param showProgressIndicator Whether to show progress dots for multi-step sequences
+ * @param progressIndicatorStyle Visual style for the progress indicator (dots, or a pill for the current step)
+ * @param progressActivePillWidth Width of the active pill when [progressIndicatorStyle] is [ProgressIndicatorStyle.PILL]
  * @param showCard Whether to wrap content in a card/box background
  * @param showSkipButton Whether to show a skip button to dismiss the entire sequence
  * @param skipButtonText Text for the skip button
@@ -78,6 +80,8 @@ fun CoachmarkTooltip(
     colors: CoachmarkColors,
     cornerRadius: Dp = 16.dp,
     showProgressIndicator: Boolean = true,
+    progressIndicatorStyle: ProgressIndicatorStyle = ProgressIndicatorStyle.DOTS,
+    progressActivePillWidth: Dp = 20.dp,
     showCard: Boolean = false,
     showSkipButton: Boolean = false,
     skipButtonText: String = "Skip",
@@ -271,6 +275,8 @@ fun CoachmarkTooltip(
                     totalSteps = totalSteps,
                     activeColor = colors.progressActiveColor,
                     inactiveColor = colors.progressInactiveColor,
+                    style = progressIndicatorStyle,
+                    activePillWidth = progressActivePillWidth,
                 )
             }
 
@@ -380,6 +386,8 @@ private fun ProgressIndicator(
     totalSteps: Int,
     activeColor: Color,
     inactiveColor: Color,
+    style: ProgressIndicatorStyle = ProgressIndicatorStyle.DOTS,
+    activePillWidth: Dp = 20.dp,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -392,14 +400,29 @@ private fun ProgressIndicator(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(totalSteps) { index ->
-            val isActive = index < currentStep
-            Box(
-                modifier =
-                    Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(if (isActive) activeColor else inactiveColor),
-            )
+            when (style) {
+                ProgressIndicatorStyle.DOTS -> {
+                    val isActive = index < currentStep
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(if (isActive) activeColor else inactiveColor),
+                    )
+                }
+
+                ProgressIndicatorStyle.PILL -> {
+                    val isCurrent = index == currentStep - 1
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(width = if (isCurrent) activePillWidth else 8.dp, height = 8.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(if (isCurrent) activeColor else inactiveColor),
+                    )
+                }
+            }
         }
     }
 }

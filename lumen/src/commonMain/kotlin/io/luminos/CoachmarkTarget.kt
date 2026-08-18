@@ -195,6 +195,24 @@ enum class TargetTapBehavior {
     BOTH,
 }
 
+/**
+ * Visual style for the multi-step progress indicator shown in the tooltip footer.
+ *
+ * @see CoachmarkConfig.progressIndicatorStyle
+ */
+enum class ProgressIndicatorStyle {
+    /** Every step is a small circle; steps up to and including the current one are filled with [CoachmarkColors.progressActiveColor] (default). */
+    DOTS,
+
+    /**
+     * The current step is an elongated pill; every other step remains a small circle in
+     * [CoachmarkColors.progressInactiveColor], like an iOS-style page indicator.
+     *
+     * Sized via [CoachmarkConfig.progressActivePillWidth].
+     */
+    PILL,
+}
+
 /** Visual style at the endpoint of the connector line. */
 enum class ConnectorEndStyle {
     /** Small filled circle (current default). */
