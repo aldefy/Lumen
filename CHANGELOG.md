@@ -15,6 +15,11 @@ All notable changes to this project will be documented in this file.
 - **Android consumers now need `compileSdk` 36 and AGP 8.9.1 or newer.** This is required by `activity-compose` 1.12.2, whose AAR metadata declares `minCompileSdk=36` and `minAndroidGradlePluginVersion=8.9.1`. Builds on older toolchains will fail `checkDebugAarMetadata`. `minSdk` is unchanged at 23, so no runtime device support is dropped.
 - Robolectric remains pinned to `sdk=34` in `lumen/src/androidUnitTest/resources/robolectric.properties`. Robolectric 4.14.1 supports SDK 34 at most, and even 4.15.1 only reaches SDK 35, so unit tests cannot yet execute against SDK 36.
 
+## [1.0.0-beta18] - 2026-08-20
+
+### Build
+- Fixed the release pipeline: `s01.oss.sonatype.org` (OSSRH) shut down 2025-06-30, and `release.yml` had never actually published to Sonatype in the first place (only to a local staging dir, zipped for the GitHub release). Now publishes to the Central Portal's OSSRH-compatibility staging API and transfers the deployment into the Portal proper. No library code changes — this release exists to verify the fixed pipeline end-to-end.
+
 ## [1.0.0-beta17] - 2026-08-20
 
 ### Features
