@@ -45,6 +45,7 @@ import io.luminos.CoachmarkConfig
 import io.luminos.CoachmarkController
 import io.luminos.CoachmarkHost
 import io.luminos.CoachmarkTarget
+import io.luminos.ConnectorStyle
 import io.luminos.CutoutShape
 import io.luminos.ScrimTapBehavior
 import io.luminos.coachmarkColors
@@ -197,6 +198,7 @@ private fun customTour(): List<CoachmarkTarget> = listOf(
         description = "This connector is a speech-bubble tail drawn by " +
             "CoachmarkConfig.customConnector.",
         shape = CutoutShape.Circle(radiusPadding = 10.dp),
+        connectorStyle = ConnectorStyle.CUSTOM,
         ctaText = "Next",
     ),
     CoachmarkTarget(

@@ -153,13 +153,14 @@ class CoachmarkTargetTest {
     @Test
     fun connectorStyle_values() {
         val values = ConnectorStyle.entries
-        assertEquals(6, values.size)
+        assertEquals(7, values.size)
         assertTrue(values.contains(ConnectorStyle.AUTO))
         assertTrue(values.contains(ConnectorStyle.DIRECT))
         assertTrue(values.contains(ConnectorStyle.HORIZONTAL))
         assertTrue(values.contains(ConnectorStyle.VERTICAL))
         assertTrue(values.contains(ConnectorStyle.ELBOW))
         assertTrue(values.contains(ConnectorStyle.CURVED))
+        assertTrue(values.contains(ConnectorStyle.CUSTOM))
     }
 
     @Test

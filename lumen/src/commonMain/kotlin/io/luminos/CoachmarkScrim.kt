@@ -179,11 +179,12 @@ data class CoachmarkConfig(
     /** Custom endpoint DrawScope lambda for ConnectorEndStyle.CUSTOM */
     val customConnectorEnd: (DrawScope.(center: Offset, angle: Float) -> Unit)? = null,
     /**
-     * Full-control connector renderer. When non-null this replaces the entire built-in
-     * connector drawing — line *and* endpoint — for every target, so a caller can draw a
-     * speech-bubble tail, a nub with no line, a dashed path, or nothing at all without a new
-     * [ConnectorStyle] case in the library. [ConnectorStyle] and [ConnectorEndStyle] are
-     * ignored while this is set.
+     * Sequence-wide default full-control connector renderer, used by every target whose
+     * [CoachmarkTarget.connectorStyle] is [ConnectorStyle.CUSTOM] and which doesn't supply
+     * its own [CoachmarkTarget.customConnector]. Replaces the entire built-in connector —
+     * line *and* endpoint — so a caller can draw a speech-bubble tail, a nub with no line, a
+     * dashed path, or nothing at all without a new [ConnectorStyle] case in the library.
+     * [ConnectorEndStyle] is ignored for a target rendered this way.
      *
      * The lambda receives the cutout-edge anchor, the tooltip-edge anchor, and the connector
      * reveal progress (0f..1f, driven by [connectorAnimationDuration]) so custom connectors
@@ -196,6 +197,8 @@ data class CoachmarkConfig(
      *         drawPath(myTeardropPath(base = to, tip = tip), color = Color.White)
      *     },
      * )
+     * // and per target:
+     * CoachmarkTarget(connectorStyle = ConnectorStyle.CUSTOM, ...)
      * ```
      */
     val customConnector: (DrawScope.(from: Offset, to: Offset, progress: Float) -> Unit)? = null,
@@ -911,8 +914,12 @@ private fun CoachmarkScrimContent(
                 val arrowSizePx = with(density) { config.connectorArrowSize.toPx() }
                 val arrowHalfAngleRad = (config.connectorArrowAngle * PI / 180f).toFloat()
                 val effectiveEndStyle = if (isInlineTitleActive) ConnectorEndStyle.NONE else target.connectorEndStyle
-                val customConnector = config.customConnector
-                if (customConnector != null) {
+                // Per-target lambda takes priority over the sequence-wide config default, so a
+                // single step can override what the rest of the sequence uses. CUSTOM with
+                // neither set falls back to drawing the resolved geometry normally, the same
+                // way AUTO would — the caller opted into "custom" but didn't supply one.
+                val customConnector = target.customConnector ?: config.customConnector
+                if (target.connectorStyle == ConnectorStyle.CUSTOM && customConnector != null) {
                     // Caller owns the whole connector: hand it the two anchors the built-in
                     // styles would have joined, plus the reveal progress, and draw nothing else.
                     val anchors = connectorAnchors(connectorPathData)
@@ -1562,7 +1569,11 @@ private fun resolveConnectorStyle(
     tooltipCenterY: Float,
     cutoutRadius: Float,
 ): ConnectorStyle {
-    if (connectorStyle != ConnectorStyle.AUTO) return connectorStyle
+    // CUSTOM still needs real path geometry — the anchors handed to the custom-connector
+    // lambda, and the fallback line if no lambda is actually supplied — so it resolves via
+    // the same heuristic as AUTO. Whether a line is *drawn* is gated separately at the draw
+    // site by the caller's raw (unresolved) ConnectorStyle.
+    if (connectorStyle != ConnectorStyle.AUTO && connectorStyle != ConnectorStyle.CUSTOM) return connectorStyle
     val horizontalDistance = kotlin.math.abs(tooltipCenterX - targetCenter.x)
     val verticalDistance = kotlin.math.abs(tooltipCenterY - targetCenter.y)
     val hasSignificantHorizontal = horizontalDistance > cutoutRadius * 2
@@ -1657,6 +1668,10 @@ private fun calculateConnectorPath(
 
     return when (resolvedStyle) {
         ConnectorStyle.AUTO -> ConnectorPathData.Segments(emptyList())
+
+        // Unreachable in practice: resolveConnectorStyle() maps CUSTOM to the same heuristic
+        // as AUTO before this function ever sees it. Kept only so this `when` stays exhaustive.
+        ConnectorStyle.CUSTOM -> ConnectorPathData.Segments(emptyList())
 
         ConnectorStyle.HORIZONTAL -> {
             val goingLeft = tooltipCenterX < targetCenter.x
