@@ -16,6 +16,7 @@ import com.aditlal.sample.examples.AnimationsExample
 import com.aditlal.sample.examples.BasicExample
 import com.aditlal.sample.examples.ConnectorsExample
 import com.aditlal.sample.examples.DialogCoordinationExample
+import com.aditlal.sample.examples.CustomRenderingExample
 import com.aditlal.sample.examples.DontShowAgainExample
 import com.aditlal.sample.examples.ExampleGallery
 import com.aditlal.sample.examples.LazyColumnExample
@@ -103,6 +104,10 @@ fun App() {
                     onBack = { currentExample = null }
                 )
                 Example.TEXT_ALIGNMENT -> TextAlignmentExample(
+                    modifier = exampleModifier,
+                    onBack = { currentExample = null }
+                )
+                Example.CUSTOM_RENDERING -> CustomRenderingExample(
                     modifier = exampleModifier,
                     onBack = { currentExample = null }
                 )

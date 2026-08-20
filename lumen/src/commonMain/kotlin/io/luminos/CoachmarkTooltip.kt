@@ -55,6 +55,15 @@ import androidx.compose.ui.unit.sp
  * @param colors Theme colors
  * @param cornerRadius Corner radius for the card
  * @param showProgressIndicator Whether to show progress dots for multi-step sequences
+ * @param progressIndicator Optional slot replacing the built-in progress dots entirely.
+ *   Receives the 1-based current step and the total step count. When `null` (default) the
+ *   built-in dots (or pill, per [progressIndicatorStyle]) render, so existing callers are
+ *   unaffected. Use this for a numeric "2 / 5" label, a segmented bar, or anything else — no
+ *   library change required. Takes priority over [progressIndicatorStyle] when set. Only
+ *   invoked when [showProgressIndicator] is true and [totalSteps] is greater than 1.
+ * @param progressIndicatorStyle Visual style for the built-in progress indicator (dots, or a
+ *   pill for the current step). Ignored when [progressIndicator] is set.
+ * @param progressActivePillWidth Width of the active pill when [progressIndicatorStyle] is [ProgressIndicatorStyle.PILL]
  * @param showCard Whether to wrap content in a card/box background
  * @param showSkipButton Whether to show a skip button to dismiss the entire sequence
  * @param skipButtonText Text for the skip button
@@ -78,6 +87,8 @@ fun CoachmarkTooltip(
     colors: CoachmarkColors,
     cornerRadius: Dp = 16.dp,
     showProgressIndicator: Boolean = true,
+    progressIndicatorStyle: ProgressIndicatorStyle = ProgressIndicatorStyle.DOTS,
+    progressActivePillWidth: Dp = 20.dp,
     showCard: Boolean = false,
     showSkipButton: Boolean = false,
     skipButtonText: String = "Skip",
@@ -91,6 +102,7 @@ fun CoachmarkTooltip(
     onCtaClick: () -> Unit,
     onSkipClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    progressIndicator: (@Composable (currentStep: Int, totalSteps: Int) -> Unit)? = null,
     titleTextAlign: TextAlign = TextAlign.Start,
     descriptionTextAlign: TextAlign = TextAlign.Start,
     skipButtonTextAlign: TextAlign = TextAlign.End,
@@ -266,12 +278,18 @@ fun CoachmarkTooltip(
         ) {
             // Progress indicator (only show for sequences with multiple steps, if enabled)
             if (hasProgressIndicator) {
-                ProgressIndicator(
-                    currentStep = currentStep,
-                    totalSteps = totalSteps,
-                    activeColor = colors.progressActiveColor,
-                    inactiveColor = colors.progressInactiveColor,
-                )
+                if (progressIndicator != null) {
+                    progressIndicator(currentStep, totalSteps)
+                } else {
+                    ProgressIndicator(
+                        currentStep = currentStep,
+                        totalSteps = totalSteps,
+                        activeColor = colors.progressActiveColor,
+                        inactiveColor = colors.progressInactiveColor,
+                        style = progressIndicatorStyle,
+                        activePillWidth = progressActivePillWidth,
+                    )
+                }
             }
 
             // CTA Button
@@ -380,6 +398,8 @@ private fun ProgressIndicator(
     totalSteps: Int,
     activeColor: Color,
     inactiveColor: Color,
+    style: ProgressIndicatorStyle = ProgressIndicatorStyle.DOTS,
+    activePillWidth: Dp = 20.dp,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -392,14 +412,29 @@ private fun ProgressIndicator(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(totalSteps) { index ->
-            val isActive = index < currentStep
-            Box(
-                modifier =
-                    Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(if (isActive) activeColor else inactiveColor),
-            )
+            when (style) {
+                ProgressIndicatorStyle.DOTS -> {
+                    val isActive = index < currentStep
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(if (isActive) activeColor else inactiveColor),
+                    )
+                }
+
+                ProgressIndicatorStyle.PILL -> {
+                    val isCurrent = index == currentStep - 1
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(width = if (isCurrent) activePillWidth else 8.dp, height = 8.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(if (isCurrent) activeColor else inactiveColor),
+                    )
+                }
+            }
         }
     }
 }

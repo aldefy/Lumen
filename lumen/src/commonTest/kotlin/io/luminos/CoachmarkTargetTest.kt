@@ -178,6 +178,14 @@ class CoachmarkTargetTest {
         assertTrue(values.contains(ConnectorEndStyle.CUSTOM))
     }
 
+    @Test
+    fun progressIndicatorStyle_values() {
+        val values = ProgressIndicatorStyle.entries
+        assertEquals(2, values.size)
+        assertTrue(values.contains(ProgressIndicatorStyle.DOTS))
+        assertTrue(values.contains(ProgressIndicatorStyle.PILL))
+    }
+
     // ── TargetTapBehavior ──────────────────────────────────────────────────
 
     @Test

@@ -16,4 +16,5 @@ enum class Example(val title: String, val description: String) {
     TAP_THROUGH("Tap-Through Behavior", "Pass-through, Advance, Both tap modes"),
     ANALYTICS("Analytics Callbacks", "Track onShow, onDismiss, onAdvance, onComplete"),
     DONT_SHOW_AGAIN("Don't Show Again", "Suppress coachmarks with checkbox + persistence"),
+    CUSTOM_RENDERING("Custom Rendering", "Pill progress, teardrop connector, custom cutout shape"),
 }
