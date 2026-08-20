@@ -55,6 +55,11 @@ import androidx.compose.ui.unit.sp
  * @param colors Theme colors
  * @param cornerRadius Corner radius for the card
  * @param showProgressIndicator Whether to show progress dots for multi-step sequences
+ * @param progressIndicator Optional slot replacing the built-in progress dots. Receives the
+ *   1-based current step and the total step count. When `null` (default) the built-in dots
+ *   render, so existing callers are unaffected. Use this for a pill, a numeric "2 / 5"
+ *   label, a segmented bar, or any other indicator — no library change required. Only
+ *   invoked when [showProgressIndicator] is true and [totalSteps] is greater than 1.
  * @param showCard Whether to wrap content in a card/box background
  * @param showSkipButton Whether to show a skip button to dismiss the entire sequence
  * @param skipButtonText Text for the skip button
@@ -91,6 +96,7 @@ fun CoachmarkTooltip(
     onCtaClick: () -> Unit,
     onSkipClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    progressIndicator: (@Composable (currentStep: Int, totalSteps: Int) -> Unit)? = null,
     titleTextAlign: TextAlign = TextAlign.Start,
     descriptionTextAlign: TextAlign = TextAlign.Start,
     skipButtonTextAlign: TextAlign = TextAlign.End,
@@ -266,12 +272,16 @@ fun CoachmarkTooltip(
         ) {
             // Progress indicator (only show for sequences with multiple steps, if enabled)
             if (hasProgressIndicator) {
-                ProgressIndicator(
-                    currentStep = currentStep,
-                    totalSteps = totalSteps,
-                    activeColor = colors.progressActiveColor,
-                    inactiveColor = colors.progressInactiveColor,
-                )
+                if (progressIndicator != null) {
+                    progressIndicator(currentStep, totalSteps)
+                } else {
+                    ProgressIndicator(
+                        currentStep = currentStep,
+                        totalSteps = totalSteps,
+                        activeColor = colors.progressActiveColor,
+                        inactiveColor = colors.progressInactiveColor,
+                    )
+                }
             }
 
             // CTA Button

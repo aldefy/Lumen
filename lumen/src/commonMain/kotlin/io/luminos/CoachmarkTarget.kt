@@ -3,7 +3,9 @@ package io.luminos
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -57,6 +59,39 @@ sealed interface CutoutShape {
         val points: Int = 5,
         val innerRadiusRatio: Float = 0.5f,
         val padding: Dp = 8.dp,
+    ) : CutoutShape
+
+    /**
+     * Arbitrary cutout outline supplied by the caller.
+     *
+     * Use this when none of the built-in shapes fit — a brand mark, a hexagon, a blob. The
+     * library draws the returned [Path] through the same `BlendMode.Clear` offscreen-layer
+     * path as every built-in shape, so the cutout stays a real transparent hole that the app
+     * UI shows through and remains interactive. The same path is reused for the cutout
+     * stroke, so [CoachmarkConfig.showStroke] keeps working.
+     *
+     * [pathBuilder] receives the target's on-screen bounds (an `androidx.compose.ui.geometry.Rect`, already in pixels) and the
+     * ambient [Density] for converting any [Dp] of your own, and must return a **closed**
+     * path in the same coordinate space. It is called on every frame of the highlight
+     * animation, so keep it allocation-light and free of side effects.
+     *
+     * ```
+     * CutoutShape.Custom { bounds, density ->
+     *     val inset = with(density) { 6.dp.toPx() }
+     *     Path().apply {
+     *         moveTo(bounds.center.x, bounds.top - inset)
+     *         lineTo(bounds.right + inset, bounds.center.y)
+     *         lineTo(bounds.center.x, bounds.bottom + inset)
+     *         lineTo(bounds.left - inset, bounds.center.y)
+     *         close()
+     *     }
+     * }
+     * ```
+     *
+     * @param pathBuilder Builds the cutout outline for the given target bounds.
+     */
+    data class Custom(
+        val pathBuilder: (bounds: androidx.compose.ui.geometry.Rect, density: Density) -> Path,
     ) : CutoutShape
 }
 

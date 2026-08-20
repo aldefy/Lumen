@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.style.TextAlign
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -177,6 +178,34 @@ data class CoachmarkConfig(
     val connectorArrowAngle: Float = 30f,
     /** Custom endpoint DrawScope lambda for ConnectorEndStyle.CUSTOM */
     val customConnectorEnd: (DrawScope.(center: Offset, angle: Float) -> Unit)? = null,
+    /**
+     * Full-control connector renderer. When non-null this replaces the entire built-in
+     * connector drawing — line *and* endpoint — for every target, so a caller can draw a
+     * speech-bubble tail, a nub with no line, a dashed path, or nothing at all without a new
+     * [ConnectorStyle] case in the library. [ConnectorStyle] and [ConnectorEndStyle] are
+     * ignored while this is set.
+     *
+     * The lambda receives the cutout-edge anchor, the tooltip-edge anchor, and the connector
+     * reveal progress (0f..1f, driven by [connectorAnimationDuration]) so custom connectors
+     * can animate in like the built-ins.
+     *
+     * ```
+     * CoachmarkConfig(
+     *     customConnector = { from, to, progress ->
+     *         val tip = Offset(from.x + (to.x - from.x) * progress, from.y + (to.y - from.y) * progress)
+     *         drawPath(myTeardropPath(base = to, tip = tip), color = Color.White)
+     *     },
+     * )
+     * ```
+     */
+    val customConnector: (DrawScope.(from: Offset, to: Offset, progress: Float) -> Unit)? = null,
+    /**
+     * Optional slot replacing the built-in progress dots in every tooltip. Receives the
+     * 1-based current step and the total step count. `null` (default) keeps the built-in
+     * dots. Set this to render a pill, a "2 / 5" label, a segmented bar, or anything else
+     * without needing a new style enum in the library.
+     */
+    val progressIndicator: (@Composable (currentStep: Int, totalSteps: Int) -> Unit)? = null,
     /** Minimum distance from screen edges for the tooltip */
     val tooltipMargin: Dp = 16.dp,
     /** Gap between the cutout and the tooltip */
@@ -878,7 +907,15 @@ private fun CoachmarkScrimContent(
                 val arrowSizePx = with(density) { config.connectorArrowSize.toPx() }
                 val arrowHalfAngleRad = (config.connectorArrowAngle * PI / 180f).toFloat()
                 val effectiveEndStyle = if (isInlineTitleActive) ConnectorEndStyle.NONE else target.connectorEndStyle
-                when (connectorPathData) {
+                val customConnector = config.customConnector
+                if (customConnector != null) {
+                    // Caller owns the whole connector: hand it the two anchors the built-in
+                    // styles would have joined, plus the reveal progress, and draw nothing else.
+                    val anchors = connectorAnchors(connectorPathData)
+                    if (anchors != null) {
+                        customConnector(this, anchors.first, anchors.second, connectorProgress.value)
+                    }
+                } else when (connectorPathData) {
                     is ConnectorPathData.Segments -> {
                         if (connectorPathData.points.isNotEmpty()) {
                             drawConnectorPath(
@@ -1049,6 +1086,7 @@ private fun BoxScope.TooltipContainer(
             colors = colors,
             cornerRadius = config.tooltipCornerRadius,
             showProgressIndicator = showProgressIndicator,
+            progressIndicator = config.progressIndicator,
             showCard = config.showTooltipCard,
             showSkipButton = config.showSkipButton,
             skipButtonText = config.skipButtonText,
@@ -1165,6 +1203,15 @@ private fun DrawScope.drawCutout(
                 blendMode = BlendMode.Clear,
             )
         }
+        is CutoutShape.Custom -> {
+            // Same offscreen-layer + Clear blend as every built-in shape, so a caller-supplied
+            // outline still punches a real transparent hole rather than an opaque fill.
+            drawPath(
+                path = shape.pathBuilder(target.bounds, density),
+                color = Color.Black,
+                blendMode = BlendMode.Clear,
+            )
+        }
     }
 }
 
@@ -1254,6 +1301,19 @@ private fun DrawScope.drawCutoutStroke(
                 color = strokeColor,
                 style = Stroke(width = strokeWidth),
             )
+        }
+        is CutoutShape.Custom -> {
+            // Scale the caller's outline about the target centre so PULSE/GLOW/BOUNCE still
+            // animate a custom shape the way they animate the built-ins.
+            val path = shape.pathBuilder(target.bounds, density)
+            val center = target.bounds.center
+            withTransform({ scale(scale, scale, pivot = center) }) {
+                drawPath(
+                    path = path,
+                    color = strokeColor,
+                    style = Stroke(width = strokeWidth),
+                )
+            }
         }
     }
 }
@@ -1473,6 +1533,17 @@ private fun calculateTooltipPosition(
     return Offset(x, y)
 }
 
+/**
+ * The cutout-edge and tooltip-edge anchors of a computed connector path, or `null` when the
+ * path is empty. Used to hand [CoachmarkConfig.customConnector] the same two points the
+ * built-in styles would have joined.
+ */
+private fun connectorAnchors(data: ConnectorPathData): Pair<Offset, Offset>? = when (data) {
+    is ConnectorPathData.Segments ->
+        if (data.points.size >= 2) data.points.first() to data.points.last() else null
+    is ConnectorPathData.Curve -> data.start to data.end
+}
+
 private sealed interface ConnectorPathData {
     data class Segments(val points: List<Offset>) : ConnectorPathData
     data class Curve(val start: Offset, val control: Offset, val end: Offset) : ConnectorPathData
@@ -1553,6 +1624,12 @@ private fun calculateConnectorPath(
         is CutoutShape.Star -> {
             val padding = with(density) { shape.padding.toPx() }
             maxOf(targetBounds.width, targetBounds.height) / 2 + padding
+        }
+        is CutoutShape.Custom -> {
+            // A caller-supplied outline has no declared padding, so approximate its extent
+            // from the target bounds. Callers wanting a tighter connector can set
+            // CoachmarkTarget.connectorLength explicitly.
+            maxOf(targetBounds.width, targetBounds.height) / 2
         }
     }
     // Connector dot center = stroke outer edge + breathingRoom + dotRadius
@@ -1745,6 +1822,9 @@ private fun DrawScope.drawShimmerEffect(
         is CutoutShape.Star -> {
             val padding = with(density) { shape.padding.toPx() }
             maxOf(target.bounds.width, target.bounds.height) / 2 + padding
+        }
+        is CutoutShape.Custom -> {
+            maxOf(target.bounds.width, target.bounds.height) / 2
         }
     }
 
