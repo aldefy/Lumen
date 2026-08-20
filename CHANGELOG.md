@@ -2,19 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.0-beta16] - 2026-08-20
-
-### Features
-- Three extension points so app- and brand-specific rendering no longer needs a new enum case or config field in `:lumen`:
-  - `CoachmarkConfig.progressIndicator`: an optional `@Composable` slot replacing the built-in progress dots. `null` (default) keeps the existing dots.
-  - `CoachmarkConfig.customConnector`: an optional `DrawScope` lambda that takes over the entire connector — line and endpoint — given the cutout-edge anchor, tooltip-edge anchor, and reveal progress. `ConnectorStyle`/`ConnectorEndStyle` are ignored while set.
-  - `CutoutShape.Custom`: a `pathBuilder` case for cutout outlines that aren't one of the built-ins (Circle/RoundedRect/Rect/Squircle/Star). Draws through the same `BlendMode.Clear` offscreen-layer path as every built-in shape.
-- `ProgressIndicatorStyle.PILL`: the current step in a multi-step progress indicator renders as an elongated pill while the other steps stay small dots, like an iOS-style page indicator. `CoachmarkConfig.progressIndicatorStyle` (default `DOTS`, preserving the existing look) and `CoachmarkConfig.progressActivePillWidth` control it — kept as a built-in convenience on top of the new `progressIndicator` slot, since it's a generic enough idiom to ship directly.
-
-### Sample App
-- Added a "Custom Rendering" example demonstrating all three extension points together: a pill progress indicator, a teardrop speech-bubble connector, and a diamond cutout shape — none of which required a library change.
-- Added a "Start Tour (Pill)" button to the Multi-Step Sequence example to demo `ProgressIndicatorStyle.PILL`.
-
 ## [Unreleased]
 
 ### Build
@@ -27,6 +14,19 @@ All notable changes to this project will be documented in this file.
 ### Notes for consumers
 - **Android consumers now need `compileSdk` 36 and AGP 8.9.1 or newer.** This is required by `activity-compose` 1.12.2, whose AAR metadata declares `minCompileSdk=36` and `minAndroidGradlePluginVersion=8.9.1`. Builds on older toolchains will fail `checkDebugAarMetadata`. `minSdk` is unchanged at 23, so no runtime device support is dropped.
 - Robolectric remains pinned to `sdk=34` in `lumen/src/androidUnitTest/resources/robolectric.properties`. Robolectric 4.14.1 supports SDK 34 at most, and even 4.15.1 only reaches SDK 35, so unit tests cannot yet execute against SDK 36.
+
+## [1.0.0-beta16] - 2026-08-20
+
+### Features
+- Three extension points so app- and brand-specific rendering no longer needs a new enum case or config field in `:lumen`:
+  - `CoachmarkConfig.progressIndicator`: an optional `@Composable` slot replacing the built-in progress dots. `null` (default) keeps the existing dots.
+  - `CoachmarkConfig.customConnector`: an optional `DrawScope` lambda that takes over the entire connector — line and endpoint — given the cutout-edge anchor, tooltip-edge anchor, and reveal progress. `ConnectorStyle`/`ConnectorEndStyle` are ignored while set.
+  - `CutoutShape.Custom`: a `pathBuilder` case for cutout outlines that aren't one of the built-ins (Circle/RoundedRect/Rect/Squircle/Star). Draws through the same `BlendMode.Clear` offscreen-layer path as every built-in shape.
+- `ProgressIndicatorStyle.PILL`: the current step in a multi-step progress indicator renders as an elongated pill while the other steps stay small dots, like an iOS-style page indicator. `CoachmarkConfig.progressIndicatorStyle` (default `DOTS`, preserving the existing look) and `CoachmarkConfig.progressActivePillWidth` control it — kept as a built-in convenience on top of the new `progressIndicator` slot, since it's a generic enough idiom to ship directly.
+
+### Sample App
+- Added a "Custom Rendering" example demonstrating all three extension points together: a pill progress indicator, a teardrop speech-bubble connector, and a diamond cutout shape — none of which required a library change.
+- Added a "Start Tour (Pill)" button to the Multi-Step Sequence example to demo `ProgressIndicatorStyle.PILL`.
 
 ## [1.0.0-beta15] - 2026-03-18
 

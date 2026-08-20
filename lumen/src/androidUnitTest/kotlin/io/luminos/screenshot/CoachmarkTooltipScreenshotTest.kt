@@ -17,6 +17,7 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import io.luminos.CoachmarkTooltip
 import io.luminos.DarkCoachmarkColors
 import io.luminos.LightCoachmarkColors
+import io.luminos.ProgressIndicatorStyle
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -81,6 +82,27 @@ class CoachmarkTooltipScreenshotTest {
             }
         }
         capture("tooltip_multiStep_step2of4")
+    }
+
+    @Test
+    fun tooltip_multiStep_pillIndicator() {
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = lightColorScheme()) {
+                Box(modifier = Modifier.background(Color(0xFF1A1A2E)).padding(16.dp)) {
+                    CoachmarkTooltip(
+                        title = "Step 2",
+                        description = "The current step renders as a pill; other steps stay dots.",
+                        ctaText = "Next",
+                        currentStep = 2,
+                        totalSteps = 4,
+                        colors = LightCoachmarkColors,
+                        progressIndicatorStyle = ProgressIndicatorStyle.PILL,
+                        onCtaClick = {},
+                    )
+                }
+            }
+        }
+        capture("tooltip_multiStep_pillIndicator")
     }
 
     @Test

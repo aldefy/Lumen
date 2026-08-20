@@ -40,6 +40,7 @@ import io.luminos.CoachmarkTarget
 import io.luminos.ConnectorStyle
 import io.luminos.CutoutShape
 import io.luminos.HighlightAnimation
+import io.luminos.ProgressIndicatorStyle
 import io.luminos.ScrimTapBehavior
 import io.luminos.coachmarkColors
 import io.luminos.coachmarkTarget
@@ -54,6 +55,7 @@ fun SequenceExample(
     val controller = rememberCoachmarkController()
     var showSequence by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableIntStateOf(0) }
+    var progressIndicatorStyle by remember { mutableStateOf(ProgressIndicatorStyle.DOTS) }
 
     CoachmarkHost(
         controller = controller,
@@ -63,6 +65,7 @@ fun SequenceExample(
             skipButtonText = "Skip tour",
             backPressBehavior = BackPressBehavior.NAVIGATE,
             scrimTapBehavior = ScrimTapBehavior.NONE,
+            progressIndicatorStyle = progressIndicatorStyle,
         ),
         colors = coachmarkColors(),
     ) {
@@ -159,8 +162,22 @@ fun SequenceExample(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    Button(onClick = { showSequence = true }) {
+                    Button(
+                        onClick = {
+                            progressIndicatorStyle = ProgressIndicatorStyle.DOTS
+                            showSequence = true
+                        },
+                    ) {
                         Text("Start Tour")
+                    }
+
+                    Button(
+                        onClick = {
+                            progressIndicatorStyle = ProgressIndicatorStyle.PILL
+                            showSequence = true
+                        },
+                    ) {
+                        Text("Start Tour (Pill)")
                     }
 
                     Button(onClick = { controller.dismiss() }) {

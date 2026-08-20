@@ -72,8 +72,8 @@ public final class io/luminos/CoachmarkColorsKt {
 
 public final class io/luminos/CoachmarkConfig {
 	public static final field $stable I
-	public synthetic fun <init> (FFFFLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZIILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (FFFFLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (FFFFLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZLio/luminos/ProgressIndicatorStyle;FZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (FFFFLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZLio/luminos/ProgressIndicatorStyle;FZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1-D9Ej5fM ()F
 	public final fun component10-D9Ej5fM ()F
 	public final fun component11-D9Ej5fM ()F
@@ -83,39 +83,41 @@ public final class io/luminos/CoachmarkConfig {
 	public final fun component15 ()Lio/luminos/ScrimOpacity;
 	public final fun component16 ()Lio/luminos/ScrimTapBehavior;
 	public final fun component17 ()Z
-	public final fun component18 ()Z
-	public final fun component19 ()Lio/luminos/BackPressBehavior;
+	public final fun component18 ()Lio/luminos/ProgressIndicatorStyle;
+	public final fun component19-D9Ej5fM ()F
 	public final fun component2-D9Ej5fM ()F
-	public final fun component20 ()Lio/luminos/HighlightAnimation;
-	public final fun component21 ()I
-	public final fun component22 ()Z
-	public final fun component23 ()Ljava/lang/String;
-	public final fun component24 ()J
-	public final fun component25 ()Z
+	public final fun component20 ()Z
+	public final fun component21 ()Lio/luminos/BackPressBehavior;
+	public final fun component22 ()Lio/luminos/HighlightAnimation;
+	public final fun component23 ()I
+	public final fun component24 ()Z
+	public final fun component25 ()Ljava/lang/String;
 	public final fun component26 ()J
-	public final fun component27 ()Ljava/lang/String;
+	public final fun component27 ()Z
 	public final fun component28 ()J
-	public final fun component29 ()Z
+	public final fun component29 ()Ljava/lang/String;
 	public final fun component3-D9Ej5fM ()F
-	public final fun component30-D9Ej5fM ()F
-	public final fun component31-D9Ej5fM ()F
+	public final fun component30 ()J
+	public final fun component31 ()Z
 	public final fun component32-D9Ej5fM ()F
 	public final fun component33-D9Ej5fM ()F
-	public final fun component34-e0LSkKk ()I
-	public final fun component35-e0LSkKk ()I
+	public final fun component34-D9Ej5fM ()F
+	public final fun component35-D9Ej5fM ()F
 	public final fun component36-e0LSkKk ()I
 	public final fun component37-e0LSkKk ()I
 	public final fun component38-e0LSkKk ()I
-	public final fun component39 ()Landroidx/compose/foundation/layout/Arrangement$Horizontal;
+	public final fun component39-e0LSkKk ()I
 	public final fun component4 ()F
-	public final fun component40 ()Z
+	public final fun component40-e0LSkKk ()I
+	public final fun component41 ()Landroidx/compose/foundation/layout/Arrangement$Horizontal;
+	public final fun component42 ()Z
 	public final fun component5 ()Lkotlin/jvm/functions/Function3;
 	public final fun component6 ()Lkotlin/jvm/functions/Function4;
 	public final fun component7 ()Lkotlin/jvm/functions/Function4;
 	public final fun component8-D9Ej5fM ()F
 	public final fun component9-D9Ej5fM ()F
-	public final fun copy-k8PXi6E (FFFFLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;Z)Lio/luminos/CoachmarkConfig;
-	public static synthetic fun copy-k8PXi6E$default (Lio/luminos/CoachmarkConfig;FFFFLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZIILjava/lang/Object;)Lio/luminos/CoachmarkConfig;
+	public final fun copy-JcQ5SgI (FFFFLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZLio/luminos/ProgressIndicatorStyle;FZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;Z)Lio/luminos/CoachmarkConfig;
+	public static synthetic fun copy-JcQ5SgI$default (Lio/luminos/CoachmarkConfig;FFFFLkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function4;FFFFIIILio/luminos/ScrimOpacity;Lio/luminos/ScrimTapBehavior;ZLio/luminos/ProgressIndicatorStyle;FZLio/luminos/BackPressBehavior;Lio/luminos/HighlightAnimation;IZLjava/lang/String;JZJLjava/lang/String;JZFFFFIIIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZIILjava/lang/Object;)Lio/luminos/CoachmarkConfig;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBackPressBehavior ()Lio/luminos/BackPressBehavior;
 	public final fun getConnectorAnimationDuration ()I
@@ -136,7 +138,9 @@ public final class io/luminos/CoachmarkConfig {
 	public final fun getDontShowAgainTextAlign-e0LSkKk ()I
 	public final fun getFadeAnimationDuration ()I
 	public final fun getHighlightAnimation ()Lio/luminos/HighlightAnimation;
+	public final fun getProgressActivePillWidth-D9Ej5fM ()F
 	public final fun getProgressIndicator ()Lkotlin/jvm/functions/Function4;
+	public final fun getProgressIndicatorStyle ()Lio/luminos/ProgressIndicatorStyle;
 	public final fun getPulseDurationMs ()I
 	public final fun getRetrySkippedTargets ()Z
 	public final fun getScrimOpacity ()Lio/luminos/ScrimOpacity;
@@ -327,7 +331,7 @@ public final class io/luminos/CoachmarkTarget {
 }
 
 public final class io/luminos/CoachmarkTooltipKt {
-	public static final fun CoachmarkTooltip-qLVjEXk (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILio/luminos/CoachmarkColors;FZZZLjava/lang/String;ZLjava/lang/String;ZLkotlin/jvm/functions/Function1;FFFLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function4;IIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZJFFLkotlin/jvm/functions/Function1;ZLandroidx/compose/runtime/Composer;IIIIII)V
+	public static final fun CoachmarkTooltip-55FXiAQ (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILio/luminos/CoachmarkColors;FZLio/luminos/ProgressIndicatorStyle;FZZLjava/lang/String;ZLjava/lang/String;ZLkotlin/jvm/functions/Function1;FFFLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function4;IIIILandroidx/compose/foundation/layout/Arrangement$Horizontal;ZJFFLkotlin/jvm/functions/Function1;ZLandroidx/compose/runtime/Composer;IIIIII)V
 }
 
 public final class io/luminos/ConnectorEndStyle : java/lang/Enum {
@@ -479,6 +483,14 @@ public final class io/luminos/OverlayCoordinatorKt {
 	public static final fun DialogOverlayEffect (Landroidx/compose/runtime/Composer;I)V
 	public static final fun getLocalOverlayCoordinator ()Landroidx/compose/runtime/ProvidableCompositionLocal;
 	public static final fun rememberOverlayCoordinator (Landroidx/compose/runtime/Composer;I)Lio/luminos/OverlayCoordinator;
+}
+
+public final class io/luminos/ProgressIndicatorStyle : java/lang/Enum {
+	public static final field DOTS Lio/luminos/ProgressIndicatorStyle;
+	public static final field PILL Lio/luminos/ProgressIndicatorStyle;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/luminos/ProgressIndicatorStyle;
+	public static fun values ()[Lio/luminos/ProgressIndicatorStyle;
 }
 
 public final class io/luminos/ScrimOpacity : java/lang/Enum {

@@ -226,6 +226,10 @@ data class CoachmarkConfig(
     val scrimTapBehavior: ScrimTapBehavior = ScrimTapBehavior.DISMISS,
     /** Whether to show progress indicator dots for multi-step sequences */
     val showProgressIndicator: Boolean = true,
+    /** Visual style for the progress indicator: small dots, or a pill for the current step */
+    val progressIndicatorStyle: ProgressIndicatorStyle = ProgressIndicatorStyle.DOTS,
+    /** Width of the active pill when [progressIndicatorStyle] is [ProgressIndicatorStyle.PILL] */
+    val progressActivePillWidth: Dp = 20.dp,
     /** Whether to wrap the tooltip content in a card/box */
     val showTooltipCard: Boolean = false,
     /** Behavior when user presses the back button */
@@ -1087,6 +1091,8 @@ private fun BoxScope.TooltipContainer(
             cornerRadius = config.tooltipCornerRadius,
             showProgressIndicator = showProgressIndicator,
             progressIndicator = config.progressIndicator,
+            progressIndicatorStyle = config.progressIndicatorStyle,
+            progressActivePillWidth = config.progressActivePillWidth,
             showCard = config.showTooltipCard,
             showSkipButton = config.showSkipButton,
             skipButtonText = config.skipButtonText,
