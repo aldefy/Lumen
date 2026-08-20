@@ -15,6 +15,11 @@ All notable changes to this project will be documented in this file.
 - **Android consumers now need `compileSdk` 36 and AGP 8.9.1 or newer.** This is required by `activity-compose` 1.12.2, whose AAR metadata declares `minCompileSdk=36` and `minAndroidGradlePluginVersion=8.9.1`. Builds on older toolchains will fail `checkDebugAarMetadata`. `minSdk` is unchanged at 23, so no runtime device support is dropped.
 - Robolectric remains pinned to `sdk=34` in `lumen/src/androidUnitTest/resources/robolectric.properties`. Robolectric 4.14.1 supports SDK 34 at most, and even 4.15.1 only reaches SDK 35, so unit tests cannot yet execute against SDK 36.
 
+## [1.0.0-beta20] - 2026-08-20
+
+### Bug Fixes
+- `beta19`'s Kotlin 2.3.0 toolchain bump was forcing that same version onto every consumer app: the published klib/jar metadata was stamped `mv=[2,3,0]`, which older Kotlin compilers refuse to read at all. Pinned `apiVersion`/`languageVersion` to `KOTLIN_2_1` in `lumen/build.gradle.kts` so the library still builds with the 2.3.0 toolchain but emits `2.1`-compatible metadata — verified by inspecting the `kotlin.Metadata.mv` annotation on the built jar (now `[2,1,0]`, previously `[2,3,0]`). Consumers on Kotlin 2.1 or newer can depend on this release; 2.1 is the new floor, not "any version." Raise the pin only as a deliberate decision to drop older-Kotlin consumers.
+
 ## [1.0.0-beta19] - 2026-08-20
 
 ### Build

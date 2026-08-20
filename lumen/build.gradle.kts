@@ -13,6 +13,14 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        // Compile with the 2.3.0 toolchain but emit metadata/ABI compatible with
+        // consumer apps still on older Kotlin. Bump this only in lockstep with a
+        // deliberate decision to drop older-Kotlin consumers.
+        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1)
+        languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1)
+    }
+
     androidTarget {
         publishLibraryVariants("release")
         compilerOptions {
@@ -106,7 +114,7 @@ android {
     }
 }
 
-val libraryVersion = "1.0.0-beta19"
+val libraryVersion = "1.0.0-beta20"
 val libraryGroup = "io.github.aldefy"
 val libraryArtifact = "lumen"
 
