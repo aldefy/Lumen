@@ -15,6 +15,11 @@ All notable changes to this project will be documented in this file.
 - **Android consumers now need `compileSdk` 36 and AGP 8.9.1 or newer.** This is required by `activity-compose` 1.12.2, whose AAR metadata declares `minCompileSdk=36` and `minAndroidGradlePluginVersion=8.9.1`. Builds on older toolchains will fail `checkDebugAarMetadata`. `minSdk` is unchanged at 23, so no runtime device support is dropped.
 - Robolectric remains pinned to `sdk=34` in `lumen/src/androidUnitTest/resources/robolectric.properties`. Robolectric 4.14.1 supports SDK 34 at most, and even 4.15.1 only reaches SDK 35, so unit tests cannot yet execute against SDK 36.
 
+## [1.0.0-beta19] - 2026-08-20
+
+### Build
+- Release pipeline: the Central Portal transfer step now requests `publishing_type=automatic`, so a validated deployment releases straight to Maven Central instead of sitting at VALIDATED awaiting a manual "Publish" click on the Portal (beta18's behavior). Also renamed the step — it was described as completing the release when it only transferred the deployment into the Portal, which read as misleadingly "done" in CI even though nothing was actually public yet.
+
 ## [1.0.0-beta18] - 2026-08-20
 
 ### Build

@@ -63,22 +63,28 @@ jobs:
             -Psigning.gnupg.keyName=${{ secrets.GPG_KEY_ID }} \
             -Psigning.gnupg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Transfer staged deployment to the Central Portal
+      - name: Publish deployment on the Central Portal (auto-release)
         if: ${{ env.OSSRH_USERNAME != '' && env.OSSRH_PASSWORD != '' }}
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
         run: |
           # maven-publish only PUTs files with no deployment context, so the upload sits in the
-          # OSSRH-compat staging area until this manual-transfer call moves it into the Central
-          # Portal proper. Must run from the same IP that did the upload — hence same job/runner.
-          # Namespace = the Maven group, io.github.aldefy. Defaults to user_managed (needs a
-          # manual "Publish" click at https://central.sonatype.com/publishing/deployments) rather
-          # than automatic, so a bad release can be dropped before it goes live.
+          # OSSRH-compat staging area until this call transfers it into the Central Portal
+          # proper. Must run from the same IP that did the upload — hence same job/runner.
+          # publishing_type=automatic releases straight to Maven Central once validation passes
+          # (VALIDATED -> PUBLISHED with no manual click). Verified against a real tag
+          # (1.0.0-beta19) that this query param is honored by this endpoint - Sonatype's own
+          # docs for this specific compat API don't spell out the transmission format, only that
+          # the parameter exists. Without OSSRH_USERNAME/OSSRH_PASSWORD set, or if this ever
+          # silently reverts to the endpoint's default (user_managed), a deployment lands as
+          # VALIDATED and needs a manual "Publish" click at
+          # https://central.sonatype.com/publishing/deployments - check there if a release
+          # doesn't show up on Maven Central shortly after this step goes green.
           TOKEN=$(printf '%s:%s' "$OSSRH_USERNAME" "$OSSRH_PASSWORD" | base64)
           curl --fail-with-body -X POST \
             -H "Authorization: Bearer ${TOKEN}" \
-            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.aldefy"
+            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.aldefy?publishing_type=automatic"
 
       - name: Verify publications
         run: |
