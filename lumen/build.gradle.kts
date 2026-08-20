@@ -160,10 +160,17 @@ publishing {
     repositories {
         maven {
             name = "sonatype"
-            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            url = if (libraryVersion.endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
+            // s01.oss.sonatype.org (OSSRH) shut down 2025-06-30. This targets its replacement,
+            // the Central Portal's OSSRH-compatibility staging API. Snapshots aren't supported
+            // by this endpoint; SNAPSHOT versions have nowhere to publish until/unless the
+            // Central Portal's own snapshot repository is wired up separately.
+            // https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
+            url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
 
+            // Credentials are a Central Portal "user token" (username/password pair generated
+            // at https://central.sonatype.com/account, under Generate User Token) — not your
+            // Sonatype account's own login. The property/env names are kept as ossrhUsername/
+            // ossrhPassword and OSSRH_USERNAME/OSSRH_PASSWORD for continuity with the old setup.
             credentials {
                 username = findProperty("ossrhUsername")?.toString()
                     ?: System.getenv("OSSRH_USERNAME")
