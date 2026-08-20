@@ -23,14 +23,17 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -39,7 +42,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
@@ -114,13 +119,40 @@ fun CoachmarkTooltip(
     connectorDotOffsetX: Dp = 0.dp,
     onDotPositioned: (Offset) -> Unit = {},
     isTooltipBelow: Boolean = true,
+    tooltipShape: ((tailAnchorX: Dp, isTooltipBelow: Boolean) -> Shape)? = null,
+    tailAnchorX: Dp = Dp.Unspecified,
+    tooltipTailInset: Dp = 0.dp,
 ) {
+    val hasTail = tooltipShape != null && tailAnchorX.isSpecified
     val cardModifier =
         if (showCard) {
-            Modifier
-                .clip(RoundedCornerShape(cornerRadius))
-                .background(colors.tooltipCardColor)
-                .padding(16.dp)
+            if (hasTail) {
+                // The tail is carved into the card's own outline, so the Column's measured
+                // size needs to be tooltipTailInset taller than the plain-card case — clip()
+                // always bounds to its content's actual layout size, so there'd otherwise be
+                // no room for the shape's tail to occupy. A Spacer inside the Column (below)
+                // grows the content by exactly that amount on the tail's side; the shape then
+                // reads that extra strip as free to draw the tail into (see SpeechBubbleShape).
+                val resolvedTailShape = remember(tooltipShape, tailAnchorX, isTooltipBelow) {
+                    object : Shape {
+                        override fun createOutline(
+                            size: Size,
+                            layoutDirection: LayoutDirection,
+                            density: Density,
+                        ) = tooltipShape!!(tailAnchorX, isTooltipBelow)
+                            .createOutline(size, layoutDirection, density)
+                    }
+                }
+                Modifier
+                    .clip(resolvedTailShape)
+                    .background(colors.tooltipCardColor)
+                    .padding(16.dp)
+            } else {
+                Modifier
+                    .clip(RoundedCornerShape(cornerRadius))
+                    .background(colors.tooltipCardColor)
+                    .padding(16.dp)
+            }
         } else {
             Modifier
         }
@@ -134,6 +166,14 @@ fun CoachmarkTooltip(
                     contentDescription = "$title. $description. Step $currentStep of $totalSteps."
                 },
     ) {
+        // Grows the Column by tooltipTailInset on the tail's side, so the card shape (clipped
+        // around this Column) has that much extra room to carve the tail into. See cardModifier.
+        // isTooltipBelow=true means the tooltip sits below the target, so the tail points UP
+        // (on the top edge) — space is reserved here, at the top.
+        if (hasTail && isTooltipBelow) {
+            Spacer(modifier = Modifier.height(tooltipTailInset))
+        }
+
         // Text shadow for better readability (only needed when floating, not in card)
         val textShadow =
             if (showCard) {
@@ -385,6 +425,10 @@ fun CoachmarkTooltip(
                         },
                 )
             }
+        }
+
+        if (hasTail && !isTooltipBelow) {
+            Spacer(modifier = Modifier.height(tooltipTailInset))
         }
     }
 }

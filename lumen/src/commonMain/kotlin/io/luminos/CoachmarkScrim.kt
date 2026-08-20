@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
@@ -179,11 +180,12 @@ data class CoachmarkConfig(
     /** Custom endpoint DrawScope lambda for ConnectorEndStyle.CUSTOM */
     val customConnectorEnd: (DrawScope.(center: Offset, angle: Float) -> Unit)? = null,
     /**
-     * Full-control connector renderer. When non-null this replaces the entire built-in
-     * connector drawing — line *and* endpoint — for every target, so a caller can draw a
-     * speech-bubble tail, a nub with no line, a dashed path, or nothing at all without a new
-     * [ConnectorStyle] case in the library. [ConnectorStyle] and [ConnectorEndStyle] are
-     * ignored while this is set.
+     * Sequence-wide default full-control connector renderer, used by every target whose
+     * [CoachmarkTarget.connectorStyle] is [ConnectorStyle.CUSTOM] and which doesn't supply
+     * its own [CoachmarkTarget.customConnector]. Replaces the entire built-in connector —
+     * line *and* endpoint — so a caller can draw a speech-bubble tail, a nub with no line, a
+     * dashed path, or nothing at all without a new [ConnectorStyle] case in the library.
+     * [ConnectorEndStyle] is ignored for a target rendered this way.
      *
      * The lambda receives the cutout-edge anchor, the tooltip-edge anchor, and the connector
      * reveal progress (0f..1f, driven by [connectorAnimationDuration]) so custom connectors
@@ -196,6 +198,8 @@ data class CoachmarkConfig(
      *         drawPath(myTeardropPath(base = to, tip = tip), color = Color.White)
      *     },
      * )
+     * // and per target:
+     * CoachmarkTarget(connectorStyle = ConnectorStyle.CUSTOM, ...)
      * ```
      */
     val customConnector: (DrawScope.(from: Offset, to: Offset, progress: Float) -> Unit)? = null,
@@ -232,6 +236,40 @@ data class CoachmarkConfig(
     val progressActivePillWidth: Dp = 20.dp,
     /** Whether to wrap the tooltip content in a card/box */
     val showTooltipCard: Boolean = false,
+    /**
+     * Optional factory for the tooltip card's outline, called with the tail's horizontal
+     * anchor (where the target sits, in px relative to the card's left edge, already clamped
+     * to the card's width) and whether the tooltip is below the target (tail should point
+     * up, on the card's top edge) or above it (tail points down, on the bottom edge).
+     *
+     * `null` (default) keeps today's plain [androidx.compose.foundation.shape.RoundedCornerShape].
+     * Only takes effect when [showTooltipCard] is true.
+     *
+     * ```
+     * CoachmarkConfig(
+     *     showTooltipCard = true,
+     *     tooltipShape = { tailAnchorX, isTooltipBelow ->
+     *         SpeechBubbleShape(
+     *             cornerRadius = with(density) { 16.dp.toPx() },
+     *             tailWidth = with(density) { 24.dp.toPx() },
+     *             tailHeight = with(density) { 10.dp.toPx() },
+     *             tailAnchorX = tailAnchorX,
+     *             tailOnBottom = !isTooltipBelow,
+     *         )
+     *     },
+     * )
+     * ```
+     */
+    val tooltipShape: ((tailAnchorX: Dp, isTooltipBelow: Boolean) -> Shape)? = null,
+    /**
+     * How far [tooltipShape]'s outline extends past the plain rounded-rect card bounds, on
+     * the side facing the target (e.g. a speech-bubble tail's height). The card reserves
+     * exactly this much extra space before clipping to [tooltipShape], so the tail isn't cut
+     * off at the card's original edge. Must match what [tooltipShape] actually draws — there's
+     * no way to measure an arbitrary [Shape]'s true extent generically, so this is the one
+     * number the two need to agree on. Ignored when [tooltipShape] is `null`.
+     */
+    val tooltipTailInset: Dp = 0.dp,
     /** Behavior when user presses the back button */
     val backPressBehavior: BackPressBehavior = BackPressBehavior.DISMISS,
     /** Default animation for the cutout highlight */
@@ -911,8 +949,12 @@ private fun CoachmarkScrimContent(
                 val arrowSizePx = with(density) { config.connectorArrowSize.toPx() }
                 val arrowHalfAngleRad = (config.connectorArrowAngle * PI / 180f).toFloat()
                 val effectiveEndStyle = if (isInlineTitleActive) ConnectorEndStyle.NONE else target.connectorEndStyle
-                val customConnector = config.customConnector
-                if (customConnector != null) {
+                // Per-target lambda takes priority over the sequence-wide config default, so a
+                // single step can override what the rest of the sequence uses. CUSTOM with
+                // neither set falls back to drawing the resolved geometry normally, the same
+                // way AUTO would — the caller opted into "custom" but didn't supply one.
+                val customConnector = target.customConnector ?: config.customConnector
+                if (target.connectorStyle == ConnectorStyle.CUSTOM && customConnector != null) {
                     // Caller owns the whole connector: hand it the two anchors the built-in
                     // styles would have joined, plus the reveal progress, and draw nothing else.
                     val anchors = connectorAnchors(connectorPathData)
@@ -1023,6 +1065,14 @@ private fun CoachmarkScrimContent(
             },
             onDotPositioned = { center -> inlineDotCenter = center },
             isTooltipBelow = isTooltipBelow,
+            tailAnchorX = if (config.tooltipShape != null) {
+                with(density) {
+                    (target.bounds.center.x - tooltipPosition.x - tooltipMarginPx)
+                        .coerceAtLeast(0f).toDp()
+                }
+            } else {
+                Dp.Unspecified
+            },
         )
 
         // Request focus on tooltip after animation completes for a11y
@@ -1067,6 +1117,7 @@ private fun BoxScope.TooltipContainer(
     connectorDotOffsetX: Dp = 0.dp,
     onDotPositioned: (Offset) -> Unit = {},
     isTooltipBelow: Boolean = true,
+    tailAnchorX: Dp = Dp.Unspecified,
 ) {
     val showProgressIndicator = target.showProgressIndicator ?: config.showProgressIndicator
 
@@ -1116,6 +1167,9 @@ private fun BoxScope.TooltipContainer(
             connectorDotOffsetX = connectorDotOffsetX,
             onDotPositioned = onDotPositioned,
             isTooltipBelow = isTooltipBelow,
+            tooltipShape = config.tooltipShape,
+            tailAnchorX = tailAnchorX,
+            tooltipTailInset = config.tooltipTailInset,
         )
     }
 }
@@ -1562,7 +1616,11 @@ private fun resolveConnectorStyle(
     tooltipCenterY: Float,
     cutoutRadius: Float,
 ): ConnectorStyle {
-    if (connectorStyle != ConnectorStyle.AUTO) return connectorStyle
+    // CUSTOM still needs real path geometry — the anchors handed to the custom-connector
+    // lambda, and the fallback line if no lambda is actually supplied — so it resolves via
+    // the same heuristic as AUTO. Whether a line is *drawn* is gated separately at the draw
+    // site by the caller's raw (unresolved) ConnectorStyle.
+    if (connectorStyle != ConnectorStyle.AUTO && connectorStyle != ConnectorStyle.CUSTOM) return connectorStyle
     val horizontalDistance = kotlin.math.abs(tooltipCenterX - targetCenter.x)
     val verticalDistance = kotlin.math.abs(tooltipCenterY - targetCenter.y)
     val hasSignificantHorizontal = horizontalDistance > cutoutRadius * 2
@@ -1657,6 +1715,10 @@ private fun calculateConnectorPath(
 
     return when (resolvedStyle) {
         ConnectorStyle.AUTO -> ConnectorPathData.Segments(emptyList())
+
+        // Unreachable in practice: resolveConnectorStyle() maps CUSTOM to the same heuristic
+        // as AUTO before this function ever sees it. Kept only so this `when` stays exhaustive.
+        ConnectorStyle.CUSTOM -> ConnectorPathData.Segments(emptyList())
 
         ConnectorStyle.HORIZONTAL -> {
             val goingLeft = tooltipCenterX < targetCenter.x

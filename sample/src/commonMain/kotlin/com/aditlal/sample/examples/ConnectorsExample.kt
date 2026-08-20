@@ -35,8 +35,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
 import kotlin.math.cos
@@ -89,6 +91,12 @@ fun ConnectorsExample(
                 path.close()
                 drawPath(path = path, color = Color.White)
             },
+            // Sequence-wide default for any target with connectorStyle = ConnectorStyle.CUSTOM
+            // that doesn't supply its own CoachmarkTarget.customConnector. See "Teardrop Tail"
+            // below for a per-target example of the same mechanism.
+            customConnector = { from, to, progress ->
+                drawTeardropTail(base = to, towards = from, progress = progress)
+            },
         ),
         colors = coachmarkColors(),
     ) {
@@ -134,7 +142,7 @@ fun ConnectorsExample(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Eight different ways to connect tooltips to targets",
+                    text = "Nine different ways to connect tooltips to targets",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -289,8 +297,79 @@ fun ConnectorsExample(
                     connectorLength = 90.dp,
                     ctaText = "Got it!",
                 ),
+                CoachmarkTarget(
+                    id = "direct",
+                    title = "Teardrop Tail",
+                    description = "ConnectorStyle.CUSTOM with a per-target connector lambda: " +
+                        "a rounded speech-bubble tail growing from the tooltip edge, no line " +
+                        "at all. This overrides the sequence-wide default set in CoachmarkConfig.",
+                    shape = CutoutShape.Circle(radiusPadding = 10.dp),
+                    connectorStyle = ConnectorStyle.CUSTOM,
+                    customConnector = { from, to, progress ->
+                        drawTeardropTail(base = to, towards = from, progress = progress, color = Color(0xFFFF6B9D))
+                    },
+                    ctaText = "Got it!",
+                ),
             )
         )
         showSequence = false
     }
+}
+
+/**
+ * Draws a rounded speech-bubble tail: a flat base at [base] (meant to sit flush against —
+ * and be partly hidden behind — the tooltip card it grows out of) rising to a single rounded
+ * peak, growing outward from [base] toward [towards] as [progress] advances from 0f to 1f.
+ *
+ * This is a "hill" silhouette (convex, domed) rather than a classic pointed teardrop. Both
+ * were compared against the source design before picking this one: a true circle-and-tangent
+ * raindrop shape reads as spiky and aggressive at the ~20-30dp size a coachmark tail actually
+ * renders at, and a straight-sided "concave waist" tail (the shape most messaging apps use for
+ * chat bubbles) looks fine but is a worse match for a tail that's meant to look like it's
+ * *part of* a heavily rounded card rather than a distinct sharp-cornered shape stuck onto it.
+ * The dome reads as continuous with the card's own corner radius.
+ *
+ * If your design wants the pointed look instead, swap the two `cubicTo` calls below for
+ * straight `lineTo`s with a slightly inset waist — the anchor math (base/tip/perpendicular)
+ * stays identical either way, which is the actual point of exposing this as app code instead
+ * of a library enum case: the *shape* is a styling decision, not a connector-routing one.
+ */
+private fun DrawScope.drawTeardropTail(
+    base: Offset,
+    towards: Offset,
+    progress: Float,
+    color: Color = Color.White,
+    length: Float = 22f,
+    width: Float = 26f,
+) {
+    val dx = towards.x - base.x
+    val dy = towards.y - base.y
+    val distance = kotlin.math.sqrt(dx * dx + dy * dy)
+    if (distance < 0.01f) return
+
+    val ux = dx / distance
+    val uy = dy / distance
+    val px = -uy
+    val py = ux
+    val halfWidth = width / 2f
+    val tip = Offset(base.x + ux * length * progress, base.y + uy * length * progress)
+
+    val baseLeft = Offset(base.x - px * halfWidth, base.y - py * halfWidth)
+    val baseRight = Offset(base.x + px * halfWidth, base.y + py * halfWidth)
+
+    // Control points a quarter-width in from each base corner, giving a flat tangent at the
+    // base and a rounded (not pointed) tangent at the peak.
+    val quarterWidth = halfWidth / 2f
+    val leftNearBase = Offset(baseLeft.x + px * quarterWidth, baseLeft.y + py * quarterWidth)
+    val leftNearPeak = Offset(tip.x - px * quarterWidth, tip.y - py * quarterWidth)
+    val rightNearPeak = Offset(tip.x + px * quarterWidth, tip.y + py * quarterWidth)
+    val rightNearBase = Offset(baseRight.x - px * quarterWidth, baseRight.y - py * quarterWidth)
+
+    val path = Path().apply {
+        moveTo(baseLeft.x, baseLeft.y)
+        cubicTo(leftNearBase.x, leftNearBase.y, leftNearPeak.x, leftNearPeak.y, tip.x, tip.y)
+        cubicTo(rightNearPeak.x, rightNearPeak.y, rightNearBase.x, rightNearBase.y, baseRight.x, baseRight.y)
+        close()
+    }
+    drawPath(path = path, color = color)
 }

@@ -76,6 +76,7 @@ fun LazyColumnExample(
     val controller = rememberCoachmarkController()
     var showSequence by remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
+    val density = androidx.compose.ui.platform.LocalDensity.current
 
     // Wire up scroll state to controller for visibility tracking
     LaunchedEffect(lazyListState) {
@@ -105,6 +106,20 @@ fun LazyColumnExample(
             skipButtonText = "Skip tour",
             scrimTapBehavior = ScrimTapBehavior.NONE,
             retrySkippedTargets = true,
+            showTooltipCard = true,
+            // Speech-bubble tail carved into the card's own outline, pointing at whichever
+            // row is targeted — demonstrates CoachmarkConfig.tooltipShape against a real
+            // whole-row target (list_card below), not just a small icon.
+            tooltipShape = { tailAnchorX, isTooltipBelow ->
+                io.luminos.shapes.SpeechBubbleShape(
+                    cornerRadius = with(density) { 16.dp.toPx() },
+                    tailWidth = with(density) { 20.dp.toPx() },
+                    tailHeight = with(density) { 10.dp.toPx() },
+                    tailAnchorX = with(density) { tailAnchorX.toPx() },
+                    tailOnBottom = !isTooltipBelow,
+                )
+            },
+            tooltipTailInset = 10.dp,
         ),
         colors = coachmarkColors(),
     ) {
@@ -215,10 +230,16 @@ fun LazyColumnExample(
                 CoachmarkTarget(
                     id = "list_card",
                     title = "Item Cards",
-                    description = "Tap any card to view details. Long press to select multiple items.",
+                    description = "Tap any card to view details. Long press to select multiple " +
+                        "items. This tail is carved into the card via CoachmarkConfig." +
+                        "tooltipShape — no separate connector line, pointing right at this row.",
                     shape = CutoutShape.RoundedRect(cornerRadius = 12.dp, padding = 4.dp),
-                    connectorStyle = ConnectorStyle.VERTICAL,
-                    connectorLength = 80.dp,
+                    // Suppress the built-in line entirely — the tooltipShape tail is the only
+                    // thing pointing at the row. See CustomRenderingExample for the same
+                    // pattern (there's no ConnectorStyle.NONE today, so CUSTOM + a no-op is
+                    // the way to opt out of a line).
+                    connectorStyle = ConnectorStyle.CUSTOM,
+                    customConnector = { _, _, _ -> },
                     ctaText = "Got it!",
                 ),
             )

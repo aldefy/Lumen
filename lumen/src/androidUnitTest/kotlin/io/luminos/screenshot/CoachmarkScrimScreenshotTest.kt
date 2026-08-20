@@ -185,6 +185,62 @@ class CoachmarkScrimScreenshotTest {
     }
 
     @Test
+    fun scrim_customConnector_targetOverride() {
+        // A distinctive filled triangle proves the per-target lambda actually renders in
+        // place of the built-in line/endpoint, and that it takes priority over the
+        // config-level default (set below to a different, unmistakable color).
+        showScrimAndCapture(
+            target = CoachmarkTarget(
+                id = "customTarget",
+                bounds = targetBounds,
+                shape = CutoutShape.Circle(),
+                title = "Custom Connector (per-target)",
+                description = "Rendered by CoachmarkTarget.customConnector, not the config default.",
+                connectorStyle = ConnectorStyle.CUSTOM,
+                customConnector = { from, to, progress ->
+                    val tip = androidx.compose.ui.geometry.Offset(
+                        x = to.x + (from.x - to.x) * progress,
+                        y = to.y + (from.y - to.y) * progress,
+                    )
+                    drawPath(
+                        path = androidx.compose.ui.graphics.Path().apply {
+                            moveTo(to.x - 16f, to.y)
+                            lineTo(to.x + 16f, to.y)
+                            lineTo(tip.x, tip.y)
+                            close()
+                        },
+                        color = androidx.compose.ui.graphics.Color.Magenta,
+                    )
+                },
+            ),
+            config = noAnimConfig.copy(
+                customConnector = { _, to, _ ->
+                    // Should never render: the target-level lambda above wins.
+                    drawCircle(color = androidx.compose.ui.graphics.Color.Red, radius = 40f, center = to)
+                },
+            ),
+            filePath = "src/androidUnitTest/snapshots/scrim_customConnectorTargetOverride.png",
+        )
+    }
+
+    @Test
+    fun scrim_customConnector_missingLambdaFallsBackToLine() {
+        // CUSTOM with no lambda supplied anywhere should draw a normal connector line
+        // (as if AUTO had been requested) rather than nothing at all.
+        showScrimAndCapture(
+            target = CoachmarkTarget(
+                id = "customFallback",
+                bounds = targetBounds,
+                shape = CutoutShape.Circle(),
+                title = "Custom Connector (fallback)",
+                description = "No customConnector lambda supplied; falls back to a normal line.",
+                connectorStyle = ConnectorStyle.CUSTOM,
+            ),
+            filePath = "src/androidUnitTest/snapshots/scrim_customConnectorFallback.png",
+        )
+    }
+
+    @Test
     fun scrim_tooltipAbove() {
         val lowerTarget = Rect(left = 150f, top = 600f, right = 250f, bottom = 660f)
         showScrimAndCapture(

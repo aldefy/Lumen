@@ -2,8 +2,10 @@ package io.luminos
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -212,6 +214,14 @@ enum class ConnectorStyle {
 
     /** Smooth curved connector using a quadratic Bezier curve. */
     CURVED,
+
+    /**
+     * Fully custom connector rendering via [CoachmarkTarget.customConnector] (or
+     * [CoachmarkConfig.customConnector] as a sequence-wide default). Draws neither a line nor
+     * an endpoint of its own — [ConnectorEndStyle] is ignored for this style, since the
+     * lambda owns the entire connector.
+     */
+    CUSTOM,
 }
 
 /**
@@ -272,6 +282,12 @@ enum class ConnectorEndStyle {
  * @property connectorStyle The style/angle of the connector line
  * @property connectorLength Length of connector line (Dp.Unspecified = auto/default 40dp)
  * @property connectorEndStyle Visual style at the endpoint of the connector line
+ * @property customConnector Full-control connector renderer for this target, active when
+ *           [connectorStyle] is [ConnectorStyle.CUSTOM]. Takes priority over
+ *           [CoachmarkConfig.customConnector] when both are set, so a sequence can mix a
+ *           config-wide default with a one-off override on a single step. `null` (default)
+ *           falls back to [CoachmarkConfig.customConnector], and if that is also `null`,
+ *           [ConnectorStyle.CUSTOM] behaves like [ConnectorStyle.AUTO].
  * @property ctaText Custom CTA button text (defaults to "Got it!")
  * @property showProgressIndicator Override for progress indicator visibility.
  *           - `null` (default): Use global [CoachmarkConfig.showProgressIndicator]
@@ -300,6 +316,7 @@ data class CoachmarkTarget(
     val connectorStyle: ConnectorStyle = ConnectorStyle.AUTO,
     val connectorLength: Dp = Dp.Unspecified,
     val connectorEndStyle: ConnectorEndStyle = ConnectorEndStyle.DOT,
+    val customConnector: (DrawScope.(from: Offset, to: Offset, progress: Float) -> Unit)? = null,
     val ctaText: String = "Got it!",
     val showProgressIndicator: Boolean? = null,
     val highlightAnimation: HighlightAnimation? = null,
