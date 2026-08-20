@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Updated toolchain: Kotlin 2.0.21 -> 2.3.0, Compose Multiplatform 1.7.3 -> 1.9.3, AGP 8.2.2 -> 8.13.2, Gradle 8.9 -> 8.14.3
 - Updated dependencies: activity-compose 1.8.2 -> 1.12.2, kotlinx-coroutines 1.8.0 -> 1.9.0, atomicfu 0.25.0 -> 0.29.0, binary-compatibility-validator 0.16.3 -> 0.17.0
 - Raised `compileSdk` to 36 (`:lumen`) and `compileSdk`/`targetSdk` to 36 (`:sample`)
+- Migrated both wasmJs sample entrypoints from `CanvasBasedWindow` to `ComposeViewport`. Compose Multiplatform 1.9.3 raises the `CanvasBasedWindow` deprecation to an error, so this is required to compile. `ComposeViewport` takes a parent container and creates the canvas itself, so both `index.html` files now use `<div id="ComposeTarget">` instead of `<canvas>`.
 - Re-recorded the 10 `scrim_*` screenshot goldens: Compose Multiplatform 1.9.3 no longer reserves system-bar insets in the Robolectric test surface, so the captured canvas is now the full 2400px implied by `w400dp-h800dp-xxhdpi` (previously 2232px). No library rendering change.
 
 ### Notes for consumers
