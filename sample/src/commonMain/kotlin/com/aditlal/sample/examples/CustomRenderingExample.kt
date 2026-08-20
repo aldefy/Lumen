@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -51,13 +50,13 @@ import io.luminos.ScrimTapBehavior
 import io.luminos.coachmarkColors
 import io.luminos.coachmarkTarget
 import io.luminos.rememberCoachmarkController
-import kotlin.math.sqrt
+import io.luminos.shapes.SpeechBubbleShape
 
 /**
  * Demonstrates Lumen's three extension points, each implemented entirely in app code:
  *
  * 1. `CoachmarkConfig.progressIndicator` — a pill-style step indicator, no library enum needed.
- * 2. `CoachmarkConfig.customConnector` — a speech-bubble teardrop tail instead of a line.
+ * 2. `CoachmarkConfig.tooltipShape` — a speech-bubble tail carved into the card's own outline.
  * 3. `CutoutShape.Custom` — a diamond cutout that isn't one of the built-in shapes.
  *
  * The point of this example is that none of these required a change to `:lumen`. Anything
@@ -71,6 +70,7 @@ fun CustomRenderingExample(
 ) {
     val controller = rememberCoachmarkController()
     var started by remember { mutableStateOf(false) }
+    val density = androidx.compose.ui.platform.LocalDensity.current
 
     CoachmarkHost(
         controller = controller,
@@ -97,37 +97,21 @@ fun CustomRenderingExample(
                     }
                 }
             },
-            // 2. Teardrop connector — a rounded speech-bubble tail growing from the tooltip
-            //    edge toward the target, with no connector line at all.
-            customConnector = { from, to, progress ->
-                val dx = from.x - to.x
-                val dy = from.y - to.y
-                val distance = sqrt(dx * dx + dy * dy)
-                if (distance > 0.01f) {
-                    val ux = dx / distance
-                    val uy = dy / distance
-                    val tip = Offset(to.x + ux * 22f * progress, to.y + uy * 22f * progress)
-                    val perpX = -uy * 12f
-                    val perpY = ux * 12f
-                    val path = Path().apply {
-                        moveTo(to.x - perpX, to.y - perpY)
-                        quadraticBezierTo(
-                            to.x - perpX * 0.4f,
-                            to.y - perpY * 0.4f,
-                            tip.x,
-                            tip.y,
-                        )
-                        quadraticBezierTo(
-                            to.x + perpX * 0.4f,
-                            to.y + perpY * 0.4f,
-                            to.x + perpX,
-                            to.y + perpY,
-                        )
-                        close()
-                    }
-                    drawPath(path = path, color = Color.White)
-                }
+            // 2. Speech-bubble tooltip shape — the tail is carved into the card's own
+            //    outline (one continuous shape, no connector line at all), pointing at
+            //    wherever the target actually sits along the card's edge.
+            tooltipShape = { tailAnchorX, isTooltipBelow ->
+                SpeechBubbleShape(
+                    cornerRadius = with(density) { 16.dp.toPx() },
+                    tailWidth = with(density) { 20.dp.toPx() },
+                    tailHeight = with(density) { 10.dp.toPx() },
+                    tailAnchorX = with(density) { tailAnchorX.toPx() },
+                    // isTooltipBelow=true means the tooltip sits below the target, so the
+                    // tail must point UP at it — on the card's TOP edge, not bottom.
+                    tailOnBottom = !isTooltipBelow,
+                )
             },
+            tooltipTailInset = 10.dp,
         ),
         colors = coachmarkColors(),
     ) {
@@ -159,7 +143,7 @@ fun CustomRenderingExample(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Pill progress, a teardrop connector, and a diamond cutout — " +
+                    text = "Pill progress, a speech-bubble tail shape, and a diamond cutout — " +
                         "all built in app code, with no new enum cases in the library.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -194,11 +178,14 @@ private fun customTour(): List<CoachmarkTarget> = listOf(
     ),
     CoachmarkTarget(
         id = "alerts",
-        title = "Teardrop Tail",
-        description = "This connector is a speech-bubble tail drawn by " +
-            "CoachmarkConfig.customConnector.",
+        title = "Speech Bubble Tail",
+        description = "The card's own outline has a tail carved into it, via " +
+            "CoachmarkConfig.tooltipShape — no separate connector at all.",
         shape = CutoutShape.Circle(radiusPadding = 10.dp),
+        // The card's own shape provides the tail; suppress the built-in line entirely by
+        // opting into CUSTOM with a no-op renderer (there's no ConnectorStyle.NONE today).
         connectorStyle = ConnectorStyle.CUSTOM,
+        customConnector = { _, _, _ -> },
         ctaText = "Next",
     ),
     CoachmarkTarget(

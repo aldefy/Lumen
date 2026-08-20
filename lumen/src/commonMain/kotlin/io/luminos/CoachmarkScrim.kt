@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
@@ -235,6 +236,40 @@ data class CoachmarkConfig(
     val progressActivePillWidth: Dp = 20.dp,
     /** Whether to wrap the tooltip content in a card/box */
     val showTooltipCard: Boolean = false,
+    /**
+     * Optional factory for the tooltip card's outline, called with the tail's horizontal
+     * anchor (where the target sits, in px relative to the card's left edge, already clamped
+     * to the card's width) and whether the tooltip is below the target (tail should point
+     * up, on the card's top edge) or above it (tail points down, on the bottom edge).
+     *
+     * `null` (default) keeps today's plain [androidx.compose.foundation.shape.RoundedCornerShape].
+     * Only takes effect when [showTooltipCard] is true.
+     *
+     * ```
+     * CoachmarkConfig(
+     *     showTooltipCard = true,
+     *     tooltipShape = { tailAnchorX, isTooltipBelow ->
+     *         SpeechBubbleShape(
+     *             cornerRadius = with(density) { 16.dp.toPx() },
+     *             tailWidth = with(density) { 24.dp.toPx() },
+     *             tailHeight = with(density) { 10.dp.toPx() },
+     *             tailAnchorX = tailAnchorX,
+     *             tailOnBottom = !isTooltipBelow,
+     *         )
+     *     },
+     * )
+     * ```
+     */
+    val tooltipShape: ((tailAnchorX: Dp, isTooltipBelow: Boolean) -> Shape)? = null,
+    /**
+     * How far [tooltipShape]'s outline extends past the plain rounded-rect card bounds, on
+     * the side facing the target (e.g. a speech-bubble tail's height). The card reserves
+     * exactly this much extra space before clipping to [tooltipShape], so the tail isn't cut
+     * off at the card's original edge. Must match what [tooltipShape] actually draws — there's
+     * no way to measure an arbitrary [Shape]'s true extent generically, so this is the one
+     * number the two need to agree on. Ignored when [tooltipShape] is `null`.
+     */
+    val tooltipTailInset: Dp = 0.dp,
     /** Behavior when user presses the back button */
     val backPressBehavior: BackPressBehavior = BackPressBehavior.DISMISS,
     /** Default animation for the cutout highlight */
@@ -1030,6 +1065,14 @@ private fun CoachmarkScrimContent(
             },
             onDotPositioned = { center -> inlineDotCenter = center },
             isTooltipBelow = isTooltipBelow,
+            tailAnchorX = if (config.tooltipShape != null) {
+                with(density) {
+                    (target.bounds.center.x - tooltipPosition.x - tooltipMarginPx)
+                        .coerceAtLeast(0f).toDp()
+                }
+            } else {
+                Dp.Unspecified
+            },
         )
 
         // Request focus on tooltip after animation completes for a11y
@@ -1074,6 +1117,7 @@ private fun BoxScope.TooltipContainer(
     connectorDotOffsetX: Dp = 0.dp,
     onDotPositioned: (Offset) -> Unit = {},
     isTooltipBelow: Boolean = true,
+    tailAnchorX: Dp = Dp.Unspecified,
 ) {
     val showProgressIndicator = target.showProgressIndicator ?: config.showProgressIndicator
 
@@ -1123,6 +1167,9 @@ private fun BoxScope.TooltipContainer(
             connectorDotOffsetX = connectorDotOffsetX,
             onDotPositioned = onDotPositioned,
             isTooltipBelow = isTooltipBelow,
+            tooltipShape = config.tooltipShape,
+            tailAnchorX = tailAnchorX,
+            tooltipTailInset = config.tooltipTailInset,
         )
     }
 }

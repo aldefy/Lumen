@@ -20,11 +20,11 @@ data class CoachmarkColors(
     /** Background color for the tooltip card */
     val tooltipBackground: Color = Color.White,
     /** Background color for the tooltip card when showCard is enabled */
-    val tooltipCardColor: Color = Color(0xFF2A2A2A).copy(alpha = 0.9f),
+    val tooltipCardColor: Color = Color(0xFF666666).copy(alpha = 0.9f),
     /** Text color for the tooltip title */
-    val titleColor: Color = Color.Black,
+    val titleColor: Color = Color.White,
     /** Text color for the tooltip description */
-    val descriptionColor: Color = Color(0xFF666666),
+    val descriptionColor: Color = Color(0xFFEEEEEE),
     /** Background color for the CTA button */
     val ctaButtonColor: Color = Color(0xFF007AFF),
     /** Text color for the CTA button */
@@ -64,7 +64,7 @@ val DarkCoachmarkColors =
         strokeColor = Color.White,
         connectorColor = Color.White,
         tooltipBackground = Color(0xFF2A2A2A),
-        tooltipCardColor = Color(0xFF1A1A1A).copy(alpha = 0.95f),
+        tooltipCardColor = Color(0xFF666666).copy(alpha = 0.95f),
         titleColor = Color.White,
         descriptionColor = Color(0xFFCCCCCC),
         ctaButtonColor = Color(0xFF0A84FF),
