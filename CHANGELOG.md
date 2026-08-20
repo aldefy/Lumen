@@ -15,6 +15,14 @@ All notable changes to this project will be documented in this file.
 - **Android consumers now need `compileSdk` 36 and AGP 8.9.1 or newer.** This is required by `activity-compose` 1.12.2, whose AAR metadata declares `minCompileSdk=36` and `minAndroidGradlePluginVersion=8.9.1`. Builds on older toolchains will fail `checkDebugAarMetadata`. `minSdk` is unchanged at 23, so no runtime device support is dropped.
 - Robolectric remains pinned to `sdk=34` in `lumen/src/androidUnitTest/resources/robolectric.properties`. Robolectric 4.14.1 supports SDK 34 at most, and even 4.15.1 only reaches SDK 35, so unit tests cannot yet execute against SDK 36.
 
+## [1.0.0-beta19] - 2026-08-20
+
+### Build
+- Fixed Maven Central publishing for real: `1.0.0-beta18` published incomplete (only `lumen-iosx64` and `lumen-iossimulatorarm64` — Android/JVM/wasmJs/the KMP metadata module never made it), because the OSSRH-compatibility endpoint stages each Gradle publish task as its own implicit deployment and only the most recently uploaded one gets released. Switched to a single atomic multipart bundle upload against Central's official Publisher API instead (the same pattern `aldefy/composeproof` already uses successfully) — `lumen/build.gradle.kts` no longer configures a remote Sonatype Maven repository at all, `release.yml` zips the local-staging output and uploads it in one `curl --form bundle` call. Verified all 7 expected publications are present in the local-staging output before this release.
+
+### Known issue
+- **`1.0.0-beta18` is permanently incomplete on Maven Central** — do not depend on it. Central doesn't allow re-publishing a version, so this can't be fixed retroactively; use `1.0.0-beta19` or later.
+
 ## [1.0.0-beta18] - 2026-08-20
 
 ### Build

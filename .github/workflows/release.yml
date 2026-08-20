@@ -53,33 +53,6 @@ jobs:
             -Psigning.gnupg.keyName=${{ secrets.GPG_KEY_ID }} \
             -Psigning.gnupg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Publish to Maven Central (Central Portal staging)
-        if: ${{ env.OSSRH_USERNAME != '' && env.OSSRH_PASSWORD != '' }}
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-        run: |
-          ./gradlew :lumen:publishAllPublicationsToSonatypeRepository \
-            -Psigning.gnupg.keyName=${{ secrets.GPG_KEY_ID }} \
-            -Psigning.gnupg.passphrase=${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Transfer staged deployment to the Central Portal
-        if: ${{ env.OSSRH_USERNAME != '' && env.OSSRH_PASSWORD != '' }}
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-        run: |
-          # maven-publish only PUTs files with no deployment context, so the upload sits in the
-          # OSSRH-compat staging area until this manual-transfer call moves it into the Central
-          # Portal proper. Must run from the same IP that did the upload — hence same job/runner.
-          # Namespace = the Maven group, io.github.aldefy. Defaults to user_managed (needs a
-          # manual "Publish" click at https://central.sonatype.com/publishing/deployments) rather
-          # than automatic, so a bad release can be dropped before it goes live.
-          TOKEN=$(printf '%s:%s' "$OSSRH_USERNAME" "$OSSRH_PASSWORD" | base64)
-          curl --fail-with-body -X POST \
-            -H "Authorization: Bearer ${TOKEN}" \
-            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.aldefy"
-
       - name: Verify publications
         run: |
           EXPECTED=7
@@ -117,3 +90,28 @@ jobs:
             --title "$TAG" \
             --notes-file release_notes.md \
             --latest
+
+      # Single atomic upload of the whole local-staging bundle via Central's official Publisher
+      # API — NOT the OSSRH-compatibility "manual/upload" endpoint. That endpoint stages each
+      # Gradle publish task as its own implicit deployment, so a multi-target KMP build (7
+      # publications here) ends up split across several deployments instead of one, and only
+      # the most recently uploaded one actually gets released. Confirmed the hard way against
+      # a real release: 1.0.0-beta18 published to Maven Central with only its 2 last-published
+      # iOS artifacts; Android/JVM/wasmJs/the KMP metadata module never made it, and can't be
+      # added after the fact since Central doesn't allow re-publishing a version. This pattern
+      # (bundle the whole staging-deploy dir, one multipart POST) is what aldefy/composeproof
+      # already uses successfully in production — see its release.yml for the working reference.
+      - name: Publish to Maven Central
+        if: ${{ env.OSSRH_USERNAME != '' && env.OSSRH_PASSWORD != '' }}
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          # BSD base64 (macOS runner) doesn't line-wrap by default; GNU base64 (Linux) does
+          # unless given -w 0. If this job ever moves off macos-latest, add that flag here.
+          TOKEN=$(printf '%s:%s' "$OSSRH_USERNAME" "$OSSRH_PASSWORD" | base64)
+          curl --fail --silent --show-error --request POST \
+            --header "Authorization: Bearer ${TOKEN}" \
+            --form bundle=@"lumen-${TAG}-bundle.zip" \
+            "https://central.sonatype.com/api/v1/publisher/upload?publishingType=AUTOMATIC&name=lumen-${TAG}"

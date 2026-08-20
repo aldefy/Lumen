@@ -106,7 +106,7 @@ android {
     }
 }
 
-val libraryVersion = "1.0.0-beta18"
+val libraryVersion = "1.0.0-beta19"
 val libraryGroup = "io.github.aldefy"
 val libraryArtifact = "lumen"
 
@@ -158,28 +158,19 @@ publishing {
     }
 
     repositories {
-        maven {
-            name = "sonatype"
-            // s01.oss.sonatype.org (OSSRH) shut down 2025-06-30. This targets its replacement,
-            // the Central Portal's OSSRH-compatibility staging API. Snapshots aren't supported
-            // by this endpoint; SNAPSHOT versions have nowhere to publish until/unless the
-            // Central Portal's own snapshot repository is wired up separately.
-            // https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
-            url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
-
-            // Credentials are a Central Portal "user token" (username/password pair generated
-            // at https://central.sonatype.com/account, under Generate User Token) — not your
-            // Sonatype account's own login. The property/env names are kept as ossrhUsername/
-            // ossrhPassword and OSSRH_USERNAME/OSSRH_PASSWORD for continuity with the old setup.
-            credentials {
-                username = findProperty("ossrhUsername")?.toString()
-                    ?: System.getenv("OSSRH_USERNAME")
-                    ?: ""
-                password = findProperty("ossrhPassword")?.toString()
-                    ?: System.getenv("OSSRH_PASSWORD")
-                    ?: ""
-            }
-        }
+        // No remote "sonatype" repository here on purpose. s01.oss.sonatype.org (OSSRH) shut
+        // down 2025-06-30, and its replacement — the Central Portal's OSSRH-compatibility
+        // staging API (ossrh-staging-api.central.sonatype.com) — uploads each publication as a
+        // separate implicit staging repository, so a multi-target KMP build like this one (7
+        // publications) ends up split across multiple deployments instead of one, and only the
+        // last one actually gets released. Confirmed against a real release (1.0.0-beta18: only
+        // the 2 last-published iOS artifacts made it to Maven Central; Android/JVM/wasmJs/the
+        // KMP metadata module did not, and can never be added to that already-published version).
+        //
+        // Central's own official Publisher API (central.sonatype.com/api/v1/publisher/upload)
+        // doesn't have this problem — it's a single atomic multipart upload of the whole
+        // local-staging output as one bundle. release.yml zips build/staging-deploy and POSTs it
+        // there directly, so no remote Maven repository is configured here at all.
         maven {
             name = "localStaging"
             url = uri(layout.buildDirectory.dir("staging-deploy"))
