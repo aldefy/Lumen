@@ -73,3 +73,6 @@ Thumbs.db
 # Claude Code
 .claude/
 CLAUDE.md
+
+# Kotlin build metadata
+.kotlin/
