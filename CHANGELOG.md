@@ -15,6 +15,22 @@ All notable changes to this project will be documented in this file.
 - **Android consumers now need `compileSdk` 36 and AGP 8.9.1 or newer.** This is required by `activity-compose` 1.12.2, whose AAR metadata declares `minCompileSdk=36` and `minAndroidGradlePluginVersion=8.9.1`. Builds on older toolchains will fail `checkDebugAarMetadata`. `minSdk` is unchanged at 23, so no runtime device support is dropped.
 - Robolectric remains pinned to `sdk=34` in `lumen/src/androidUnitTest/resources/robolectric.properties`. Robolectric 4.14.1 supports SDK 34 at most, and even 4.15.1 only reaches SDK 35, so unit tests cannot yet execute against SDK 36.
 
+## [1.0.0-beta17] - 2026-08-20
+
+### Features
+- `CoachmarkConfig.tooltipShape`: an optional `Shape` factory for the tooltip card, receiving the target's horizontal anchor and whether the tooltip is above or below it. A new `io.luminos.shapes.SpeechBubbleShape` builds a speech-bubble tail as one continuous outline with the card body — no seam, no separate connector needed. `CoachmarkConfig.tooltipTailInset` reserves the extra space the tail needs.
+- `ConnectorStyle.CUSTOM` + `CoachmarkTarget.customConnector`: a per-target full-control connector renderer, taking priority over `CoachmarkConfig.customConnector` (added in beta16) when both are set. Lets a single step in a sequence override what the rest of the sequence uses — e.g. mixing a teardrop-tail step with elbow-connector steps. `CUSTOM` with no lambda supplied anywhere falls back to a normal connector line rather than drawing nothing.
+
+### Bug Fixes
+- `DarkCoachmarkColors.tooltipCardColor` and the default `CoachmarkColors().tooltipCardColor` failed WCAG contrast against `scrimColor` (measured 1.19:1 and 1.38:1; need ≥3:1 for a UI boundary) — both defaulted to a near-black card over a near-black scrim, making the card edge (and now the speech-bubble tail) nearly invisible in dark themes. The default's `titleColor = Color.Black` additionally failed text contrast outright against its own dark card (1.38:1, needs ≥4.5:1) — a pre-existing defect, previously undetected because no sample exercised `showTooltipCard = true` with the plain default colors. Fixed by moving both cards to `#666666` and the default's title/description colors to white/near-white. Verified ≥3.1:1 card-vs-scrim and ≥6.2:1 text-vs-card in both palettes; `LightCoachmarkColors` was already fine and is untouched.
+
+### Sample App
+- New "Speech Bubble Tail" step in the Custom Rendering example, and a "Custom Rendering" example itself demonstrating `progressIndicator`, `tooltipShape`, and `CutoutShape.Custom` together with no library-specific code beyond the extension points.
+- LazyColumn example's "Item Cards" step now uses `tooltipShape` on a real whole-row target, matching a reference speech-bubble tooltip design (tooltip above a list row, tail pointing down at it, no connector line).
+
+### Known limitations
+- `tooltipShape`/`SpeechBubbleShape` only support a tail on the top or bottom edge today. Combining `tooltipShape` with a `HORIZONTAL`-style connector (target beside the tooltip rather than above/below it) produces a tail pointing in a direction unrelated to where the connector line actually goes — confirmed by direct on-device testing. Left as a follow-up rather than a partial fix.
+
 ## [1.0.0-beta16] - 2026-08-20
 
 ### Features
