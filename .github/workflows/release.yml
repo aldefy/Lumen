@@ -54,7 +54,7 @@ jobs:
             -Psigning.gnupg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Publish to Maven Central (Central Portal staging)
-        if: ${{ secrets.OSSRH_USERNAME != '' && secrets.OSSRH_PASSWORD != '' }}
+        if: ${{ env.OSSRH_USERNAME != '' && env.OSSRH_PASSWORD != '' }}
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
@@ -64,7 +64,7 @@ jobs:
             -Psigning.gnupg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Transfer staged deployment to the Central Portal
-        if: ${{ secrets.OSSRH_USERNAME != '' && secrets.OSSRH_PASSWORD != '' }}
+        if: ${{ env.OSSRH_USERNAME != '' && env.OSSRH_PASSWORD != '' }}
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
