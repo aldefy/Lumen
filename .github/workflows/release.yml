@@ -53,6 +53,33 @@ jobs:
             -Psigning.gnupg.keyName=${{ secrets.GPG_KEY_ID }} \
             -Psigning.gnupg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
+      - name: Publish to Maven Central (Central Portal staging)
+        if: ${{ secrets.OSSRH_USERNAME != '' && secrets.OSSRH_PASSWORD != '' }}
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        run: |
+          ./gradlew :lumen:publishAllPublicationsToSonatypeRepository \
+            -Psigning.gnupg.keyName=${{ secrets.GPG_KEY_ID }} \
+            -Psigning.gnupg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Transfer staged deployment to the Central Portal
+        if: ${{ secrets.OSSRH_USERNAME != '' && secrets.OSSRH_PASSWORD != '' }}
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        run: |
+          # maven-publish only PUTs files with no deployment context, so the upload sits in the
+          # OSSRH-compat staging area until this manual-transfer call moves it into the Central
+          # Portal proper. Must run from the same IP that did the upload — hence same job/runner.
+          # Namespace = the Maven group, io.github.aldefy. Defaults to user_managed (needs a
+          # manual "Publish" click at https://central.sonatype.com/publishing/deployments) rather
+          # than automatic, so a bad release can be dropped before it goes live.
+          TOKEN=$(printf '%s:%s' "$OSSRH_USERNAME" "$OSSRH_PASSWORD" | base64)
+          curl --fail-with-body -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.aldefy"
+
       - name: Verify publications
         run: |
           EXPECTED=7
